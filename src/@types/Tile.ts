@@ -3,8 +3,7 @@ import { CardInfo } from './Card'
 export type Tile =
   | {
       type: 'fairy' // Casillas con hadas
-      playerOnePoints: number
-      playerTwoPoints: number
+  
       card: CardInfo | null
     }
   | {
@@ -18,9 +17,5 @@ export type Tile =
     }
   | {
       type: 'empty' // Casillas sin función especial
-      playerOnePoints: number
-      playerTwoPoints: number
-      playerOnePawns: number
-      playerTwoPawns: number
       card: CardInfo | null
     }
