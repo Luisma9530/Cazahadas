@@ -18,7 +18,7 @@ export const usePointStore = create<PointStore>((set) => ({
 
     data.forEach((row) =>
       row.forEach((tile) => {
-        // 📌 Sumar puntos solo si la casilla una hada capturada
+        //Sumar puntos solo si la casilla una hada capturada
         if (tile.type === "capturedFairies") {
           if (tile.owner === "playerOne") {
             newPlayerOnePoints += tile.cards.length; // El número de hadas capturadas por el jugador

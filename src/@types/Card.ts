@@ -8,6 +8,7 @@ export type CardInfo = {
   name: string;
   type: CardType;
   placedByPlayerOne?: boolean;
+  text: string;
 } & (
   | {
     type: CardType.CATCH;

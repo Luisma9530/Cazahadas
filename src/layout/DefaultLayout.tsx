@@ -16,8 +16,8 @@ export default function DefaultLayout() {
   const [resetGameStore] = useGameStore((state) => [state.resetStore]) //Sirve
   const [resetPointsStore] = usePointStore((state) => [state.resetStore]) //Modificada
   const [resetTurnStore] = useTurnStore((state) => [state.resetStore]) //Sirve
-  const [resetModalStore] = useModalStore((state) => [state.resetStore])
-  const [resetNeoHandStore] = useNeoHandStore((state) => [state.resetStore])
+  const [resetModalStore] = useModalStore((state) => [state.resetStore])//Sirve
+  const [resetNeoHandStore] = useNeoHandStore((state) => [state.resetStore])//Modificada
 
 
   const resetAllStores = () => {

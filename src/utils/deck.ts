@@ -3,65 +3,76 @@ import { CardType, CardInfo } from "../@types/Card";
 const catchCard1: CardInfo = {
   name: "Catch",
   type: CardType.CATCH,
+  text: "Atrapar",
 };
 
 const catchCard2: CardInfo = {
   name: "Catch",
   type: CardType.CATCH,
+  text: "Atrapar",
 };
 
 const magicCard1: CardInfo = {
   name: "+=1",
   type: CardType.MAGIC,
   operation: (x: number) => x + 1,
+  text: "+=1",
 };
 
 const magicCard2: CardInfo = {
   name: "+=1",
   type: CardType.MAGIC,
   operation: (x: number) => x + 1,
+  text: "+=1",
 };
 
 const magicCard3: CardInfo = {
   name: "-=1",
   type: CardType.MAGIC,
   operation: (x: number) => x - 1,
+  text: "-=1",
 };
 
 const magicCard4: CardInfo = {
   name: "-=1",
   type: CardType.MAGIC,
   operation: (x: number) => x - 1,
+  text: "-=1",
 };
 
 const magicCard5: CardInfo = {
   name: "*=-1",
   type: CardType.MAGIC,
   operation: (x: number) => x * (-1),
+  text: "*=-1",
 };
 
 const magicCard6: CardInfo = {
   name: "+=2",
   type: CardType.MAGIC,
   operation: (x: number) => x + 2,
+  text: "+=2",
 };
 
 const magicCard7: CardInfo = {
   name: "+=2",
   type: CardType.MAGIC,
   operation: (x: number) => x + 2,
+  text: "+=2",
 };
 
 const magicCard8: CardInfo = {
   name: "-=2",
   type: CardType.MAGIC,
   operation: (x: number) => x - 2,
+  text: "-=2",
 };
 
 const magicCard9: CardInfo = {
   name: "-=2",
   type: CardType.MAGIC,
   operation: (x: number) => x - 2,
+  text: "-=2",
 };
 
 const magicCard10: CardInfo = {
@@ -72,7 +83,8 @@ const magicCard10: CardInfo = {
       x += 1;
     }
     return x;
-  }
+  },
+  text: "for i=1:-1:x+1\nx += 1\nendfor",
 };
 
 const magicCard11: CardInfo = {
@@ -83,7 +95,8 @@ const magicCard11: CardInfo = {
       x -= 1;
     }
     return x;
-  }
+  },
+  text: "for i=1:x+1\nx -= 1\nendfor",
 };
 
 const magicCard12: CardInfo = {
@@ -95,7 +108,8 @@ const magicCard12: CardInfo = {
     }
     while (x <= 0);
     return x;
-  }
+  },
+  text: "do\nx += 1\nuntil x>0",
 };
 
 const magicCard13: CardInfo = {
@@ -106,7 +120,8 @@ const magicCard13: CardInfo = {
       x += 1;
     }
     return x;
-  }
+  },
+  text: "while x<=0\nx += 1\nwndwhile",
 };
 
 const magicCard14: CardInfo = {
@@ -118,55 +133,64 @@ const magicCard14: CardInfo = {
     }
     while (x >= 0);
     return x;
-  }
+  },
+  text: "do\nx -= 1\nuntil x<0",
 };
 
 const shieldCard1: CardInfo = {
   name: "x>=0",
   type: CardType.SHIELD,
   defenseCondition: (x: number) => x >= 0,
+  text: "if x>=0\n[[no consigue el\nhada]]\nendif",
 };
 
 const shieldCard2: CardInfo = {
   name: "x<=0",
   type: CardType.SHIELD,
   defenseCondition: (x: number) => x <= 0,
+  text: "if x<=0\n[[no consigue el\nhada]]\nendif",
 };
 
 const shieldCard3: CardInfo = {
   name: "x>=1",
   type: CardType.SHIELD,
   defenseCondition: (x: number) => x >= 1,
+  text: "if x>=1\n[[no consigue el\nhada]]\nendif",
 };
 
 const shieldCard4: CardInfo = {
   name: "x<=1",
   type: CardType.SHIELD,
   defenseCondition: (x: number) => x <= 1,
+  text: "if x<=1\n[[no consigue el\nhada]]\nendif",
 };
 
 const shieldCard5: CardInfo = {
   name: "x>=0",
   type: CardType.SHIELD,
   defenseCondition: (x: number) => x >= 0,
+  text: "if x>=0\n[[no consigue el\nhada]]\nendif",
 };
 
 const shieldCard6: CardInfo = {
   name: "x<=0",
   type: CardType.SHIELD,
   defenseCondition: (x: number) => x <= 0,
+  text: "if x<=0\n[[no consigue el\nhada]]\nendif",
 };
 
 const shieldCard7: CardInfo = {
   name: "x>=0",
   type: CardType.SHIELD,
   defenseCondition: (x: number) => x >= 0,
+  text: "if x>=0\n[[no consigue el\nhada]]\nendif",
 };
 
 const shieldCard8: CardInfo = {
   name: "x<=0",
   type: CardType.SHIELD,
   defenseCondition: (x: number) => x <= 0,
+  text: "if x<=0\n[[no consigue el\nhada]]\nendif",
 };
 
 export const deckCards = [

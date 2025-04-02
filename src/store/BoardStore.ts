@@ -7,10 +7,10 @@ type BoardStore = {
   resetStore: () => void
 }
 
-// 📌 MATRIZ 3x4 ACTUALIZADA
+//MATRIZ 3x4 ACTUALIZADA
 const initialBoard: Tile[][] = new Array(3).fill(null).map((_, rowIndex) =>
   new Array(4).fill(null).map((_, colIndex) => {
-    // 📌 FILA CENTRAL: Hadas en juego y variable X
+    //FILA CENTRAL: Hadas en juego y variable X
     if (rowIndex === 1) {
       if (colIndex === 0 || colIndex === 1 || colIndex === 2) {
         return { type: 'fairy', playerOnePoints: 0, playerTwoPoints: 0, playerOnePawns: 0, playerTwoPawns: 0, card: null }
@@ -20,7 +20,7 @@ const initialBoard: Tile[][] = new Array(3).fill(null).map((_, rowIndex) =>
       }
     }
 
-    // 📌 FILA SUPERIOR (rival): Baraja, hadas capturadas, descartes y magias
+    //FILA SUPERIOR (rival): Baraja, hadas capturadas, descartes y magias
     if (rowIndex === 0) {
       if (colIndex === 0) return { type: 'deck', owner: 'playerTwo', cards: [] } // Baraja del rival
       if (colIndex === 1) return { type: 'capturedFairies', owner: 'playerTwo', cards: [] } // Hadas capturadas por el rival
@@ -28,7 +28,7 @@ const initialBoard: Tile[][] = new Array(3).fill(null).map((_, rowIndex) =>
       if (colIndex === 3) return { type: 'magic', owner: 'playerTwo', cards: [] } // Magias usadas por el rival
     }
 
-    // 📌 FILA INFERIOR (jugador): Baraja, hadas capturadas, descartes y magias
+    //FILA INFERIOR (jugador): Baraja, hadas capturadas, descartes y magias
     if (rowIndex === 2) {
       if (colIndex === 0) return { type: 'deck', owner: 'playerOne', cards: [] } // Tu baraja
       if (colIndex === 1) return { type: 'capturedFairies', owner: 'playerOne', cards: [] } // Tus hadas capturadas
@@ -36,7 +36,7 @@ const initialBoard: Tile[][] = new Array(3).fill(null).map((_, rowIndex) =>
       if (colIndex === 3) return { type: 'magic', owner: 'playerOne', cards: [] } // Tus magias usadas
     }
 
-    // 📌 Casillas vacías
+    //Casillas vacías
     return { type: 'empty', playerOnePoints: 0, playerTwoPoints: 0, playerOnePawns: 0, playerTwoPawns: 0, card: null }
   })
 )
