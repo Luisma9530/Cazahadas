@@ -1,334 +1,194 @@
-import { Tile } from '../@types/Tile'
-import { CardInfo } from '../@types/Card'
-import useCardStore from '../store/CardStore'
-import useBoardStore from '../store/BoardStore'
-import Card from './Card'
-import socket from '../socket'
-import { Result, useGameStore } from '../store/GameStore'
-import { usePointStore } from '../store/PointsStore'
-import { useEffect, useState } from 'react'
-import useNeoHandStore from '../store/NeoHandStore'
-import useTurnStore from '../store/TurnStore'
-import transformMatrix from '../utils/transformMatrix'
-import { useParams } from 'react-router-dom'
+import { useEffect, useState } from "react";
+import socket from "../socket";
+import { Tile } from "../@types/Tile";
+import useBoardStore from "../store/BoardStore";
+import { useGameStore } from "../store/GameStore";
+import { usePointStore } from "../store/PointsStore";
+import useNeoHandStore from "../store/NeoHandStore";
+import useTurnStore from "../store/TurnStore";
+import useCardStore from "../store/CardStore"; // Para la carta seleccionada
+import Card from "../components/Card";
+import { useParams } from "react-router-dom";
 
-
-export default function Board({
-  amIP1
-}: {
-  amIP1: boolean
-}) {
+export default function Board({ amIP1 }: { amIP1: boolean }) {
+  // Obtenemos el estado del tablero (estructura 3x4) desde el store
+  const [tiles, setTiles] = useBoardStore((state) => [state.board, state.setBoard]);
+  // Carta seleccionada para colocar en la zona de juego
   const [selectedCard, resetSelectedCard] = useCardStore((state) => [
     state.selectedCard,
     state.resetSelectedCard,
-  ])
-  const [tiles, setTiles] = useBoardStore((state) => [
-    state.board,
-    state.setBoard,
-  ])
+  ]);
+  const [isMyTurn] = useTurnStore((state) => [state.isMyTurn]);
+  const [gameOver, setGameResult, playerOneName, playerTwoName, playerDisconnected] =
+    useGameStore((state) => [
+      state.gameOver,
+      state.setGameResult,
+      state.playerOneName,
+      state.playerTwoName,
+      state.playerDisconnected,
+    ]);
+  const [setPoints] = usePointStore((state) => [state.setPoints]);
+  const [placeCard] = useNeoHandStore((state) => [state.placeCard]);
 
+  const { id: gameId } = useParams<{ id: string }>();
 
-  const [isMyTurn] = useTurnStore((state) => [state.isMyTurn])
-
-  const [gameOver, setGameResult, playerOneName, playerTwoName, playerDisconnected] = useGameStore((state) => [state.gameOver, state.setGameResult, state.playerOneName, state.playerTwoName, state.playerDisconnected])
-  const [playerOnePointsArray, playerTwoPointsArray] = usePointStore(state => [state.playerOnePoints, state.playerTwoPoints])
-  const [sumOfPlayersPoints, setSumOfPlayersPoints] = useState<number[]>([0, 0])
-  const [placeCard] = useNeoHandStore(state => [state.placeCard])
-
-  const { id: gameId } = useParams<{ id: string }>()
-
-  useEffect(() => {
-    if (gameOver) {
-      if (playerDisconnected) {
-        setGameResult(Result.WIN)
-        return
-      }
-      const newSumOfPlayersPoints = [0, 0]
-      Array(3).fill(0).forEach((_, index) => {
-        if (amIP1) {
-          if (playerOnePointsArray[index] > playerTwoPointsArray[index]) {
-            newSumOfPlayersPoints[0] += playerOnePointsArray[index]
-          }
-          if (playerOnePointsArray[index] < playerTwoPointsArray[index]) {
-            newSumOfPlayersPoints[1] += playerTwoPointsArray[index]
-          }
-          return
-        }
-        if (playerOnePointsArray[index] > playerTwoPointsArray[index]) {
-          newSumOfPlayersPoints[1] += playerOnePointsArray[index]
-        }
-        if (playerOnePointsArray[index] < playerTwoPointsArray[index]) {
-          newSumOfPlayersPoints[0] += playerTwoPointsArray[index]
-        }
-      })
-      setSumOfPlayersPoints(newSumOfPlayersPoints)
-      if (newSumOfPlayersPoints[0] > newSumOfPlayersPoints[1]) {
-        setGameResult(Result.WIN)
-      }
-      if (newSumOfPlayersPoints[0] < newSumOfPlayersPoints[1]) {
-        setGameResult(Result.LOSE)
-      }
-      if (newSumOfPlayersPoints[0] === newSumOfPlayersPoints[1]) {
-        setGameResult(Result.DRAW)
-      }
-    }
-  }, [gameOver])
-
-  const rows = 3
-  const cols = 7
-  const tilesElements = new Array(rows)
-    .fill(0)
-    .map(() => new Array(cols).fill(0))
-
-  function canAddCardToPosition(card: CardInfo | null, position: Tile) {
-    if (!card) {
-      return false
-    }
-
-    if (!isMyTurn) {
-      return false
-    }
-
-    if (amIP1 && position?.playerOnePawns === 0) {
-      return false
-    }
-
-    if (!amIP1 && position?.playerTwoPawns === 0) {
-      return false
-    }
-
-    if (amIP1 && position?.playerOnePawns < card.pawnsCost) {
-      return false
-    }
-
-    if (!amIP1 && position?.playerTwoPawns < card.pawnsCost) {
-      return false
-    }
-
-    return true
+  // Validación para colocar carta en zona de juego (fila 1, celdas 0-2)
+  function canAddCardToPosition(card: any, position: Tile): boolean {
+    if (!card || !isMyTurn) return false;
+    // Aquí se pueden agregar validaciones adicionales según la mecánica de hadas.
+    // Por ejemplo, si la celda ya tiene una carta de tipo 'fairy', no se permite.
+    if (position.type !== 'fairy') return false;
+    return true;
   }
 
-  function mapPawns(card: CardInfo, rowIndex: number, colIndex: number) {
-    const correctColIndex = isMyTurn ? colIndex : Math.abs(colIndex - 4)
-    const transformedRowIndex = correctColIndex
-    const transformedColIndex = -rowIndex
-    const newTiles = [...tiles]
-    for (let i = 0; i < card.pawnsPositions.length; i++) {
-      const newRow = -(transformedColIndex + card.pawnsPositions[i][1])
-      const newCol = amIP1 ? transformedRowIndex + card.pawnsPositions[i][0] : Math.abs(-transformedRowIndex + card.pawnsPositions[i][0])
-
-      if (newRow < 0 || newRow >= rows || newCol < 0 || newCol >= cols - 2) {
-        continue
-      }
-
-
-      if (amIP1) {
-        newTiles[newRow][newCol] = {
-          playerOnePoints:
-            newTiles[newRow][newCol].playerOnePawns === -1
-              ? newTiles[newRow][newCol].playerOnePoints
-              : 0,
-          playerTwoPoints:
-            newTiles[newRow][newCol].playerTwoPawns === -1
-              ? newTiles[newRow][newCol].playerTwoPoints
-              : 0,
-          playerOnePawns:
-            newTiles[newRow][newCol].playerOnePawns !== -1 &&
-              newTiles[newRow][newCol].playerOnePawns < 3
-              ? newTiles[newRow][newCol].playerTwoPawns !== 0
-                ? newTiles[newRow][newCol].playerTwoPawns
-                : newTiles[newRow][newCol].playerOnePawns + 1
-              : newTiles[newRow][newCol].playerOnePawns,
-          playerTwoPawns: 0,
-          card:
-            newTiles[newRow][newCol].playerOnePawns === -1
-              ? newTiles[newRow][newCol].card
-              : newTiles[newRow][newCol].playerTwoPawns === -1
-                ? newTiles[newRow][newCol].card
-                : null,
-        }
-        continue
-      }
-      newTiles[newRow][newCol] = {
-        playerOnePoints:
-          newTiles[newRow][newCol].playerOnePawns === -1
-            ? newTiles[newRow][newCol].playerOnePoints
-            : 0,
-        playerTwoPoints:
-          newTiles[newRow][newCol].playerTwoPawns === -1
-            ? newTiles[newRow][newCol].playerTwoPoints
-            : 0,
-        playerOnePawns: 0,
-        playerTwoPawns:
-          newTiles[newRow][newCol].playerTwoPawns !== -1 &&
-            newTiles[newRow][newCol].playerTwoPawns < 3
-            ? newTiles[newRow][newCol].playerOnePawns !== 0
-              ? newTiles[newRow][newCol].playerOnePawns
-              : newTiles[newRow][newCol].playerTwoPawns + 1
-            : newTiles[newRow][newCol].playerTwoPawns,
-        card:
-          newTiles[newRow][newCol].playerOnePawns === -1
-            ? newTiles[newRow][newCol].card
-            : newTiles[newRow][newCol].playerTwoPawns === -1
-              ? newTiles[newRow][newCol].card
-              : null,
-      }
-    }
-
-    if (amIP1) {
-      newTiles[rowIndex][correctColIndex] = {
-        playerOnePoints: card.points,
-        playerTwoPoints: 0,
-        playerOnePawns: -1,
-        playerTwoPawns: -1,
-        card: {
-          ...card,
-          placedByPlayerOne: true,
-        },
-      }
-      return newTiles
-    }
-
-    newTiles[rowIndex][correctColIndex] = {
-      playerOnePoints: 0,
-      playerTwoPoints: card.points,
-      playerOnePawns: -1,
-      playerTwoPawns: -1,
-      card: {
-        ...card,
-        placedByPlayerOne: false,
-      },
-    }
-
-    return newTiles
-  }
-
+  // Al hacer clic en una celda de la zona de juego (fila 1, columnas 0 a 2)
   function handleCellClick(position: Tile, rowIndex: number, colIndex: number) {
-    if (!canAddCardToPosition(selectedCard, position)) {
-      return
-    }
-
-    if (!selectedCard) {
-      return
-    }
-
-    const newTiles = mapPawns(selectedCard, rowIndex, colIndex)
-
-    placeCard(selectedCard)
-    setTiles(newTiles)
-    resetSelectedCard()
-    socket.emit('place-card', { tiles: newTiles, gameId })
+    if (!selectedCard || !canAddCardToPosition(selectedCard, position)) return;
+    // Lógica para colocar la carta. Se asume que mapPawns transforma la celda y actualiza el estado.
+    const newTiles = mapPawns(selectedCard, rowIndex, colIndex, tiles, amIP1);
+    placeCard(selectedCard);
+    setTiles(newTiles);
+    resetSelectedCard();
+    socket.emit("place-card", { tiles: newTiles, gameId });
   }
 
-
-
-
-  for (let i = 0; i < rows; i++) {
-    tilesElements[i][0] = (
-      <div
-        className={`bg-gray-800 h-44 w-full flex items-center justify-center border-solid border-2 border-black`}
-        key={`${i}-${0}`}
-      >
-        <div
-          className={`h-24 w-24 outline outline-offset-2 outline-yellow-400 text-5xl font-medium
-             text-white ${amIP1 ? playerOnePointsArray[i] > playerTwoPointsArray[i]
-              ? 'bg-green-400  drop-shadow-glow'
-              : 'bg-green-400 brightness-75 '
-              : playerOnePointsArray[i] > playerTwoPointsArray[i]
-                ? 'bg-red-400 drop-shadow-glow'
-                : 'bg-red-400 brightness-75 '} shadow-xl
-             rounded-full flex justify-center items-center`}
-        >
-          {playerOnePointsArray[i]}
-        </div>
-      </div>
-    )
-    tilesElements[i][cols - 1] = (
-      <div
-        className={`bg-gray-800 h-44 w-full flex items-center justify-center border-solid border-2 border-black`}
-        key={`${i}-${cols - 1}`}
-      >
-        <div
-          className={`h-24 w-24 outline outline-offset-2 outline-yellow-400 
-            ${amIP1 ? playerTwoPointsArray[i] > playerOnePointsArray[i]
-              ? 'bg-red-400 drop-shadow-glow'
-              : 'bg-red-400 brightness-75 ' : playerTwoPointsArray[i] > playerOnePointsArray[i]
-              ? 'bg-green-400  drop-shadow-glow'
-              : 'bg-green-400 brightness-75 '
-            } text-5xl text-white font-medium shadow-xl rounded-full
-             flex justify-center items-center`}
-        >
-          {playerTwoPointsArray[i]}
-        </div>
-      </div>
-    )
+  // Función para transformar el tablero al colocar una carta en la zona de juego.
+  // Para Cazahadas, en la celda seleccionada (de tipo 'fairy'), se reemplaza la celda
+  // con una nueva que contenga la carta y los puntos correspondientes.
+  function mapPawns(
+    card: any,
+    rowIndex: number,
+    colIndex: number,
+    currentTiles: Tile[][],
+    amIP1: boolean
+  ): Tile[][] {
+    const newTiles = currentTiles.map((row) => row.slice());
+    // Reemplazamos la celda de tipo 'fairy' donde se coloca la carta por una celda ocupada.
+    newTiles[rowIndex][colIndex] = {
+      type: 'fairy',
+      card: { ...card, placedByPlayerOne: amIP1 },
+    };
+    // Opcionalmente, se pueden actualizar puntos u otras propiedades en la celda.
+    return newTiles;
   }
 
-
-  for (let i = 0; i < rows; i++) {
-    for (let j = 1; j < cols - 1; j++) {
-      const color = (i + j) % 2 === 0 ? 'bg-white' : 'bg-gray-800'
-      tilesElements[i][j] = (
-        <div
-          className={`${color} h-44 w-full border-solid border-4 hover:border-4 ${!tiles[i][j - 1].card ? 'flex justify-center items-center' : ''}  border-black
-           ${selectedCard ? (canAddCardToPosition(selectedCard, tiles[i][j - 1]) ? 'cursor-pointer  hover:border-green-400' : 'cursor-not-allowed hover:border-red-400') : ''}
-           transition duration-300 ease-out`}
-          onClick={() => handleCellClick(tiles[i][j - 1], i, j - 1)}
-          key={`${i}-${j}`}
-        >
-          {!tiles[i][j - 1].card ? (
-            <div className="text-4xl font-bold text-center ">
-              {tiles[i][j - 1] && tiles[i][j - 1].playerOnePawns > 0 && (
-                <>
-                  <p>{'♟'.repeat(tiles[i][j - 1].playerOnePawns)}</p>
-                  <hr className={`rounded mt-4 border-2 ${amIP1 ? 'border-green-400' : 'border-red-400'}`} />
-                </>
-              )}
-              {tiles[i][j - 1] && tiles[i][j - 1].playerTwoPawns > 0 && (
-                <>
-                  <p>{'♟'.repeat(tiles[i][j - 1].playerTwoPawns)}</p>
-                  <hr className={`rounded mt-4 border-2 ${!amIP1 ? 'border-green-400' : 'border-red-400'}`} />
-                </>
-              )}
-            </div>
-          ) : (
-            <div className="flex justify-center p-1 h-full items-center">
-              <Card placed={true} card={tiles[i][j - 1].card} amIP1={amIP1} />
-            </div>
-          )}
-        </div>
-      )
-    }
-  }
+  // Renderizamos el tablero con la estructura 3x4.
   return (
-    <>
-      <div className="flex flex-col items-center justify-center gap-4">
-        <div className="flex w-full items-center justify-evenly">
-          <div className="flex flex-col items-center justify-center gap-3 w-32">
-            <span className={`text-8xl ${gameOver ? 'visible' : 'invisible'}`}>{sumOfPlayersPoints[0]}</span>
-            <span className={`text-8xl scale-x-[-1] `}>🐉</span>
-            <h1 className="text-4xl">
-              {amIP1 ? playerOneName : playerTwoName} {' '}
-            </h1>
-            <h2 className='text-2xl'>
-              {amIP1 ? '(Player 1)' : '(Player 2)'}
-            </h2>
-          </div>
-          <div className="grid grid-cols-7 gap-1 w-8/12">
-            {amIP1 ? tilesElements : transformMatrix(tilesElements)}
-          </div>
-          <div className="flex flex-col items-center justify-center gap-3 w-32">
-            <span className={`text-8xl ${gameOver ? 'visible' : 'invisible'}`}>{sumOfPlayersPoints[1]}</span>
-            <span className={`text-8xl`}>🐉</span>
-            <h1 className="text-4xl">
-              {amIP1 ? playerTwoName : playerOneName} {' '}
-            </h1>
-            <h2 className='text-2xl'>
-              {amIP1 ? '(Player 2)' : '(Player 1)'}
-            </h2>
-          </div>
-        </div>
+    <div className="grid grid-rows-3 grid-cols-4 gap-2 p-4 w-full max-w-xl mx-auto">
+      {/* Fila 0: Zona del Rival */}
+      <div className="bg-red-500 flex items-center justify-center border">
+        {"Deck Rival"}
       </div>
-    </>
-  )
+      <div className="bg-red-500 flex items-center justify-center border">
+        {tiles[0][1].type === 'capturedFairies' ? (
+          tiles[0][1].cards.length > 0 ? (
+            <Card placed={true} card={tiles[0][1].cards[0]} amIP1={amIP1} />
+          ) : (
+            "Captured Fairies"
+          )
+        ) : (
+          "Captured Fairies"
+        )}
+      </div>
+      <div className="bg-red-500 flex items-center justify-center border">
+        {tiles[0][2].type === 'discard' ? (
+          tiles[0][2].cards.length > 0 ? (
+            <Card placed={true} card={tiles[0][2].cards[0]} amIP1={amIP1} />
+          ) : (
+            "Discard Rival"
+          )
+        ) : (
+          "Discard Rival"
+        )}
+      </div>
+      <div className="bg-red-500 flex items-center justify-center border">
+        {tiles[0][3].type === 'magic' ? (
+          tiles[0][3].cards.length > 0 ? (
+            <Card placed={true} card={tiles[0][3].cards[0]} amIP1={amIP1} />
+          ) : (
+            "Magics Rival"
+          )
+        ) : (
+          "Magics Rival"
+        )}
+      </div>
+
+      {/* Fila 1: Zona de juego */}
+      {/* Las primeras tres celdas son para hadas en juego */}
+      <div
+        className="bg-gray-200 flex items-center justify-center border cursor-pointer"
+        onClick={() => handleCellClick(tiles[1][0], 1, 0)}
+      >
+        {tiles[1][0].type === 'fairy' && tiles[1][0].card ? (
+          <Card placed={true} card={tiles[1][0].card} amIP1={amIP1} />
+        ) : (
+          "Fairy 1"
+        )}
+      </div>
+      <div
+        className="bg-gray-200 flex items-center justify-center border cursor-pointer"
+        onClick={() => handleCellClick(tiles[1][1], 1, 1)}
+      >
+        {tiles[1][1].type === 'fairy' && tiles[1][1].card ? (
+          <Card placed={true} card={tiles[1][1].card} amIP1={amIP1} />
+        ) : (
+          "Fairy 2"
+        )}
+      </div>
+      <div
+        className="bg-gray-200 flex items-center justify-center border cursor-pointer"
+        onClick={() => handleCellClick(tiles[1][2], 1, 2)}
+      >
+        {tiles[1][2].type === 'fairy' && tiles[1][2].card ? (
+          <Card placed={true} card={tiles[1][2].card} amIP1={amIP1} />
+        ) : (
+          "Fairy 3"
+        )}
+      </div>
+      {/* Última celda de la fila central para la variable X */}
+      <div className="bg-yellow-300 flex items-center justify-center border">
+        {tiles[1][3].type === 'variableX'
+          ? tiles[1][3].value
+          : "X"}
+      </div>
+
+      {/* Fila 2: Zona del Jugador */}
+      <div className="bg-blue-500 flex items-center justify-center border">
+        {"Deck Player"}
+      </div>
+      <div className="bg-blue-500 flex items-center justify-center border">
+        {tiles[2][1].type === 'capturedFairies' ? (
+          tiles[2][1].cards.length > 0 ? (
+            <Card placed={true} card={tiles[2][1].cards[0]} amIP1={amIP1} />
+          ) : (
+            "Captured Fairies"
+          )
+        ) : (
+          "Captured Fairies"
+        )}
+      </div>
+      <div className="bg-blue-500 flex items-center justify-center border">
+        {tiles[2][2].type === 'discard' ? (
+          tiles[2][2].cards.length > 0 ? (
+            <Card placed={true} card={tiles[2][2].cards[0]} amIP1={amIP1} />
+          ) : (
+            "Discard Player"
+          )
+        ) : (
+          "Discard Player"
+        )}
+      </div>
+      <div className="bg-blue-500 flex items-center justify-center border">
+        {tiles[2][3].type === 'magic' ? (
+          tiles[2][3].cards.length > 0 ? (
+            <Card placed={true} card={tiles[2][3].cards[0]} amIP1={amIP1} />
+          ) : (
+            "Magics Player"
+          )
+        ) : (
+          "Magics Player"
+        )}
+      </div>
+    </div>
+  );
 }

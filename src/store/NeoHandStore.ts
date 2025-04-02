@@ -7,7 +7,7 @@ let index = 0;
 function drawInitialHand(initialDeck: CardInfo[]) {
   const hand: CardUnity[] = [];
 
-  for (; index < 5; index++) {
+  for (; index < 7; index++) {
     const randomIndex = Math.floor(Math.random() * initialDeck.length);
     hand.push({ ...initialDeck[randomIndex], id: index });
     initialDeck.splice(randomIndex, 1);
@@ -18,8 +18,12 @@ function drawInitialHand(initialDeck: CardInfo[]) {
 
 type HandStore = {
   deck: CardInfo[];
+  opponentDeck: CardInfo[];
+  opponentCards: CardUnity[];
   playerCards: CardUnity[];
+  discardPile: CardUnity[];
   placeCard: (card: CardUnity) => void;
+  discardCard: (card: CardUnity) => void;
   drawCard: () => void;
   drawInitialHand: () => void;
   resetStore: () => void;
@@ -28,12 +32,21 @@ type HandStore = {
 const useNeoHandStore = create<HandStore>((set) => ({
   deck: [...deckCards],
   playerCards: [] as CardUnity[],
+  opponentDeck: [...deckCards],
+  opponentCards: [] as CardUnity[],
   placeCard: (card) => {
     set((state) => ({
       playerCards: state.playerCards.filter((c) => c.id !== card.id),
     }));
     return;
   },
+  discardPile: [] as CardUnity[],
+  discardCard: (card) => { 
+    set((state) => ({
+      playerCards: state.playerCards.filter((c) => c.id !== card.id),
+      discardPile: [...state.discardPile, card],
+    }))
+},
   drawCard: () => {
     set((state) => {
       const randomIndex = Math.floor(Math.random() * state.deck.length);
@@ -44,10 +57,18 @@ const useNeoHandStore = create<HandStore>((set) => ({
     });
   },
   drawInitialHand: () =>
-    set((state) => ({ playerCards: drawInitialHand(state.deck) })),
+    set((state) => ({ 
+      playerCards: drawInitialHand(state.deck),
+      opponentHand: drawInitialHand(state.opponentDeck),
+     })),
   resetStore: () => {
     index = 0;
-    return set({ playerCards: [] as CardUnity[], deck: [...deckCards] });
+    return set({ 
+      playerCards: [] as CardUnity[], 
+      deck: [...deckCards],
+      opponentCards: [] as CardUnity[],
+      opponentDeck: [...deckCards],
+     });
   },
 }));
 
