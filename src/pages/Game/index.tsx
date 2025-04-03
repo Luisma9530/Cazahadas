@@ -84,15 +84,25 @@ export default function Game() {
     }
   }, [isMyTurn, amIP1]);
 
-  const handleGameIdClick = async (gameId?: string) => {
+  const handleGameIdClick = (gameId?: string) => {
+    if (!gameId) return;
+
+    const textArea = document.createElement("textarea");
+    textArea.value = gameId;
+    document.body.appendChild(textArea);
+    textArea.select();
+
     try {
-      if (!gameId) return;
-      await navigator.clipboard.writeText(gameId);
-      setIsCopied(true);
+      navigator.clipboard.writeText(gameId)
+        .then(() => setIsCopied(true))
+        .catch(err => console.error("Error al copiar:", err));
     } catch (err) {
-      console.error('Failed to copy: ', err);
+      console.error("Clipboard API no soportado:", err);
     }
-  }
+
+    document.body.removeChild(textArea);
+  };
+
 
   const shouldShowBoard = !loading && !gameBusy
 
