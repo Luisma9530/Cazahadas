@@ -29,8 +29,15 @@ export default function Home() {
     }
   }, [])
 
+  function generateUUID() {
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
+      const r = (crypto.getRandomValues(new Uint8Array(1))[0] % 16) | 0;
+      return (c === 'x' ? r : (r & 0x3) | 0x8).toString(16);
+    });
+  }
+
   const handleStartGame = () => {
-    const randomGameId = window.crypto.randomUUID()
+    const randomGameId = generateUUID()
     navigate(`/game/${randomGameId}`)
     socket.connect()
     socket.emit('start-game-info', {
