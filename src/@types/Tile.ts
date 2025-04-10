@@ -11,7 +11,7 @@ export type Tile =
       value: number
     }
   | {
-      type: 'deck'| "capturedFairies" | 'discard' | 'magic'  // Baraja, descartes y magias
+      type: 'deck'| "capturedFairies" | 'discard' | 'magic'
       owner: 'playerOne' | 'playerTwo'
       cards: CardInfo[]
     }

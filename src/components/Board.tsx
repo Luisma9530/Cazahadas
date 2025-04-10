@@ -8,6 +8,7 @@ import useNeoHandStore from "../store/NeoHandStore";
 import useTurnStore from "../store/TurnStore";
 import useCardStore from "../store/CardStore"; // Para la carta seleccionada
 import Card from "../components/Card";
+import { CardType } from "../@types/Card";
 import { useParams } from "react-router-dom";
 
 export default function Board({ amIP1 }: { amIP1: boolean }) {
@@ -33,17 +34,30 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
   const { id: gameId } = useParams<{ id: string }>();
 
   // Validación para colocar carta en zona de juego (fila 1, celdas 0-2)
-  function canAddCardToPosition(card: any, position: Tile): boolean {
+  function canAddCardToPosition(card: any, position: Tile, rowIndex: number, colIndex: number): boolean {
     if (!card || !isMyTurn) return false;
-    // Aquí se pueden agregar validaciones adicionales según la mecánica de hadas.
-    // Por ejemplo, si la celda ya tiene una carta de tipo 'fairy', no se permite.
-    if (position.type !== 'fairy') return false;
-    return true;
+
+    if (rowIndex == 2) {
+      switch (card.type) {
+        case CardType.SHIELD:
+          return position.type === 'deck'|| position.type === 'discard';
+        case CardType.MAGIC:
+          return position.type === 'magic' || position.type === 'discard';
+        default:
+          return false; // Si no conocemos el tipo no dejamos colocar
+      }
+    } else {
+      if (CardType.CATCH === card.type) {
+        return position.type === 'fairy' && position.card === null;
+      } else {
+        return false;
+      }
+    }
   }
 
   // Al hacer clic en una celda de la zona de juego (fila 1, columnas 0 a 2)
   function handleCellClick(position: Tile, rowIndex: number, colIndex: number) {
-    if (!selectedCard || !canAddCardToPosition(selectedCard, position)) return;
+    if (!selectedCard || !canAddCardToPosition(selectedCard, position, rowIndex, colIndex)) return;
     // Lógica para colocar la carta. Se asume que mapPawns transforma la celda y actualiza el estado.
     const newTiles = mapPawns(selectedCard, rowIndex, colIndex, tiles, amIP1);
     placeCard(selectedCard);
@@ -146,17 +160,23 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
         )}
       </div>
       {/* Última celda de la fila central para la variable X */}
-      <div className="bg-yellow-300 flex items-center justify-center border">
+      <div 
+        className="bg-yellow-300 flex items-center justify-center border"
+        onClick={() => handleCellClick(tiles[1][3], 1, 3)}>
         {tiles[1][3].type === 'variableX'
           ? tiles[1][3].value
           : "X"}
       </div>
 
       {/* Fila 2: Zona del Jugador */}
-      <div className="bg-blue-500 flex items-center justify-center border">
+      <div 
+        className="bg-blue-500 flex items-center justify-center border cursor-pointer"
+        onClick={() => handleCellClick(tiles[2][0], 2, 0)}>
         {"Deck Player"}
       </div>
-      <div className="bg-blue-500 flex items-center justify-center border">
+      <div 
+        className="bg-blue-500 flex items-center justify-center border"
+        onClick={() => handleCellClick(tiles[2][1], 2, 1)}>
         {tiles[2][1].type === 'capturedFairies' ? (
           tiles[2][1].cards.length > 0 ? (
             <Card placed={true} card={tiles[2][1].cards[0]} amIP1={amIP1} />
@@ -167,10 +187,16 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
           "Captured Fairies"
         )}
       </div>
-      <div className="bg-blue-500 flex items-center justify-center border">
+      <div 
+        className="bg-blue-500 flex items-center justify-center border cursor-pointer"
+        onClick={() => handleCellClick(tiles[2][2], 2, 2)}>
         {tiles[2][2].type === 'discard' ? (
           tiles[2][2].cards.length > 0 ? (
-            <Card placed={true} card={tiles[2][2].cards[0]} amIP1={amIP1} />
+            <div className="flex space-x-1">
+              {tiles[2][2].cards.slice(0, 3).map((card, i) => (
+                <Card key={i} placed={true} card={card} amIP1={amIP1} />
+              ))}
+            </div>
           ) : (
             "Discard Player"
           )
@@ -178,7 +204,9 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
           "Discard Player"
         )}
       </div>
-      <div className="bg-blue-500 flex items-center justify-center border">
+      <div 
+        className="bg-blue-500 flex items-center justify-center border cursor-pointer"
+        onClick={() => handleCellClick(tiles[2][3], 2, 3)}>
         {tiles[2][3].type === 'magic' ? (
           tiles[2][3].cards.length > 0 ? (
             <Card placed={true} card={tiles[2][3].cards[0]} amIP1={amIP1} />
