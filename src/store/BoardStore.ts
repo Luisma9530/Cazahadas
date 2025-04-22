@@ -13,7 +13,7 @@ const initialBoard: Tile[][] = new Array(3).fill(null).map((_, rowIndex) =>
     //FILA CENTRAL: Hadas en juego y variable X
     if (rowIndex === 1) {
       if (colIndex === 0 || colIndex === 1 || colIndex === 2) {
-        return { type: 'fairy', playerOnePoints: 0, playerTwoPoints: 0, playerOnePawns: 0, playerTwoPawns: 0, card: null }
+        return { type: 'fairy', playerOnePoints: 0, playerTwoPoints: 0, playerOnePawns: 0, playerTwoPawns: 0, card: null, captured: false } // Hadas en juego
       }
       if (colIndex === 3) {
         return { type: 'variableX', value: 0 }

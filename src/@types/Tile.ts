@@ -5,6 +5,8 @@ export type Tile =
       type: 'fairy' // Casillas con hadas
   
       card: CardInfo | null
+
+      captured: boolean // Indica si la hada ha sido capturada o no
     }
   | {
       type: 'variableX' // Casilla de la variable X

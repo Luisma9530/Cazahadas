@@ -59,7 +59,7 @@ const useNeoHandStore = create<HandStore>((set) => ({
   drawInitialHand: () =>
     set((state) => ({ 
       playerCards: drawInitialHand(state.deck),
-      opponentHand: drawInitialHand(state.opponentDeck),
+      opponentCards: drawInitialHand(state.opponentDeck),
      })),
   resetStore: () => {
     index = 0;

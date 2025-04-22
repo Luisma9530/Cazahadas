@@ -34,8 +34,14 @@ export default function Game() {
 
   const [gameStartModal, toggleGameStartModal, turnModal, toggleTurnModal] = useModalStore((state) => [state.gameStartModal, state.toggleGameStartModal, state.turnModal, state.toggleTurnModal])
 
-
-
+  function mirrorBoard(tiles: Tile[][]): Tile[][] {
+    // Cambia filas: 0 <-> 2, mantiene columnas
+    return [
+      tiles[2].map((col) => ({ ...col })), // fila 0 <- antes fila 2
+      tiles[1].map((col) => ({ ...col })), // fila 1 igual
+      tiles[0].map((col) => ({ ...col })), // fila 2 <- antes fila 0
+    ];
+  }
 
   useEffect(() => {
     socket.on('player-connected', (data: { firstPlayer: boolean }) => {
@@ -58,7 +64,10 @@ export default function Game() {
       setPoints(data.tiles)
       toggleTurnModal()
       if (!isMyTurn) {
-        setBoard(data.tiles)
+        const mirroredTiles = mirrorBoard(data.tiles);
+        setBoard(mirroredTiles);
+      } else {
+        setBoard(data.tiles);
       }
       toggleTurn()
     })
