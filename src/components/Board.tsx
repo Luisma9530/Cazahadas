@@ -7,10 +7,10 @@ import { usePointStore } from "../store/PointsStore";
 import useNeoHandStore from "../store/NeoHandStore";
 import useTurnStore from "../store/TurnStore";
 import useCardStore from "../store/CardStore"; // Para la carta seleccionada
-import useCaptureStore from "../store/CaptureStore";
 import Card from "../components/Card";
 import { CardType, CardUnity } from "../@types/Card";
 import { useParams } from "react-router-dom";
+import { hydrateCard } from "../utils/hydrateCard"; // Para rehidratar cartas
 
 export default function Board({ amIP1 }: { amIP1: boolean }) {
   // Obtenemos el estado del tablero (estructura 3x4) desde el store
@@ -33,54 +33,6 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
   const [placeCard] = useNeoHandStore((state) => [state.placeCard]);
 
   const { id: gameId } = useParams<{ id: string }>();
-
-  const [pendingCapture, setPendingCapture, clearPendingCapture] = useCaptureStore((state) => [
-    state.pendingCapture,
-    state.setPendingCapture,
-    state.clearPendingCapture,
-  ]);
-
-  useEffect(() => {
-    if (!pendingCapture) return;
-
-    const isMyCatch = pendingCapture.placedByPlayerOne === amIP1;
-    const nowMyTurn = isMyTurn;
-
-    if (isMyCatch && nowMyTurn && tiles[0][2].type === 'deck' && tiles[2][2].type === 'discard' && tiles[1][3].type === 'variableX') {
-      const fairyTile = tiles[1][pendingCapture.fairyIndex];
-      const rivalShield =
-        amIP1 ? tiles[0][2].cards.at(-1) : tiles[2][2].cards.at(-1); // Última carta en el discard del rival
-
-      const xValue = tiles[1][3].value;
-
-      if (rivalShield && rivalShield.type === CardType.SHIELD) {
-        if (!rivalShield || !rivalShield.defenseCondition(xValue)) {
-          const newTiles = [...tiles];
-          const capturedRow = amIP1 ? 2 : 0;
-          if (newTiles[capturedRow][1].type === 'capturedFairies' &&
-            fairyTile.type === 'fairy' &&
-            'card' in fairyTile &&
-            fairyTile.card) {
-            newTiles[capturedRow][1].cards.push(fairyTile.card);
-            const newFairyTile = newTiles[1][pendingCapture.fairyIndex];
-            if (newFairyTile.type === 'fairy') {
-              if (newFairyTile.card) {
-                newFairyTile.captured = true; // <--- Aquí marcas que fue atrapada
-              }
-              newFairyTile.card = null;
-              newTiles[1][pendingCapture.fairyIndex] = newFairyTile;
-            }
-            setTiles(newTiles);
-            socket.emit("capture-fairy", { tiles: newTiles, gameId });
-          }
-        }
-      }
-
-      clearPendingCapture();
-    }
-  }, [isMyTurn]);
-
-
 
   // Validación para colocar carta en zona de juego
   function canAddCardToPosition(card: any, position: Tile, rowIndex: number, colIndex: number): boolean {
@@ -116,6 +68,58 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
     socket.emit("place-card", { tiles: newTiles, gameId });
   }
 
+  function checkMarkedFairiesForCapture(
+    tiles: Tile[][],
+    amIP1: boolean
+  ): Tile[][] {
+    const newTiles = tiles.map((row) => row.map((tile) => ({ ...tile })));
+
+
+    for (let colIndex = 0; colIndex < newTiles[1].length - 1; colIndex++) {
+      const tile = newTiles[1][colIndex];
+
+      if (
+        tile.type === 'fairy' &&
+        tile.marked &&
+        !tile.captured &&
+        tile.placedByPlayerOne === amIP1
+      ) {
+        // Verificar la condición de defensa del escudo del rival
+        const rivalDeck = newTiles[0][0];
+        const variableTile = newTiles[1][3];
+
+        if (rivalDeck.type === 'deck' && variableTile.type === 'variableX') {
+          const rivalShield = rivalDeck.cards?.at(-1); // Última carta en el deck del rival
+          const hydratedRivalShield = hydrateCard(rivalShield != undefined ? rivalShield : {}); // Rehidratamos la carta del rival
+          if (
+            rivalDeck.cards.length == 0 || // No hay escudo en el deck del rival
+            (
+              hydratedRivalShield.type === CardType.SHIELD && // Última carta en el deck del rival
+              !hydratedRivalShield.defenseCondition(variableTile.value)// La variable X no cumple la condición del escudo
+            )
+          ) {
+            if (tile.type === 'fairy' && tile.card && newTiles[2][1].type === 'capturedFairies') {
+              tile.captured = true;
+              newTiles[1][colIndex] = tile; // Actualizar el estado de la hada
+              newTiles[2][1].cards.push(tile.card); // Agregar la hada capturada a la zona de hadas capturadas
+            }
+          }
+        }
+
+      }
+    }
+    return newTiles;
+  }
+
+  useEffect(() => {
+    // Ejecutar la lógica de captura al iniciar turno
+    if (isMyTurn) { // Solo ejecutar si es mi turno
+      const updatedTiles = checkMarkedFairiesForCapture(tiles, amIP1);
+      setTiles(updatedTiles);
+    }
+  }, [isMyTurn]);
+
+
   // Función para transformar el tablero al colocar una carta en la zona de juego.
   function mapPawns(
     card: CardUnity,
@@ -134,11 +138,10 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
             ...currentTile,
             cards: [...(currentTile.cards || []), { ...card, placedByPlayerOne: amIP1 }],
           };
+          if (newTiles[1][3].type === 'variableX' && newTiles[rowIndex][colIndex].type !== 'discard') {
+            newTiles[1][3].value = card.operation(newTiles[1][3].value); // Aplicar la operación de la carta mágica a la variable X
+          }
         }
-        if (newTiles[1][3].type === 'variableX') {
-          newTiles[1][3].value = card.operation(newTiles[1][3].value); // Aplicar la operación de la carta mágica a la variable X
-        }
-        // Aquí podrías agregar más efectos especiales de cartas mágicas
         break;
       case CardType.SHIELD:
         if (currentTile.type === 'discard' || currentTile.type === 'deck') {
@@ -151,18 +154,13 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
 
       case CardType.CATCH:
         if (currentTile.type === 'fairy' && !currentTile.card) {
-          setPendingCapture({ fairyIndex: colIndex, placedByPlayerOne: amIP1 });
-          newTiles[rowIndex][colIndex] = {
-            ...currentTile,
-            card: { ...card, placedByPlayerOne: amIP1 },
-          };
-          if (newTiles[0][0].type === 'deck' && newTiles[0][0].cards.length > 0) {
-            // Compruebo la última carta del mazo rival, miro su atributo condicion y lo considero para el efecto de la carta
-            const lastCard = newTiles[0][0].cards[newTiles[0][0].cards.length - 1];
-            if (lastCard.type === 'shield' && newTiles[1][3].type === 'variableX') {
-              var overcomeShied = lastCard.defenseCondition(newTiles[1][3].value); // Aquí compruebo la condición de defensa de la carta escudo
-
-            }
+          if (!currentTile.captured && !currentTile.marked) { // Si la hada no ha sido capturada y no está marcada, se puede colocar la carta
+            currentTile.marked = true; // Marcar la hada como seleccionada
+            currentTile.placedByPlayerOne = amIP1; // Marcar la hada como seleccionada por el jugador 1 o 2
+            newTiles[rowIndex][colIndex] = {
+              ...currentTile,
+              card: { ...card, placedByPlayerOne: amIP1 }, // Colocar la carta en la celda
+            };
           }
         }
         break;
@@ -203,9 +201,17 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
       <div className="bg-red-500 flex items-center justify-center border">
         {tiles[0][1].type === 'capturedFairies' ? (
           tiles[0][1].cards.length > 0 ? (
-            tiles[0][1].cards.map((card, index) => (
-              <Card key={index} placed={true} card={card} amIP1={amIP1} />
-            ))
+            <div className="relative h-[100px] w-[70px]">
+              {tiles[0][1].cards.slice(-3).map((card, i) => (
+                <div
+                  key={i}
+                  className="absolute top-0 left-0"
+                  style={{ top: `${i * 12}px`, zIndex: i }}
+                >
+                  <Card placed={true} card={card} amIP1={amIP1} />
+                </div>
+              ))}
+            </div>
           ) : (
             <div className="text-sm text-white">Captured Fairies</div>
           )
@@ -337,9 +343,17 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
       <div className="bg-blue-500 flex items-center justify-center border">
         {tiles[2][1].type === 'capturedFairies' ? (
           tiles[2][1].cards.length > 0 ? (
-            tiles[2][1].cards.map((card, index) => (
-              <Card key={index} placed={true} card={card} amIP1={amIP1} />
-            ))
+            <div className="relative h-[100px] w-[70px]">
+              {tiles[2][1].cards.slice(-3).map((card, i) => (
+                <div
+                  key={i}
+                  className="absolute top-0 left-0"
+                  style={{ top: `${i * 12}px`, zIndex: i }}
+                >
+                  <Card placed={true} card={card} amIP1={amIP1} />
+                </div>
+              ))}
+            </div>
           ) : (
             <div className="text-sm text-white">Captured Fairies</div>
           )

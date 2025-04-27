@@ -7,6 +7,10 @@ export type Tile =
       card: CardInfo | null
 
       captured: boolean // Indica si la hada ha sido capturada o no
+
+      marked: boolean // Indica si la hada ha sido marcada o no
+
+      placedByPlayerOne: boolean | null // Indica si la hada fue colocada por el jugador 1 o 2
     }
   | {
       type: 'variableX' // Casilla de la variable X

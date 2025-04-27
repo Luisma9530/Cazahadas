@@ -8,7 +8,6 @@ type CardProps = {
 
 function renderCardText(text: string) {
   const parts = text.split(/(\[\[.*?\]\])/);
-  console.log(parts)
   return parts.map((part, index) => {
     if (part.startsWith("[[") && part.endsWith("]]")) {
       // Removemos los marcadores [[ ]]

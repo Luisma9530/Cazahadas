@@ -101,16 +101,23 @@ export default function Game() {
     document.body.appendChild(textArea);
     textArea.select();
 
-    try {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
       navigator.clipboard.writeText(gameId)
         .then(() => setIsCopied(true))
         .catch(err => console.error("Error al copiar:", err));
-    } catch (err) {
-      console.error("Clipboard API no soportado:", err);
+    } else {
+      // Fallback en navegadores antiguos o sin HTTPS
+      try {
+        document.execCommand("copy");
+        setIsCopied(true);
+      } catch (err) {
+        console.error("No se pudo copiar usando execCommand:", err);
+      }
     }
 
     document.body.removeChild(textArea);
   };
+
 
 
   const shouldShowBoard = !loading && !gameBusy
