@@ -20,7 +20,7 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
     state.selectedCard,
     state.resetSelectedCard,
   ]);
-  const [isMyTurn] = useTurnStore((state) => [state.isMyTurn]);
+  const [isMyTurn, isMyFirstTurn, setIsMyFirstTurn] = useTurnStore((state) => [state.isMyTurn,  state.isMyFirstTurn, state.setIsMyFirstTurn]);
   const [gameOver, setGameResult, playerOneName, playerTwoName, playerDisconnected] =
     useGameStore((state) => [
       state.gameOver,
@@ -30,7 +30,7 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
       state.playerDisconnected,
     ]);
   const [setPoints] = usePointStore((state) => [state.setPoints]);
-  const [placeCard] = useNeoHandStore((state) => [state.placeCard]);
+  const [placeCard, drawCard, drawInitialHand] = useNeoHandStore((state) => [state.placeCard, state.drawCard, state.drawInitialHand]);
 
   const { id: gameId } = useParams<{ id: string }>();
 
@@ -102,6 +102,14 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
               tile.captured = true;
               newTiles[1][colIndex] = tile; // Actualizar el estado de la hada
               newTiles[2][1].cards.push(tile.card); // Agregar la hada capturada a la zona de hadas capturadas
+              console.log('Hada capturada:', tile.card);
+              if (newTiles[2][1].cards.length >= 2) {
+                console.log('Fin del juego: Capturadas dos hadas');
+                socket.emit('game-end', {
+                  reason: 'captured-two-fairies',
+                  winner: amIP1 ? playerOneName : playerTwoName,
+                }); // Emitir evento de fin de juego si se capturan dos hadas
+              }
             }
           }
         }
@@ -114,6 +122,9 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
   useEffect(() => {
     // Ejecutar la lógica de captura al iniciar turno
     if (isMyTurn) { // Solo ejecutar si es mi turno
+      if (!isMyFirstTurn) {
+        drawCard();
+      }
       const updatedTiles = checkMarkedFairiesForCapture(tiles, amIP1);
       setTiles(updatedTiles);
     }
@@ -144,7 +155,7 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
         }
         break;
       case CardType.SHIELD:
-        if (currentTile.type === 'discard' || currentTile.type === 'deck') {
+        if (currentTile.type === 'deck') {
           newTiles[rowIndex][colIndex] = {
             ...currentTile,
             cards: [...(currentTile.cards || []), { ...card, placedByPlayerOne: amIP1 }],

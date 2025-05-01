@@ -76,6 +76,11 @@ export default function Game() {
       if (data?.playerDisconnected) {
         setPlayerDisconnected(true)
       }
+      
+      if (data?.reason === 'captured-two-fairies') {
+        console.log(`¡Ganó ${data.winner} capturando dos hadas!`);
+      }
+
       setGameOver(true)
     })
 
