@@ -1,9 +1,8 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import socket from "../socket";
 import { Tile } from "../@types/Tile";
 import useBoardStore from "../store/BoardStore";
 import { useGameStore } from "../store/GameStore";
-import { usePointStore } from "../store/PointsStore";
 import useNeoHandStore from "../store/NeoHandStore";
 import useTurnStore from "../store/TurnStore";
 import useCardStore from "../store/CardStore"; // Para la carta seleccionada
@@ -20,22 +19,18 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
     state.selectedCard,
     state.resetSelectedCard,
   ]);
-  const [isMyTurn, isMyFirstTurn, setIsMyFirstTurn] = useTurnStore((state) => [state.isMyTurn,  state.isMyFirstTurn, state.setIsMyFirstTurn]);
-  const [gameOver, setGameResult, playerOneName, playerTwoName, playerDisconnected] =
+  const [isMyTurn, isMyFirstTurn] = useTurnStore((state) => [state.isMyTurn,  state.isMyFirstTurn]);
+  const [playerOneName, playerTwoName] =
     useGameStore((state) => [
-      state.gameOver,
-      state.setGameResult,
       state.playerOneName,
       state.playerTwoName,
-      state.playerDisconnected,
     ]);
-  const [setPoints] = usePointStore((state) => [state.setPoints]);
-  const [placeCard, drawCard, drawInitialHand] = useNeoHandStore((state) => [state.placeCard, state.drawCard, state.drawInitialHand]);
+  const [placeCard, drawCard] = useNeoHandStore((state) => [state.placeCard, state.drawCard]);
 
   const { id: gameId } = useParams<{ id: string }>();
 
   // Validación para colocar carta en zona de juego
-  function canAddCardToPosition(card: any, position: Tile, rowIndex: number, colIndex: number): boolean {
+  function canAddCardToPosition(card: any, position: Tile, rowIndex: number): boolean {
     if (!card || !isMyTurn) return false;
 
     if (rowIndex == 2) {
@@ -59,7 +54,7 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
 
   // Al hacer clic en una celda de la zona de juego (fila 1, columnas 0 a 2)
   function handleCellClick(position: Tile, rowIndex: number, colIndex: number) {
-    if (!selectedCard || !canAddCardToPosition(selectedCard, position, rowIndex, colIndex)) return;
+    if (!selectedCard || !canAddCardToPosition(selectedCard, position, rowIndex)) return;
     // Lógica para colocar la carta. Se asume que mapPawns transforma la celda y actualiza el estado.
     const newTiles = mapPawns(selectedCard, rowIndex, colIndex, tiles, amIP1);
     placeCard(selectedCard);

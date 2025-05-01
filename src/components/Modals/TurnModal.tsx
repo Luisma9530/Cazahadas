@@ -2,14 +2,11 @@ import { motion } from "framer-motion";
 import { useModalStore } from "../../store/ModalStore";
 import useNeoHandStore from "../../store/NeoHandStore";
 import useTurnStore from "../../store/TurnStore";
-import { useGameStore } from "../../store/GameStore";
 
 export function TurnModal() {
   const [toggleTurnModal] = useModalStore((state) => [state.toggleTurnModal]);
   const [isMyTurn, isMyFirstTurn, setIsMyFirstTurn] = useTurnStore((state) => [state.isMyTurn, state.isMyFirstTurn, state.setIsMyFirstTurn])
-  const [drawCard, drawInitialHand] = useNeoHandStore((state) => [state.drawCard, state.drawInitialHand])
-  const [amIP1] = useGameStore((state) => [state.amIP1])
-  
+  const [drawInitialHand] = useNeoHandStore((state) => [state.drawInitialHand])  
 
   return <div className="fixed mt-[320px] top-0 left-0 w-full h-full flex items-start justify-center">
     <motion.div
