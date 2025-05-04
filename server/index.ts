@@ -1,8 +1,22 @@
+import fastifyStatic from '@fastify/static';
 import fastify from "fastify";
+import path from 'path';
 import { Server as SocketIOServer } from "socket.io";
 import { Tile } from "../src/@types/Tile";
 
 const app = fastify();
+
+const __dirname = path.resolve();
+
+app.register(fastifyStatic, {
+  root: path.join(__dirname, 'dist'),
+  prefix: '/',
+  wildcard: false, //evita conflictos con HEAD
+});
+
+app.setNotFoundHandler((_, reply) => {
+  reply.sendFile('index.html');
+});
 
 const io = new SocketIOServer(app.server, {
   cors: {
@@ -107,7 +121,7 @@ io.on("connection", (socket) => {
   });
 });
 
-app.listen({ port: 4000, host: "0.0.0.0" }, (err, address) => {
+app.listen({ port: parseInt(process.env.PORT!) || 4000, host: '0.0.0.0' }, (err, address) => {
   if (err) {
     console.error(err);
     process.exit(1);
