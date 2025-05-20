@@ -118,6 +118,7 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
 
   useEffect(() => {
     var updatedTiles = tiles.map((row) => row.map((tile) => ({ ...tile })));
+    setIsBattle(chechIsBattle(updatedTiles));
     if (!isBattle) {
       updatedTiles = checkMarkedFairiesForCapture(tiles, amIP1);
     }
@@ -129,6 +130,19 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
       }
     }
   }, [isMyTurn]);
+
+  function chechIsBattle(tiles: Tile[][]): boolean {
+    // Es batalla si hay una carta de tipo "catch" en la zona de las hadas, que corresponde a la fila 1
+    // Además la carta debe estar marcada y no capturada
+    return tiles[1].some((tile) => {
+      return (
+        tile.type === 'fairy' &&
+        tile.card?.type === CardType.CATCH &&
+        tile.marked &&
+        !tile.captured
+      );
+    });
+  }
 
 
   // Función para transformar el tablero al colocar una carta en la zona de juego.
