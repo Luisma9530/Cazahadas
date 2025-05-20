@@ -19,7 +19,7 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
     state.selectedCard,
     state.resetSelectedCard,
   ]);
-  const [isMyTurn, isMyFirstTurn] = useTurnStore((state) => [state.isMyTurn,  state.isMyFirstTurn]);
+  const [isMyTurn, isMyFirstTurn, isBattle, setIsBattle] = useTurnStore((state) => [state.isMyTurn, state.isMyFirstTurn, state.isBattle, state.setIsBattle]);
   const [playerOneName, playerTwoName] =
     useGameStore((state) => [
       state.playerOneName,
@@ -38,13 +38,13 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
         case CardType.SHIELD:
           return position.type === 'deck' || position.type === 'discard';
         case CardType.MAGIC:
-          return position.type === 'magic' || position.type === 'discard';
+          return (position.type === 'magic' && isBattle) || position.type === 'discard';
         default:
           return false; // Si no conocemos el tipo no dejamos colocar
       }
     } else {
       if (CardType.CATCH === card.type) {
-        return position.type === 'fairy' && position.card === null;
+        return position.type === 'fairy' && position.card === null && !isBattle;
       } else {
         return false;
       }
@@ -97,13 +97,15 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
               tile.captured = true;
               newTiles[1][colIndex] = tile; // Actualizar el estado de la hada
               newTiles[2][1].cards.push(tile.card); // Agregar la hada capturada a la zona de hadas capturadas
+              setIsBattle(false); // Cambiar el estado de batalla a falso
               console.log('Hada capturada:', tile.card);
               if (newTiles[2][1].cards.length >= 2) {
                 console.log('Fin del juego: Capturadas dos hadas');
-                socket.emit('game-end', {
+                socket.emit('fairy-captured', {
                   reason: 'captured-two-fairies',
-                  winner: amIP1 ? playerOneName : playerTwoName,
-                }); // Emitir evento de fin de juego si se capturan dos hadas
+                  winner: amIP1,
+                  gameId: gameId,
+                });// Emitir evento de fin de juego si se capturan dos hadas
               }
             }
           }
@@ -115,13 +117,16 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
   }
 
   useEffect(() => {
+    var updatedTiles = tiles.map((row) => row.map((tile) => ({ ...tile })));
+    if (!isBattle) {
+      updatedTiles = checkMarkedFairiesForCapture(tiles, amIP1);
+    }
+    setTiles(updatedTiles);
     // Ejecutar la lógica de captura al iniciar turno
     if (isMyTurn) { // Solo ejecutar si es mi turno
       if (!isMyFirstTurn) {
-        drawCard();
+        drawCard(isBattle);
       }
-      const updatedTiles = checkMarkedFairiesForCapture(tiles, amIP1);
-      setTiles(updatedTiles);
     }
   }, [isMyTurn]);
 
@@ -167,6 +172,7 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
               ...currentTile,
               card: { ...card, placedByPlayerOne: amIP1 }, // Colocar la carta en la celda
             };
+            setIsBattle(true); // Cambiar el estado de batalla a verdadero
           }
         }
         break;
@@ -180,20 +186,30 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
   }
 
   // Renderizamos el tablero con la estructura 3x4.
+
+  //Quiero aumentar el tamaño de las casillas de la zona de juego
   return (
-    <div className="grid grid-rows-3 grid-cols-4 gap-2 p-4 w-full max-w-xl mx-auto">
+    <div className="grid grid-rows-3 grid-cols-4 gap-4 p-4 w-full max-w-5xl mx-auto auto-rows-[130px] auto-cols-[100px]">
       {/* Fila 0: Zona del Rival */}
       <div className="bg-red-500 flex items-center justify-center border">
         {tiles[0][0].type === 'deck' ? (
           tiles[0][0].cards.length > 0 ? (
-            <div className="relative h-[100px] w-[70px]">
+            <div className="relative h-[130px] w-[100px]">
               {tiles[0][0].cards.slice(-3).map((card, i) => (
                 <div
                   key={i}
-                  className="absolute top-0 left-0"
+                  className="absolute top-0 left-0 group"
                   style={{ top: `${i * 12}px`, zIndex: i }}
                 >
-                  <Card placed={true} card={card} amIP1={amIP1} />
+                  <div className="w-[100px] h-[105px] overflow-hidden">
+                    <Card placed={true} card={card} amIP1={amIP1} />
+                  </div>
+                  {/* Hover preview */}
+                  <div className="absolute z-50 hidden group-hover:block top-[-10px] left-[110px]">
+                    <div className="w-[150px] h-[200px] border bg-white shadow-lg rounded p-2">
+                      <Card placed={true} card={card} amIP1={amIP1} />
+                    </div>
+                  </div>
                 </div>
               ))}
             </div>
@@ -207,14 +223,22 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
       <div className="bg-red-500 flex items-center justify-center border">
         {tiles[0][1].type === 'capturedFairies' ? (
           tiles[0][1].cards.length > 0 ? (
-            <div className="relative h-[100px] w-[70px]">
+            <div className="relative h-[130px] w-[100px]">
               {tiles[0][1].cards.slice(-3).map((card, i) => (
                 <div
                   key={i}
-                  className="absolute top-0 left-0"
+                  className="absolute top-0 left-0 group"
                   style={{ top: `${i * 12}px`, zIndex: i }}
                 >
-                  <Card placed={true} card={card} amIP1={amIP1} />
+                  <div className="w-[100px] h-[105px] overflow-hidden">
+                    <Card placed={true} card={card} amIP1={amIP1} />
+                  </div>
+                  {/* Hover preview */}
+                  <div className="absolute z-50 hidden group-hover:block top-[-10px] left-[110px]">
+                    <div className="w-[150px] h-[200px] border bg-white shadow-lg rounded p-2">
+                      <Card placed={true} card={card} amIP1={amIP1} />
+                    </div>
+                  </div>
                 </div>
               ))}
             </div>
@@ -229,14 +253,22 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
       <div className="bg-red-500 flex items-center justify-center border">
         {tiles[0][2].type === 'discard' ? (
           tiles[0][2].cards.length > 0 ? (
-            <div className="relative h-[100px] w-[70px]">
+            <div className="relative h-[130px] w-[100px]">
               {tiles[0][2].cards.slice(-3).map((card, i) => (
                 <div
                   key={i}
-                  className="absolute top-0 left-0"
+                  className="absolute top-0 left-0 group"
                   style={{ top: `${i * 12}px`, zIndex: i }}
                 >
-                  <Card placed={true} card={card} amIP1={amIP1} />
+                  <div className="w-[100px] h-[105px] overflow-hidden">
+                    <Card placed={true} card={card} amIP1={amIP1} />
+                  </div>
+                  {/* Hover preview */}
+                  <div className="absolute z-50 hidden group-hover:block top-[-10px] left-[110px]">
+                    <div className="w-[150px] h-[200px] border bg-white shadow-lg rounded p-2">
+                      <Card placed={true} card={card} amIP1={amIP1} />
+                    </div>
+                  </div>
                 </div>
               ))}
             </div>
@@ -250,14 +282,22 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
       <div className="bg-red-500 flex items-center justify-center border">
         {tiles[0][3].type === 'magic' ? (
           tiles[0][3].cards.length > 0 ? (
-            <div className="relative h-[100px] w-[70px]">
+            <div className="relative h-[130px] w-[100px]">
               {tiles[0][3].cards.slice(-3).map((card, i) => (
                 <div
                   key={i}
-                  className="absolute top-0 left-0"
+                  className="absolute top-0 left-0 group"
                   style={{ top: `${i * 12}px`, zIndex: i }}
                 >
-                  <Card placed={true} card={card} amIP1={amIP1} />
+                  <div className="w-[100px] h-[105px] overflow-hidden">
+                    <Card placed={true} card={card} amIP1={amIP1} />
+                  </div>
+                  {/* Hover preview */}
+                  <div className="absolute z-50 hidden group-hover:block top-[-10px] left-[110px]">
+                    <div className="w-[150px] h-[200px] border bg-white shadow-lg rounded p-2">
+                      <Card placed={true} card={card} amIP1={amIP1} />
+                    </div>
+                  </div>
                 </div>
               ))}
             </div>
@@ -328,14 +368,22 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
         onClick={() => handleCellClick(tiles[2][0], 2, 0)}>
         {tiles[2][0].type === 'deck' ? (
           tiles[2][0].cards.length > 0 ? (
-            <div className="relative h-[100px] w-[70px]">
+            <div className="relative h-[130px] w-[100px]">
               {tiles[2][0].cards.slice(-3).map((card, i) => (
                 <div
                   key={i}
-                  className="absolute top-0 left-0"
+                  className="absolute top-0 left-0 group"
                   style={{ top: `${i * 12}px`, zIndex: i }}
                 >
-                  <Card placed={true} card={card} amIP1={amIP1} />
+                  <div className="w-[100px] h-[105px] overflow-hidden">
+                    <Card placed={true} card={card} amIP1={amIP1} />
+                  </div>
+                  {/* Hover preview */}
+                  <div className="absolute z-50 hidden group-hover:block top-[-10px] left-[110px]">
+                    <div className="w-[150px] h-[200px] border bg-white shadow-lg rounded p-2">
+                      <Card placed={true} card={card} amIP1={amIP1} />
+                    </div>
+                  </div>
                 </div>
               ))}
             </div>
@@ -349,14 +397,16 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
       <div className="bg-blue-500 flex items-center justify-center border">
         {tiles[2][1].type === 'capturedFairies' ? (
           tiles[2][1].cards.length > 0 ? (
-            <div className="relative h-[100px] w-[70px]">
+            <div className="relative h-[130px] w-[100px]">
               {tiles[2][1].cards.slice(-3).map((card, i) => (
                 <div
                   key={i}
-                  className="absolute top-0 left-0"
+                  className="absolute top-0 left-0 group"
                   style={{ top: `${i * 12}px`, zIndex: i }}
                 >
-                  <Card placed={true} card={card} amIP1={amIP1} />
+                  <div className="w-[100px] h-[105px] overflow-hidden">
+                    <Card placed={true} card={card} amIP1={amIP1} />
+                  </div>
                 </div>
               ))}
             </div>
@@ -373,14 +423,22 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
         onClick={() => handleCellClick(tiles[2][2], 2, 2)}>
         {tiles[2][2].type === 'discard' ? (
           tiles[2][2].cards.length > 0 ? (
-            <div className="relative h-[100px] w-[70px]">
+            <div className="relative h-[130px] w-[100px]">
               {tiles[2][2].cards.slice(-3).map((card, i) => (
                 <div
                   key={i}
-                  className="absolute top-0 left-0"
+                  className="absolute top-0 left-0 group"
                   style={{ top: `${i * 12}px`, zIndex: i }}
                 >
-                  <Card placed={true} card={card} amIP1={amIP1} />
+                  <div className="w-[100px] h-[105px] overflow-hidden">
+                    <Card placed={true} card={card} amIP1={amIP1} />
+                  </div>
+                  {/* Hover preview */}
+                  <div className="absolute z-50 hidden group-hover:block top-[-10px] left-[110px]">
+                    <div className="w-[150px] h-[200px] border bg-white shadow-lg rounded p-2">
+                      <Card placed={true} card={card} amIP1={amIP1} />
+                    </div>
+                  </div>
                 </div>
               ))}
             </div>
@@ -396,14 +454,22 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
         onClick={() => handleCellClick(tiles[2][3], 2, 3)}>
         {tiles[2][3].type === 'magic' ? (
           tiles[2][3].cards.length > 0 ? (
-            <div className="relative h-[100px] w-[70px]">
+            <div className="relative h-[130px] w-[100px]">
               {tiles[2][3].cards.slice(-3).map((card, i) => (
                 <div
                   key={i}
-                  className="absolute top-0 left-0"
+                  className="absolute top-0 left-0 group"
                   style={{ top: `${i * 12}px`, zIndex: i }}
                 >
-                  <Card placed={true} card={card} amIP1={amIP1} />
+                  <div className="w-[100px] h-[105px] overflow-hidden">
+                    <Card placed={true} card={card} amIP1={amIP1} />
+                  </div>
+                  {/* Hover preview */}
+                  <div className="absolute z-50 hidden group-hover:block top-[-10px] left-[110px]">
+                    <div className="w-[150px] h-[200px] border bg-white shadow-lg rounded p-2">
+                      <Card placed={true} card={card} amIP1={amIP1} />
+                    </div>
+                  </div>
                 </div>
               ))}
             </div>

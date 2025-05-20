@@ -86,6 +86,9 @@ export default function Card({ card, placed = false, amIP1 }: CardProps) {
     }
   }
 
+  // Renderizamos la carta con su contenido y estilos.
+  // Si la carta está colocada, le damos un borde gris.
+  // Si no, le damos un fondo blanco.
   return (
     <div
       className={`flex flex-col justify-between ${placed ? 'border border-gray-400' : ''} w-full h-full ${backgroundColor} rounded-lg`}

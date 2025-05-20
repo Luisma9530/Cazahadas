@@ -1,8 +1,8 @@
 import { create } from "zustand";
 
 export enum Result {
-  WIN = "win",
-  LOSE = "lose",
+  PLAYER1WIN = "player1win",
+  PLAYER2WIN = "player2win",
   DRAW = "draw",
 }
 

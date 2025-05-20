@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import { CardInfo, CardUnity } from "../@types/Card";
 import { deckCards } from "../utils/deck";
+import Hand from "../components/Hand";
 
 let index = 0;
 
@@ -24,7 +25,7 @@ type HandStore = {
   discardPile: CardUnity[];
   placeCard: (card: CardUnity) => void;
   discardCard: (card: CardUnity) => void;
-  drawCard: () => void;
+  drawCard: (isBattle: boolean) => void;
   drawInitialHand: () => void;
   resetStore: () => void;
 };
@@ -41,33 +42,43 @@ const useNeoHandStore = create<HandStore>((set) => ({
     return;
   },
   discardPile: [] as CardUnity[],
-  discardCard: (card) => { 
+  discardCard: (card) => {
     set((state) => ({
       playerCards: state.playerCards.filter((c) => c.id !== card.id),
       discardPile: [...state.discardPile, card],
     }))
-},
-  drawCard: () => {
+  },
+  drawCard: (isBattle: boolean) => { // Esta función se encarga de robar una carta del mazo y agregarla a la mano del jugador
     set((state) => {
-      const randomIndex = Math.floor(Math.random() * state.deck.length);
-      const [drawnCard] = state.deck.splice(randomIndex, 1);
+      if (isBattle) return { playerCards: state.playerCards }; // No robar si es batalla
+
+      const newDeck = [...state.deck];
+      const newHand = [...state.playerCards];
+
+      while (newDeck.length > 0 && newHand.length < 7) {
+        const randomIndex = Math.floor(Math.random() * newDeck.length);
+        const [drawnCard] = newDeck.splice(randomIndex, 1);
+        newHand.push({ ...drawnCard, id: index++ });
+      }
+
       return {
-        playerCards: [...state.playerCards, { ...drawnCard, id: index++ }],
+        deck: newDeck,
+        playerCards: newHand,
       };
     });
   },
   drawInitialHand: () =>
-    set((state) => ({ 
+    set((state) => ({
       playerCards: drawInitialHand(state.deck),
-     })),
+    })),
   resetStore: () => {
     index = 0;
-    return set({ 
-      playerCards: [] as CardUnity[], 
+    return set({
+      playerCards: [] as CardUnity[],
       deck: [...deckCards],
       opponentCards: [] as CardUnity[],
       opponentDeck: [...deckCards],
-     });
+    });
   },
 }));
 

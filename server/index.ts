@@ -36,23 +36,30 @@ let currentGames = {} as {
 io.on("connection", (socket) => {
   console.log("A Player with id", socket.id, "connected");
 
-  socket.on("skip-turn", (data: { tiles: Tile[][]; gameId: string }) => {
-    if (currentGames[data.gameId].playerSkippedTurn) {
+  socket.on("skip-turn", (data: { tiles: Tile[][]; gameId: string, isBattle: boolean }) => {
+    if (currentGames[data.gameId].playerSkippedTurn && !data.isBattle) {
       io.to(currentGames[data.gameId].playerIds).emit("game-end");
       return;
+    }
+    // Si el jugador ha saltado su turno y es una batalla, se termina la batalla
+    var endBattle = false;
+    if (currentGames[data.gameId].playerSkippedTurn && data.isBattle) {
+      endBattle = true
     }
     currentGames[data.gameId].playerSkippedTurn = true;
     io.to(currentGames[data.gameId].playerIds).emit("new-turn", {
       tiles: data.tiles,
       playerSkippedTurn: currentGames[data.gameId].playerSkippedTurn,
+      endBattle: endBattle,
     });
   });
 
-  socket.on("place-card", (data: { tiles: Tile[][]; gameId: string }) => {
+  socket.on("place-card", (data: { tiles: Tile[][]; gameId: string, isBattle: boolean }) => {
     currentGames[data.gameId].playerSkippedTurn = false;
     io.to(currentGames[data.gameId].playerIds).emit("new-turn", {
       tiles: data.tiles,
       playerSkippedTurn: currentGames[data.gameId].playerSkippedTurn,
+      endBattle: false
     });
   });
 
@@ -69,6 +76,16 @@ io.on("connection", (socket) => {
       return;
     }
   });
+  socket.on("fairy-captured", (data) => {
+    const game = currentGames[data.gameId];
+    if (!game) return;
+
+    io.to(game.playerIds).emit("game-end", {
+      reason: data.reason,
+      winner: data.winner,
+    });
+  });
+
 
   // rooms
 

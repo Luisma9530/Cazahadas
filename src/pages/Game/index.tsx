@@ -4,7 +4,7 @@ import Hand from "../../components/Hand";
 import socket from "../../socket";
 import { Tile } from "../../@types/Tile";
 import useBoardStore from "../../store/BoardStore";
-import { useGameStore } from "../../store/GameStore";
+import { Result, useGameStore } from "../../store/GameStore";
 import { usePointStore } from "../../store/PointsStore";
 import SkipTurn from "../../components/SkipTurn";
 import { useModalStore } from "../../store/ModalStore";
@@ -25,9 +25,9 @@ export default function Game() {
   const [gameBusy, setGameBusy] = useState(false)
   const [isCopied, setIsCopied] = useState(false);
 
-  const [isMyTurn, toggleTurn, setPlayerSkippedTurn] = useTurnStore((state) => [state.isMyTurn, state.toggleTurn, state.setPlayerSkippedTurn])
+  const [isMyTurn, toggleTurn, setPlayerSkippedTurn, setIsBattle, isBattle] = useTurnStore((state) => [state.isMyTurn, state.toggleTurn, state.setPlayerSkippedTurn, state.setIsBattle, state.isBattle])
   const [setBoard] = useBoardStore((state) => [state.setBoard])
-  const [amIP1, setAmIP1, gameOver, setGameOver, setPlayerOneName, setPlayerTwoName, setPlayerDisconnected] = useGameStore((state) => [state.amIP1, state.setAmIP1, state.gameOver, state.setGameOver, state.setPlayerOneName, state.setPlayerTwoName, state.setPlayerDisconnected])
+  const [amIP1, setAmIP1, gameOver, setGameOver, setPlayerOneName, setPlayerTwoName, setPlayerDisconnected, setGameResult, gameResult] = useGameStore((state) => [state.amIP1, state.setAmIP1, state.gameOver, state.setGameOver, state.setPlayerOneName, state.setPlayerTwoName, state.setPlayerDisconnected, state.setGameResult, state.gameResult])
   const [setPoints] = usePointStore((state) => [state.setPoints])
 
   const { id: gameId } = useParams<{ id: string }>()
@@ -59,8 +59,13 @@ export default function Game() {
       setPlayerTwoName(data[1])
     })
 
-    socket.on('new-turn', (data: { tiles: Tile[][], playerSkippedTurn: boolean }) => {
-      setPlayerSkippedTurn(data.playerSkippedTurn)
+    socket.on('new-turn', (data: { tiles: Tile[][], playerSkippedTurn: boolean, endBattle: boolean }) => {
+      if (isBattle && data.endBattle) {
+        setPlayerSkippedTurn(false)
+        setIsBattle(false)
+      } else {
+        setPlayerSkippedTurn(data.playerSkippedTurn)
+      }
       setPoints(data.tiles)
       toggleTurnModal()
       if (!isMyTurn) {
@@ -76,9 +81,9 @@ export default function Game() {
       if (data?.playerDisconnected) {
         setPlayerDisconnected(true)
       }
-      
       if (data?.reason === 'captured-two-fairies') {
         console.log(`¡Ganó ${data.winner} capturando dos hadas!`);
+        setGameResult(data.winner === amIP1 ? Result.PLAYER1WIN : Result.PLAYER2WIN)
       }
 
       setGameOver(true)
@@ -150,7 +155,7 @@ export default function Game() {
       }
       {gameStartModal && !gameOver && <GameStartModal />}
       {turnModal && !gameOver && <TurnModal />}
-      {gameOver && <EndGameModal />}
+      {gameOver && <EndGameModal amIP1={amIP1} winner={gameResult}/>}
     </div>
   )
 }
