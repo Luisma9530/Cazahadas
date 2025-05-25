@@ -2,7 +2,6 @@ import { useEffect } from "react";
 import socket from "../socket";
 import { Tile } from "../@types/Tile";
 import useBoardStore from "../store/BoardStore";
-import { useGameStore } from "../store/GameStore";
 import useNeoHandStore from "../store/NeoHandStore";
 import useTurnStore from "../store/TurnStore";
 import useCardStore from "../store/CardStore"; // Para la carta seleccionada
@@ -19,12 +18,10 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
     state.selectedCard,
     state.resetSelectedCard,
   ]);
-  const [isMyTurn, isMyFirstTurn, isBattle, setIsBattle] = useTurnStore((state) => [state.isMyTurn, state.isMyFirstTurn, state.isBattle, state.setIsBattle]);
-  const [playerOneName, playerTwoName] =
-    useGameStore((state) => [
-      state.playerOneName,
-      state.playerTwoName,
-    ]);
+  const [isMyTurn, isMyFirstTurn, isBattle, setIsBattle, setIsMyFirstTurn] = useTurnStore((state) => [state.isMyTurn, state.isMyFirstTurn, state.isBattle, state.setIsBattle, state.setIsMyFirstTurn]);
+
+  const [drawInitialHand] = useNeoHandStore((state) => [state.drawInitialHand])
+
   const [placeCard, drawCard] = useNeoHandStore((state) => [state.placeCard, state.drawCard]);
 
   const { id: gameId } = useParams<{ id: string }>();
@@ -127,6 +124,9 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
     if (isMyTurn) { // Solo ejecutar si es mi turno
       if (!isMyFirstTurn) {
         drawCard(isBattle);
+      } else {
+        drawCard(isBattle)
+        setIsMyFirstTurn(false)
       }
     }
   }, [isMyTurn]);

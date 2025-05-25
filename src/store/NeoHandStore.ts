@@ -1,7 +1,6 @@
 import { create } from "zustand";
 import { CardInfo, CardUnity } from "../@types/Card";
 import { deckCards } from "../utils/deck";
-import Hand from "../components/Hand";
 
 let index = 0;
 
