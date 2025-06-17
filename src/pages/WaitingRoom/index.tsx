@@ -1,8 +1,6 @@
 import { useNavigate, useParams } from "react-router-dom"
 import socket from "../../socket"
 import { useState } from "react"
-import Lottie from "lottie-react";
-import mageIdle from "../../assets/animations/wizard.json";
 
 
 export function WaitingRoom() {
@@ -24,10 +22,6 @@ export function WaitingRoom() {
 
   return (
     <div className="flex justify-center items-center gap-10">
-      {/* Animación del mago a la izquierda */}
-      <div className="w-64">
-        <Lottie animationData={mageIdle} loop autoplay />
-      </div>
 
       {/* Formulario para unirse */}
       <div className="border border-black rounded-lg">
@@ -45,11 +39,6 @@ export function WaitingRoom() {
             <span className="text-2xl font-medium text-black group-hover:text-white">Join Game</span>
           </button>
         </div>
-      </div>
-
-      {/* Animación del mago a la izquierda */}
-      <div className="w-64">
-        <Lottie animationData={mageIdle} loop autoplay />
       </div>
     </div>
   )
