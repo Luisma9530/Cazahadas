@@ -8,7 +8,7 @@ export function TurnModal() {
   const [isMyTurn, isMyFirstTurn, setIsMyFirstTurn] = useTurnStore((state) => [state.isMyTurn, state.isMyFirstTurn, state.setIsMyFirstTurn])
   const [drawInitialHand] = useNeoHandStore((state) => [state.drawInitialHand])
 
-  return <div className="fixed mt-[320px] top-0 left-0 w-full h-full flex items-start justify-center">
+  return <div className="fixed mt-[320px] top-0 left-0 w-full h-full flex items-start justify-center z-50">
     <motion.div
       animate={{ opacity: [0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0], scaleY: [1, 1, 1, 1, 1, 1, 0.9, 0.8, 0.7, 0.6, 0.0], scaleX: [0, 1, 1, 1, 1, 1, 1, 1.1, 1.2, 1.3] }}
       transition={{ duration: 2, times: [0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0], }}
@@ -23,4 +23,4 @@ export function TurnModal() {
       </motion.h2>
     </motion.div>
   </div>
-} 
+}

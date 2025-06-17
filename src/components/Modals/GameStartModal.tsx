@@ -5,7 +5,7 @@ export function GameStartModal() {
 
   const [toggleGameStartModal, toggleTurnModal] = useModalStore((state) => [state.toggleGameStartModal, state.toggleTurnModal]);
 
-  return <div className="fixed mt-[320px] top-0 left-0 w-full h-full flex items-start justify-center">
+  return <div className="fixed mt-[320px] top-0 left-0 w-full h-full flex items-start justify-center z-50">
     <motion.div
       animate={{ opacity: [0, 1, 1, 0] }}
       key="game-start-modal"
@@ -21,4 +21,4 @@ export function GameStartModal() {
       <h2 className="text-5xl font-normal text-yellow-300">Draw Blood!</h2>
     </motion.div>
   </div>
-} 
+}

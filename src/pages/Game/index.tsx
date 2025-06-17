@@ -15,9 +15,9 @@ import { EndGameModal } from "../../components/Modals/EndGameModal";
 import { useParams } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCopy } from "@fortawesome/free-regular-svg-icons";
-
-
-
+import useBackgroundStore from "../../store/BackgroundStore";
+import homeBackground from '../../assets/images/homeBackground.png';
+import wizard from "../../assets/images/wizard.png";
 
 
 export default function Game() {
@@ -29,6 +29,7 @@ export default function Game() {
   const [setBoard] = useBoardStore((state) => [state.setBoard])
   const [amIP1, setAmIP1, gameOver, setGameOver, setPlayerOneName, setPlayerTwoName, setPlayerDisconnected, setGameResult, gameResult] = useGameStore((state) => [state.amIP1, state.setAmIP1, state.gameOver, state.setGameOver, state.setPlayerOneName, state.setPlayerTwoName, state.setPlayerDisconnected, state.setGameResult, state.gameResult])
   const [setPoints] = usePointStore((state) => [state.setPoints])
+  const { setBackground } = useBackgroundStore();
 
   const { id: gameId } = useParams<{ id: string }>()
 
@@ -55,6 +56,7 @@ export default function Game() {
       if (amIP1) {
         toggleTurn()
       }
+      setBackground(homeBackground)
       setPlayerOneName(data[0])
       setPlayerTwoName(data[1])
     })
@@ -144,10 +146,17 @@ export default function Game() {
         </div>
       }
       {
-        shouldShowBoard && <div className="h-full">
-          <Board amIP1={amIP1} />
-          <SkipTurn />
-          <Hand />
+        shouldShowBoard &&
+        <div>
+          <div className="scale-[0.65] -mt-16">
+            <Board amIP1={amIP1} />
+          </div>
+          <div className="-mt-[13rem]">
+            <SkipTurn />
+          </div>
+          <div className="-mt-[6rem]">
+            <Hand />
+          </div>
         </div>
       }
       {
@@ -155,7 +164,7 @@ export default function Game() {
       }
       {gameStartModal && !gameOver && <GameStartModal />}
       {turnModal && !gameOver && <TurnModal />}
-      {gameOver && <EndGameModal amIP1={amIP1} winner={gameResult}/>}
+      {gameOver && <EndGameModal amIP1={amIP1} winner={gameResult} />}
     </div>
   )
 }
