@@ -29,22 +29,21 @@ export default function SkipTurn() {
   }
 
   return (
-    <div className="flex w-11/12 items-center justify-end p-2 h-20">
-      <AnimatePresence>
-        {isMyTurn && !gameOver && (
-          <motion.span
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className={`mr-8 text-4xl rounded-full bg-gray-50 hover:bg-gray-200 transition duration-200
-        shadow-xl cursor-pointer  text-black border-4 border-yellow-400 py-1 px-12`}
-            onClick={handleSkipTurn}
-          > 
-          {playerSkippedTurn ? (isBattle ? 'End battle' : 'End game') : 'Skip turn'} 
-          </motion.span> // Si el jugador ha saltado su turno, se muestra "End battle" o "End game" dependiendo de si es una batalla o no.
-        )
-        }
-      </AnimatePresence>
-    </div>
-  )
+  <div className="flex w-11/12 items-center justify-end p-2 h-20 relative z-50">
+    <AnimatePresence>
+      {isMyTurn && !gameOver && (
+        <motion.span
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          className={`-mt-20 text-4xl rounded-full bg-gray-50 hover:bg-gray-200 transition duration-200
+      shadow-xl cursor-pointer text-black border-4 border-yellow-400 py-1 px-12 z-50`}
+          onClick={handleSkipTurn}
+        > 
+        {playerSkippedTurn ? (isBattle ? 'End battle' : 'End game') : 'Skip turn'} 
+        </motion.span>
+      )}
+    </AnimatePresence>
+  </div>
+)
 }

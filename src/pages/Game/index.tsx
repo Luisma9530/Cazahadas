@@ -138,10 +138,12 @@ export default function Game() {
     <div className="h-full overflow-x-hidden w-full">
       {
         loading && <div className="flex flex-col items-center gap-10">
-          <p className="text-center">Waiting for another player...</p>
+          <p className="text-center text-white text-xl">Waiting for another player...</p>
           <div className="flex gap-6" title={`${isCopied ? 'Copied!' : 'Copy'}`}>
-            <h1 className="text-5xl " >{gameId}</h1>
-            <button className="cursor-pointer" onClick={() => handleGameIdClick(gameId)}><FontAwesomeIcon icon={faCopy} size={"xl"} /></button>
+            <h1 className="text-5xl text-white font-bold">{gameId}</h1>
+            <button className="cursor-pointer text-white hover:text-gray-300 transition-colors" onClick={() => handleGameIdClick(gameId)}>
+              <FontAwesomeIcon icon={faCopy} size={"xl"} />
+            </button>
           </div>
         </div>
       }

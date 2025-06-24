@@ -91,7 +91,7 @@ export default function DefaultLayout() {
       <div className="flex flex-col justify-center items-center mt-2 h-full w-full">
         {!showRules && (
           <h1
-            className="font-light z-50 text-5xl hover:cursor-pointer font-title"
+            className="font-light z-50 text-5xl hover:cursor-pointer font-title text-white drop-shadow-lg"
             onClick={handleTitleClick}
           >
             Cazahadas
