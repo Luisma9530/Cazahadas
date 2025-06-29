@@ -15,8 +15,8 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [notification, setNotification] = useState<{ type: 'success' | 'error', message: string } | null>(null);
-  const [setLogedUser, setPassword] = useAuthStore((state) => [ state.setLogedUser, state.setPassword]);
-
+  const [setLogedUser, setPassword] = useAuthStore((state) => [state.setLogedUser, state.setPassword]);
+  const API_URL = import.meta.env.VITE_API_URL;
 
   const [loginData, setLoginData] = useState({
     username: '',
@@ -70,7 +70,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
     e.preventDefault();
     console.log("Login data:", loginData);
     try {
-      const response = await fetch("http://localhost:8000/login", {
+      const response = await fetch(`${API_URL}/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -104,7 +104,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
       return;
     }
     try {
-      const response = await fetch("http://localhost:8000/create-user", {
+      const response = await fetch(`${API_URL}/create-user`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

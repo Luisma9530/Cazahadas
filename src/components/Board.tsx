@@ -28,6 +28,8 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
   const [logedUser, password] = useAuthStore((state) => [state.logedUser, state.password]);
 
   const { id: gameId } = useParams<{ id: string }>();
+  const API_URL = import.meta.env.VITE_API_URL;
+
 
   // Validación para colocar carta en zona de juego
   function canAddCardToPosition(card: any, position: Tile, rowIndex: number): boolean {
@@ -68,9 +70,10 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
     }
   });
 
+
   async function sendCapturedFairies() {
     try {
-      const response = await fetch("http://localhost:8000/add-score", {
+      const response = await fetch(`${API_URL}/add-score`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

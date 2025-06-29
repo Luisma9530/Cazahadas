@@ -33,6 +33,7 @@ export default function DefaultLayout() {
   const [showAuth, setShowAuth] = useState(false);
   const [logedUser] = useAuthStore((state) => [state.logedUser]);
   const [scores, setScores] = useState([]);
+  const API_URL = import.meta.env.VITE_API_URL;
 
 
   const location = useLocation();
@@ -52,7 +53,7 @@ export default function DefaultLayout() {
 
   const fetchScores = async () => {
     try {
-      const response = await fetch("http://localhost:8000/get-scores");
+      const response = await fetch(`${API_URL}/get-scores`);
       const data = await response.json();
       setScores(data);
     } catch (error) {
