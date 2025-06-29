@@ -1,6 +1,7 @@
 import { CardUnity } from '../@types/Card'
 import useCardStore from '../store/CardStore'
 import Card from './Card'
+import socket from "../socket";
 import useNeoHandStore from '../store/NeoHandStore'
 import { AnimatePresence, motion } from 'framer-motion'
 import hoverSound from '../assets/sounds/hover.wav'
@@ -37,6 +38,7 @@ export default function Hand() {
     flickAudio.currentTime = 0
     flickAudio.volume = 0.4
     flickAudio.play()
+    socket.emit("selected-card", { card });
   }
 
   const handleHoverStart = (card: CardUnity) => {

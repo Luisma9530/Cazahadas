@@ -3,6 +3,7 @@ import socket from '../../socket'
 import { useEffect, useState } from 'react'
 import waitingRoomBackground from '../../assets/images/waitingRoomBackground.png';
 import useBackgroundStore from "../../store/BackgroundStore";
+import { useAuthStore } from '../../store/LoginStore';
 
 export default function Home() {
   const navigate = useNavigate()
@@ -10,6 +11,7 @@ export default function Home() {
   const [gameId, setGameId] = useState<string>('')
   const [errorMessage, setErrorMessage] = useState<string>('')
   const { setBackground } = useBackgroundStore();
+  const [logedUser] = useAuthStore((state) => [state.logedUser]);
 
   useEffect(() => {
     socket.on('game-busy', () => {
@@ -41,6 +43,9 @@ export default function Home() {
   }
 
   const handleStartGame = () => {
+    if (logedUser) {
+      setPlayerName(logedUser)
+    }
     const randomGameId = generateUUID()
     navigate(`/game/${randomGameId}`)
     setBackground(waitingRoomBackground)
@@ -87,7 +92,14 @@ export default function Home() {
       </div>
       <div className="border border-black border-solid-2 rounded-lg bg-white">
         <div className="flex flex-col items-center justify-center gap-6 p-10">
-          <input value={playerName} onChange={handleChangePlayerNameInput} className="text-sm w-72 py-2 px-1 text-center border border-solid-1 border-gray-400 rounded-md" placeholder="Your name" />
+          {!logedUser &&
+            <input value={playerName} onChange={handleChangePlayerNameInput} className="text-sm w-72 py-2 px-1 text-center border border-solid-1 border-gray-400 rounded-md" placeholder="Your name" />
+          }
+          {logedUser &&
+            <span className="text-sm w-72 py-2 px-1 text-center border border-solid-1 border-gray-400 rounded-md">
+              {logedUser}
+            </span>
+          }
           <button
             onClick={handleStartGame}
             className="rounded-md w-72 px-4 py-2 border text-black border-black hover:bg-gray-700 hover:border-gray-700 group active:translate-y-2"

@@ -8,12 +8,14 @@ import { usePointStore } from "../store/PointsStore";
 import useTurnStore from "../store/TurnStore";
 import useNeoHandStore from "../store/NeoHandStore";
 import homeBackground from '../assets/images/homeBackground.png';
-import createGameBackground from '../assets/images/createGameBackground.png';
-import gameBackground from '../assets/images/gameBackground.png';
 import waitingRoomBackground from '../assets/images/waitingRoomBackground.png';
 import useBackgroundStore from "../store/BackgroundStore";
 import GameRulesModal from "../components/Modals/GameRulesModal";
-import { Sparkles } from "lucide-react";
+import ScoreboardModal from "../components/Modals/ScoreBoardModal"; // Importar el nuevo modal
+import { Sparkles, Trophy } from "lucide-react"; // Añadir icono Trophy
+import AuthModal from '../components/Modals/AuthModal';
+import { User } from 'lucide-react';
+import { useAuthStore } from "../store/LoginStore";
 
 
 export default function DefaultLayout() {
@@ -27,6 +29,11 @@ export default function DefaultLayout() {
   const [resetNeoHandStore] = useNeoHandStore((state) => [state.resetStore])
   const { background, resetBackground } = useBackgroundStore();
   const [showRules, setShowRules] = useState(false);
+  const [showScoreboard, setShowScoreboard] = useState(false);
+  const [showAuth, setShowAuth] = useState(false);
+  const [logedUser] = useAuthStore((state) => [state.logedUser]);
+  const [scores, setScores] = useState([]);
+
 
   const location = useLocation();
 
@@ -41,6 +48,16 @@ export default function DefaultLayout() {
       return `url(${waitingRoomBackground})`;
     }
     return "none";
+  };
+
+  const fetchScores = async () => {
+    try {
+      const response = await fetch("http://localhost:8000/get-scores");
+      const data = await response.json();
+      setScores(data);
+    } catch (error) {
+      console.error("Error al obtener puntuaciones:", error);
+    }
   };
 
 
@@ -61,6 +78,13 @@ export default function DefaultLayout() {
     navigate('/')
   }
 
+  const handleScoreboardClick = () => {
+    fetchScores();
+    setShowScoreboard(true);
+  };
+
+
+
 
   return (
     <div className="h-full overflow-x-hidden overflow-y-hidden"
@@ -80,7 +104,27 @@ export default function DefaultLayout() {
         <Sparkles className="w-6 h-6" />
       </button>
 
-      {/* Modal */}
+      {/* Botón de Scoreboard */}
+      <button
+        onClick={() => handleScoreboardClick()}
+        className="absolute top-4 right-20 z-50 bg-gradient-to-r from-green-400 to-blue-500 text-white p-3 rounded-full shadow-lg hover:scale-110 transition-transform"
+        title="Ver puntuaciones"
+      >
+        <Trophy className="w-6 h-6" />
+      </button>
+
+      {/* Botón de Inicio de Sesión */}
+      {!logedUser &&
+        <button
+          onClick={() => setShowAuth(true)}
+          className="absolute top-4 right-36 z-50 bg-gradient-to-r from-purple-400 to-pink-500 text-white p-3 rounded-full shadow-lg hover:scale-110 transition-transform"
+          title="Iniciar sesión"
+        >
+          <User className="w-6 h-6" />
+        </button>
+      }
+
+      {/* Modal de Reglas */}
       {showRules &&
         <GameRulesModal
           isOpen={showRules}
@@ -88,8 +132,25 @@ export default function DefaultLayout() {
         />
       }
 
+      {/* Modal de Scoreboard */}
+      {showScoreboard &&
+        <ScoreboardModal
+          isOpen={showScoreboard}
+          onClose={() => setShowScoreboard(false)}
+          scores={scores} // Puedes pasar datos reales aquí
+        />
+      }
+
+      {/* Modal de Autenticación */}
+      {showAuth &&
+        <AuthModal
+          isOpen={showAuth}
+          onClose={() => setShowAuth(false)}
+        />
+      }
+
       <div className="flex flex-col justify-center items-center mt-2 h-full w-full">
-        {!showRules && (
+        {(!showRules && !showAuth && !showScoreboard) && (
           <h1
             className="font-light z-50 text-5xl hover:cursor-pointer font-title text-white drop-shadow-lg"
             onClick={handleTitleClick}

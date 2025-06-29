@@ -29,7 +29,7 @@ export default function SkipTurn() {
   }
 
   return (
-  <div className="flex w-11/12 items-center justify-end p-2 h-20 relative z-50">
+  <div className="flex w-11/12 items-center justify-end p-2 h-20 relative z-10">
     <AnimatePresence>
       {isMyTurn && !gameOver && (
         <motion.span
@@ -37,7 +37,7 @@ export default function SkipTurn() {
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           className={`-mt-20 text-4xl rounded-full bg-gray-50 hover:bg-gray-200 transition duration-200
-      shadow-xl cursor-pointer text-black border-4 border-yellow-400 py-1 px-12 z-50`}
+      shadow-xl cursor-pointer text-black border-4 border-yellow-400 py-1 px-12 z-10`}
           onClick={handleSkipTurn}
         > 
         {playerSkippedTurn ? (isBattle ? 'End battle' : 'End game') : 'Skip turn'} 

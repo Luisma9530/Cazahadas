@@ -1,7 +1,7 @@
 import { motion } from "framer-motion";
 import { Fireworks } from '@fireworks-js/react'
 import type { FireworksHandlers } from '@fireworks-js/react'
-import { Result, useGameStore } from "../../store/GameStore";
+import { Result } from "../../store/GameStore";
 import { useRef } from "react";
 import explosion0 from "../../assets/sounds/explosion0.mp3";
 import explosion1 from "../../assets/sounds/explosion1.mp3";

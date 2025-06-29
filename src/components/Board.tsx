@@ -9,6 +9,7 @@ import Card from "../components/Card";
 import { CardType, CardUnity } from "../@types/Card";
 import { useParams } from "react-router-dom";
 import { hydrateCard } from "../utils/hydrateCard"; // Para rehidratar cartas
+import { useAuthStore } from '../store/LoginStore';
 
 export default function Board({ amIP1 }: { amIP1: boolean }) {
   // Obtenemos el estado del tablero (estructura 3x4) desde el store
@@ -23,6 +24,8 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
   const [drawInitialHand] = useNeoHandStore((state) => [state.drawInitialHand])
 
   const [placeCard, drawCard] = useNeoHandStore((state) => [state.placeCard, state.drawCard]);
+
+  const [logedUser, password] = useAuthStore((state) => [state.logedUser, state.password]);
 
   const { id: gameId } = useParams<{ id: string }>();
 
@@ -45,6 +48,46 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
       } else {
         return false;
       }
+    }
+  }
+
+  socket.on("selected-card", (data: { card: CardUnity }) => {
+    switch (data.card.type) {
+      case CardType.MAGIC:
+
+        break;
+      case CardType.SHIELD:
+
+        break;
+      case CardType.CATCH:
+
+        break;
+      default:
+        console.warn(`Tipo de carta no reconocido: ${(data.card as any).type}`);
+        break;
+    }
+  });
+
+  async function sendCapturedFairies() {
+    try {
+      const response = await fetch("http://localhost:8000/add-score", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          logedUser,
+          password,
+        }),
+      });
+
+      if (!response.ok) {
+        console.error("❌ Error al guardar puntos en la base de datos:", await response.json());
+      } else {
+        console.log("✅ Puntos añadidos correctamente");
+      }
+    } catch (error) {
+      console.error("❌ Error de red al enviar puntos:", error);
     }
   }
 
@@ -95,7 +138,9 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
               newTiles[1][colIndex] = tile; // Actualizar el estado de la hada
               newTiles[2][1].cards.push(tile.card); // Agregar la hada capturada a la zona de hadas capturadas
               setIsBattle(false); // Cambiar el estado de batalla a falso
-              console.log('Hada capturada:', tile.card);
+              if (logedUser) {
+                sendCapturedFairies()
+              }
               if (newTiles[2][1].cards.length >= 2) {
                 console.log('Fin del juego: Capturadas dos hadas');
                 socket.emit('fairy-captured', {

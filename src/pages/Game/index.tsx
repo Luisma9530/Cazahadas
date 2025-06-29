@@ -85,7 +85,11 @@ export default function Game() {
       }
       if (data?.reason === 'captured-two-fairies') {
         console.log(`¡Ganó ${data.winner} capturando dos hadas!`);
-        setGameResult(data.winner === amIP1 ? Result.PLAYER1WIN : Result.PLAYER2WIN)
+        if (data.winner === amIP1) {
+          setGameResult(Result.PLAYER1WIN)
+        } else {
+          setGameResult(Result.PLAYER2WIN)
+        }
       }
 
       setGameOver(true)
