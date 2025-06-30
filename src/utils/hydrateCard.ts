@@ -12,7 +12,6 @@ const cardMap: Record<CardKey, CardInfo> = deckCards.reduce((acc, card) => {
 
 // Función para rehidratar una carta plana
 export function hydrateCard(card: Partial<CardInfo>): CardInfo {
-    console.log(card);
     const key = `${card.type}-${card.name}` as CardKey;
     const original = cardMap[key];
 

@@ -49,7 +49,6 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
   const showNotification = (type: 'success' | 'error', message: string) => {
     setNotification({ type, message });
     setTimeout(() => setNotification(null), 5000);
-    console.log(message)
   };
 
   const validateForm = (data: typeof registerData, isRegister: boolean): string | null => {
@@ -68,7 +67,6 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Login data:", loginData);
     try {
       const response = await fetch(`${API_URL}/login`, {
         method: "POST",
@@ -83,7 +81,6 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
 
       if (response.ok) {
         alert("✅ Login exitoso");
-        console.log("Login data:", data);
         setLogedUser(data.username);
         setPassword(loginData.password);
         onClose();
