@@ -31,7 +31,7 @@ export default function DefaultLayout() {
   const [showRules, setShowRules] = useState(false);
   const [showScoreboard, setShowScoreboard] = useState(false);
   const [showAuth, setShowAuth] = useState(false);
-  const [logedUser] = useAuthStore((state) => [state.logedUser]);
+  const [logedUser, setLogedUser, setPassword] = useAuthStore((state) => [state.logedUser, state.setLogedUser, state.setPassword]);
   const [scores, setScores] = useState([]);
   const API_URL = import.meta.env.VITE_API_URL;
 
@@ -84,7 +84,10 @@ export default function DefaultLayout() {
     setShowScoreboard(true);
   };
 
-
+  const closeSesion = () => {
+    setLogedUser(null);
+    setPassword(null);
+  }
 
 
   return (
@@ -124,6 +127,19 @@ export default function DefaultLayout() {
           <User className="w-6 h-6" />
         </button>
       }
+
+      {/* Botón de Cerrar de Sesión */}
+      {logedUser &&
+        <button
+          onClick={() => closeSesion()}
+          className="absolute top-4 right-36 z-50 bg-gradient-to-r from-purple-400 to-pink-500 text-white p-3 rounded-full shadow-lg hover:scale-110 transition-transform"
+          title="Iniciar sesión"
+        >
+          Cerrar sesión
+        </button>
+      }
+
+
 
       {/* Modal de Reglas */}
       {showRules &&

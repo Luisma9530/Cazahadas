@@ -162,6 +162,11 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
   }
 
   useEffect(() => {
+    // Ejecutar drawCard una vez al cargar el componente por primera vez
+    drawCard(isBattle);
+  }, []);
+
+  useEffect(() => {
     var updatedTiles = tiles.map((row) => row.map((tile) => ({ ...tile })));
     setIsBattle(chechIsBattle(updatedTiles));
     if (!isBattle) {

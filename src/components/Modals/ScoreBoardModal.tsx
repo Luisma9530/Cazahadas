@@ -133,7 +133,7 @@ const ScoreboardModal: React.FC<ScoreboardModalProps> = ({
             <div className="text-center mb-8">
               <div className="mb-4">
                 <h1 className="text-4xl md:text-5xl font-bold text-green-400 mb-2 font-mono tracking-wider animate-pulse">
-                  ◊ HALL OF FAME ◊
+                  ◊ SALÓN DE LA FAMA ◊
                 </h1>
                 <div className="text-green-300 text-lg font-mono font-semibold">
                   ═══════════════════════════════
@@ -156,8 +156,8 @@ const ScoreboardModal: React.FC<ScoreboardModalProps> = ({
             {/* Headers de la tabla */}
             <div className="grid grid-cols-12 gap-2 mb-4 px-4 py-2 bg-green-900/30 border border-green-500 rounded font-mono text-green-300 text-sm font-bold">
               <div className="col-span-2 text-center font-extrabold">RNK</div>
-              <div className="col-span-6 font-extrabold">PLAYER NAME</div>
-              <div className="col-span-4 text-center font-extrabold">FAIRIES</div>
+              <div className="col-span-6 font-extrabold">NOMBRE DEL UGADOR</div>
+              <div className="col-span-4 text-center font-extrabold">HADAS CAPTURADAS</div>
             </div>
 
             {/* Lista de puntuaciones */}
@@ -207,7 +207,7 @@ const ScoreboardModal: React.FC<ScoreboardModalProps> = ({
                 onClick={onClose}
                 className="bg-gradient-to-r from-green-600 via-green-500 to-green-600 text-black font-bold px-8 py-3 rounded-lg border-2 border-green-400 hover:scale-105 hover:shadow-lg transition-all duration-200 font-mono text-lg shadow-md hover:from-green-500 hover:to-green-500 animate-pulse"
               >
-                [RETURN TO GAME]
+                [VOLVER AL JUEGO]
               </button>
             </div>
 
