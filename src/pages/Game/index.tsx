@@ -18,6 +18,8 @@ import { faCopy } from "@fortawesome/free-regular-svg-icons";
 import useBackgroundStore from "../../store/BackgroundStore";
 import homeBackground from '../../assets/images/homeBackground.png';
 import wizard from "../../assets/images/wizard.png";
+import e from "cors";
+import { CardType, CardUnity } from "../../@types/Card";
 
 
 export default function Game() {
@@ -61,11 +63,11 @@ export default function Game() {
       setPlayerTwoName(data[1])
     })
 
-    socket.on('new-turn', (data: { tiles: Tile[][], playerSkippedTurn: boolean, endBattle: boolean }) => {
-      if (isBattle && data.endBattle) {
+    socket.on('new-turn', (data: { tiles: Tile[][], playerSkippedTurn: boolean, endBattle: boolean, selectedCard: CardUnity }) => {
+      if (isBattle && data.endBattle) { // Si es una batalla y se terminó, se reinicia el estado de batalla
         setPlayerSkippedTurn(false)
         setIsBattle(false)
-      } else {
+      } else { // Si no es una batalla o no se terminó, se actualiza el estado de si el jugador saltó su turno
         setPlayerSkippedTurn(data.playerSkippedTurn)
       }
       setPoints(data.tiles)
@@ -79,19 +81,26 @@ export default function Game() {
       toggleTurn()
     })
 
-    socket.on('game-end', (data) => {
+    socket.on('game-end', (data: { tiles: Tile[][], playerDisconnected: boolean, winner: boolean, reason: string }) => {
+      setPlayerSkippedTurn(false)
       if (data?.playerDisconnected) {
         setPlayerDisconnected(true)
-      }
-      if (data?.reason === 'captured-two-fairies') {
-        console.log(`¡Ganó ${data.winner} capturando dos hadas!`);
-        if (data.winner === amIP1) {
+        if (amIP1) {
           setGameResult(Result.PLAYER1WIN)
         } else {
           setGameResult(Result.PLAYER2WIN)
         }
       }
-
+      if (data?.reason === 'captured-two-fairies') {
+        console.log(`¡Ganó ${data.winner} capturando dos hadas!`);
+        if (data.winner) {
+          setGameResult(Result.PLAYER1WIN)
+          console.log("Ganó el jugador 1");
+        } else {
+          setGameResult(Result.PLAYER2WIN)
+          console.log("Ganó el jugador 2");
+        }
+      }
       setGameOver(true)
     })
 

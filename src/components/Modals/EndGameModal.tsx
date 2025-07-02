@@ -14,8 +14,8 @@ export function EndGameModal({ amIP1, winner }: { amIP1: boolean, winner: Result
   // Si soy el jugador 1 y el resultado es PLAYER1WIN, entonces soy el ganador
   // Si soy el jugador 2 y el resultado es PLAYER2WIN, entonces soy el ganador
   return <div className="fixed top-0 left-0 w-full h-full flex items-center justify-center backdrop-blur-[2px] z-50 pointer-events-none">
-    {winner === Result.PLAYER1WIN && !amIP1 ||
-      winner === Result.PLAYER2WIN && amIP1 &&
+    {((winner === Result.PLAYER1WIN && amIP1) ||
+      (winner === Result.PLAYER2WIN && !amIP1)) &&
       <>
         <div className="px-20 py-12 mb-96 fixed inset-0 z-[60] flex items-center justify-center pointer-events-none">
           <motion.h2
@@ -47,8 +47,8 @@ export function EndGameModal({ amIP1, winner }: { amIP1: boolean, winner: Result
         />
       </>
     }
-    {winner === Result.PLAYER2WIN && !amIP1 ||
-      winner === Result.PLAYER1WIN && amIP1 &&
+    {((winner === Result.PLAYER1WIN && !amIP1) ||
+      (winner === Result.PLAYER2WIN && amIP1)) &&
       <div className="px-20 py-12 mb-96 z-[60] relative pointer-events-none">
         <h2 className="text-8xl font-semibold text-red-500 drop-shadow-[0_1.2px_1.2px_rgba(0,0,0,0.8)]">You Lose!</h2>
       </div>}

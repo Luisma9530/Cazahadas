@@ -116,7 +116,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
         alert("✅ Usuario creado con éxito");
         onClose();
       } else {
-        alert("❌ Error: " + data);
+        alert("❌ Error: " + data.detail.detail);
       }
     } catch (err) {
       console.error("Error al crear usuario:", err);

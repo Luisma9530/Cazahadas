@@ -46,7 +46,7 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
       }
     } else {
       if (CardType.CATCH === card.type) {
-        return position.type === 'fairy' && position.card === null && !isBattle;
+        return position.type === 'fairy' && (position.card === null || !position.marked) && !isBattle;
       } else {
         return false;
       }
@@ -69,7 +69,6 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
         break;
     }
   });
-
 
   async function sendCapturedFairies() {
     try {
@@ -97,13 +96,14 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
 
   // Al hacer clic en una celda de la zona de juego (fila 1, columnas 0 a 2)
   function handleCellClick(position: Tile, rowIndex: number, colIndex: number) {
+    console.log(tiles)
     if (!selectedCard || !canAddCardToPosition(selectedCard, position, rowIndex)) return;
     // Lógica para colocar la carta. Se asume que mapPawns transforma la celda y actualiza el estado.
     const newTiles = mapPawns(selectedCard, rowIndex, colIndex, tiles, amIP1);
     placeCard(selectedCard);
     setTiles(newTiles);
     resetSelectedCard();
-    socket.emit("place-card", { tiles: newTiles, gameId });
+    socket.emit("place-card", { tiles: newTiles, gameId: gameId, isBattle: isBattle, selectedCard: selectedCard });
   }
 
   function checkMarkedFairiesForCapture(
@@ -111,21 +111,42 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
     amIP1: boolean
   ): Tile[][] {
     const newTiles = tiles.map((row) => row.map((tile) => ({ ...tile })));
-
-
     for (let colIndex = 0; colIndex < newTiles[1].length - 1; colIndex++) {
       const tile = newTiles[1][colIndex];
-
       if (
         tile.type === 'fairy' &&
         tile.marked &&
         !tile.captured &&
-        tile.placedByPlayerOne === amIP1
+        tile.placedByPlayerOne === amIP1) {
+
+      }
+    }
+
+
+    return newTiles
+  }
+
+  /*
+  function checkMarkedFairiesForCapture(
+    tiles: Tile[][],
+    amIP1: boolean
+  ): Tile[][] {
+    const newTiles = tiles.map((row) => row.map((tile) => ({ ...tile })));
+ 
+ 
+    for (let colIndex = 0; colIndex < newTiles[1].length - 1; colIndex++) {
+      const tile = newTiles[1][colIndex];
+ 
+      if (
+        tile.type === 'fairy' &&
+        tile.marked &&
+        !tile.captured &&
+        tile.placedByPlayerOne === amIP1 // Verificar si la hada fue colocada por el jugador actual
       ) {
         // Verificar la condición de defensa del escudo del rival
         const rivalDeck = newTiles[0][0];
         const variableTile = newTiles[1][3];
-
+ 
         if (rivalDeck.type === 'deck' && variableTile.type === 'variableX') {
           const rivalShield = rivalDeck.cards?.at(-1); // Última carta en el deck del rival
           const hydratedRivalShield = hydrateCard(rivalShield != undefined ? rivalShield : {}); // Rehidratamos la carta del rival
@@ -140,51 +161,53 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
               tile.captured = true;
               newTiles[1][colIndex] = tile; // Actualizar el estado de la hada
               newTiles[2][1].cards.push(tile.card); // Agregar la hada capturada a la zona de hadas capturadas
-              setIsBattle(false); // Cambiar el estado de batalla a falso
               if (logedUser) {
                 sendCapturedFairies()
               }
               if (newTiles[2][1].cards.length >= 2) {
                 console.log('Fin del juego: Capturadas dos hadas');
-                socket.emit('fairy-captured', {
+                socket.emit('all-fairy-captured', {
                   reason: 'captured-two-fairies',
                   winner: amIP1,
                   gameId: gameId,
-                });// Emitir evento de fin de juego si se capturan dos hadas
+                }); // Emitir evento de fin de juego si se capturan dos hadas
               }
             }
           }
         }
-
+ 
       }
     }
     return newTiles;
   }
+  */
 
   useEffect(() => {
     // Ejecutar drawCard una vez al cargar el componente por primera vez
-    drawCard(isBattle);
+    drawCard(false);
   }, []);
 
   useEffect(() => {
     var updatedTiles = tiles.map((row) => row.map((tile) => ({ ...tile })));
-    setIsBattle(chechIsBattle(updatedTiles));
     if (!isBattle) {
       updatedTiles = checkMarkedFairiesForCapture(tiles, amIP1);
     }
     setTiles(updatedTiles);
+
+    if (isMyTurn) {
+      setIsBattle(checkIsBattle(updatedTiles)); // Verificar si es batalla
+    }
+
     // Ejecutar la lógica de captura al iniciar turno
-    if (isMyTurn) { // Solo ejecutar si es mi turno
-      if (!isMyFirstTurn) {
-        drawCard(isBattle);
-      } else {
-        drawCard(isBattle)
-        setIsMyFirstTurn(false)
-      }
+    if (!isMyFirstTurn) {
+      drawCard(isBattle);
+    } else {
+      drawCard(isBattle)
+      setIsMyFirstTurn(false)
     }
   }, [isMyTurn]);
 
-  function chechIsBattle(tiles: Tile[][]): boolean {
+  function checkIsBattle(tiles: Tile[][]): boolean {
     // Es batalla si hay una carta de tipo "catch" en la zona de las hadas, que corresponde a la fila 1
     // Además la carta debe estar marcada y no capturada
     return tiles[1].some((tile) => {
@@ -231,7 +254,7 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
         break;
 
       case CardType.CATCH:
-        if (currentTile.type === 'fairy' && !currentTile.card) {
+        if (currentTile.type === 'fairy') {
           if (!currentTile.captured && !currentTile.marked) { // Si la hada no ha sido capturada y no está marcada, se puede colocar la carta
             currentTile.marked = true; // Marcar la hada como seleccionada
             currentTile.placedByPlayerOne = amIP1; // Marcar la hada como seleccionada por el jugador 1 o 2
@@ -253,7 +276,6 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
   }
 
   // Renderizamos el tablero con la estructura 3x4.
-
   return (
     <div className="relative w-full min-h-screen flex items-center justify-center p-4">
       {/* Mesa de fondo */}
@@ -263,7 +285,8 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
       <div className="relative z-10 grid grid-rows-3 gap-1 p-8 w-full max-w-4xl mx-auto">
         {/* Fila 0: Zona del Rival - Grid normal (AHORA ARRIBA) */}
         <div className="grid grid-cols-4 gap-2 auto-rows-[100px] auto-cols-[80px] ">
-          <div className="rival-cell-3d game-cell bg-red-500 flex items-center justify-center border hover-container">
+          <div className="rival-cell-3d defense-cell-castle game-cell flex items-center justify-center hover-container">
+            <div className="defense-shield-icon"></div>
             {tiles[0][0].type === 'deck' ? (
               tiles[0][0].cards.length > 0 ? (
                 <div className="relative h-[100px] w-[80px]">
@@ -286,10 +309,14 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
                   ))}
                 </div>
               ) : (
-                "Deck Rival"
+                <div className="text-xs font-bold text-center text-stone-800">
+                  DEFENSA<br />DEL HADA
+                </div>
               )
             ) : (
-              "Deck Rival"
+              <div className="text-xs font-bold text-center text-stone-800">
+                DEFENSA<br />DEL HADA
+              </div>
             )}
           </div>
 
@@ -739,6 +766,105 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
       .player-cell-3d:hover {
         transform: perspective(1200px) rotateX(1deg) scale(1.02);
       }
+
+      .defense-cell-castle {
+        position: relative;
+        border-radius: 8px;
+    
+        /* Marco de hierro forjado */
+        border: 4px solid;
+        border-image: linear-gradient(45deg, 
+        #2c1810, #4a3728, #3d2f24, #2c1810, 
+        #5a453a, #2c1810, #4a3728, #3d2f24
+    ) 1;
+    
+    /* Fondo de muro de castillo */
+    background: 
+        /* Grietas y detalles */
+        radial-gradient(ellipse 20px 5px at 20% 30%, rgba(0,0,0,0.3) 0%, transparent 70%),
+        radial-gradient(ellipse 15px 3px at 70% 60%, rgba(0,0,0,0.2) 0%, transparent 70%),
+        radial-gradient(ellipse 10px 8px at 85% 20%, rgba(0,0,0,0.25) 0%, transparent 60%),
+        
+        /* Patrón de bloques de piedra */
+        repeating-linear-gradient(
+            0deg,
+            #8b7d6b 0px,
+            #8b7d6b 25px,
+            #756b5a 25px,
+            #756b5a 27px
+        ),
+        repeating-linear-gradient(
+            90deg,
+            #8b7d6b 0px,
+            #8b7d6b 40px,
+            #756b5a 40px,
+            #756b5a 42px
+        ),
+        
+        /* Base de piedra */
+        linear-gradient(135deg, 
+            #a0927f 0%, 
+            #8b7d6b 25%, 
+            #756b5a 50%, 
+            #8b7d6b 75%, 
+            #9a8c79 100%
+        );
+    
+    /* Sombras y profundidad */
+    box-shadow: 
+        0 0 0 2px #2c1810,
+        0 0 0 4px #4a3728,
+        inset 0 2px 4px rgba(0,0,0,0.3),
+        inset 0 -2px 4px rgba(255,255,255,0.1),
+        0 4px 12px rgba(0,0,0,0.4);
+    
+    transition: all 0.3s ease;
+}
+
+.defense-cell-castle:hover {
+z-index: 9999 !important;
+    transform: translateY(-2px);
+    box-shadow: 
+        0 0 0 2px #2c1810,
+        0 0 0 4px #4a3728,
+        inset 0 2px 4px rgba(0,0,0,0.3),
+        inset 0 -2px 4px rgba(255,255,255,0.2),
+        0 8px 20px rgba(0,0,0,0.5),
+        0 0 15px rgba(218, 165, 32, 0.3);
+}
+
+.defense-cell-castle .hover-preview-container {
+    /* Crear un contexto que permita salirse */
+    position: static;
+}
+
+.defense-cell-castle .hover-preview-container .hover-preview {
+    /* Posición absoluta respecto al documento, no a la casilla */
+    position: fixed !important;
+    z-index: 10000 !important;
+}
+
+/* Icono de escudo */
+.defense-shield-icon {
+    position: absolute;
+    top: 8px;
+    left: 8px;
+    width: 32px;
+    height: 32px;
+    background: radial-gradient(ellipse at center, #daa520 30%, #b8860b 70%);
+    border: 1px solid #8b7d6b;
+    border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+    z-index: 10;
+}
+
+.defense-shield-icon::before {
+    content: '🛡️';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 20px;
+}
     `}</style>
       </div>
     </div>

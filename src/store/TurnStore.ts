@@ -23,7 +23,7 @@ const useTurnStore = create<useTurnStore>((set) => ({
   setPlayerSkippedTurn: (playerSkippedTurn: boolean) =>
     set(() => ({ playerSkippedTurn: playerSkippedTurn })),
   resetStore: () =>
-    set({ isMyTurn: false, isMyFirstTurn: true, playerSkippedTurn: false }),
+    set({ isMyTurn: false, isMyFirstTurn: true, playerSkippedTurn: false, isBattle: false}),
 }));
 
 export default useTurnStore;
