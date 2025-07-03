@@ -148,62 +148,6 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
     return newTiles
   }
 
-  /*
-  function checkMarkedFairiesForCapture(
-    tiles: Tile[][],
-    amIP1: boolean
-  ): Tile[][] {
-    const newTiles = tiles.map((row) => row.map((tile) => ({ ...tile })));
- 
- 
-    for (let colIndex = 0; colIndex < newTiles[1].length - 1; colIndex++) {
-      const tile = newTiles[1][colIndex];
- 
-      if (
-        tile.type === 'fairy' &&
-        tile.marked &&
-        !tile.captured &&
-        tile.placedByPlayerOne === amIP1 // Verificar si la hada fue colocada por el jugador actual
-      ) {
-        // Verificar la condición de defensa del escudo del rival
-        const rivalDeck = newTiles[0][0];
-        const variableTile = newTiles[1][3];
- 
-        if (rivalDeck.type === 'deck' && variableTile.type === 'variableX') {
-          const rivalShield = rivalDeck.cards?.at(-1); // Última carta en el deck del rival
-          const hydratedRivalShield = hydrateCard(rivalShield != undefined ? rivalShield : {}); // Rehidratamos la carta del rival
-          if (
-            rivalDeck.cards.length == 0 || // No hay escudo en el deck del rival
-            (
-              hydratedRivalShield.type === CardType.SHIELD && // Última carta en el deck del rival
-              !hydratedRivalShield.defenseCondition(variableTile.value)// La variable X no cumple la condición del escudo
-            )
-          ) {
-            if (tile.type === 'fairy' && tile.card && newTiles[2][1].type === 'capturedFairies') {
-              tile.captured = true;
-              newTiles[1][colIndex] = tile; // Actualizar el estado de la hada
-              newTiles[2][1].cards.push(tile.card); // Agregar la hada capturada a la zona de hadas capturadas
-              if (logedUser) {
-                sendCapturedFairies()
-              }
-              if (newTiles[2][1].cards.length >= 2) {
-                console.log('Fin del juego: Capturadas dos hadas');
-                socket.emit('all-fairy-captured', {
-                  reason: 'captured-two-fairies',
-                  winner: amIP1,
-                  gameId: gameId,
-                }); // Emitir evento de fin de juego si se capturan dos hadas
-              }
-            }
-          }
-        }
- 
-      }
-    }
-    return newTiles;
-  }
-  */
-
   useEffect(() => {
     // Ejecutar drawCard una vez al cargar el componente por primera vez
     drawCard(false);
