@@ -92,13 +92,27 @@ export default function Game() {
         }
       }
       if (data?.reason === 'captured-two-fairies') {
-        console.log(`¡Ganó ${data.winner} capturando dos hadas!`);
         if (data.winner) {
           setGameResult(Result.PLAYER1WIN)
-          console.log("Ganó el jugador 1");
         } else {
           setGameResult(Result.PLAYER2WIN)
-          console.log("Ganó el jugador 2");
+        }
+      }
+      if (data?.reason === 'player-skipped-turn') {
+        var playe1Fairies = 0
+        var player2Fairies = 0
+        if (data.tiles[0][1].type === 'capturedFairies') {
+          player2Fairies = data.tiles[0][1].cards.length;
+        }
+        if (data.tiles[2][1].type === 'capturedFairies') {
+          playe1Fairies = data.tiles[2][1].cards.length;
+        }
+        if (playe1Fairies > player2Fairies) {
+          setGameResult(Result.PLAYER1WIN)
+        } else if (playe1Fairies < player2Fairies) {
+          setGameResult(Result.PLAYER2WIN)
+        } else {
+          setGameResult(Result.DRAW)
         }
       }
       setGameOver(true)

@@ -275,12 +275,12 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
                   ))}
                 </div>
               ) : (
-                <div className="text-xs font-bold text-center text-stone-800">
+                <div className="text-xs font-bold text-center text-stone-100">
                   DEFENSA<br />DEL HADA
                 </div>
               )
             ) : (
-              <div className="text-xs font-bold text-center text-stone-800">
+              <div className="text-xs font-bold text-center text-stone-100">
                 DEFENSA<br />DEL HADA
               </div>
             )}
@@ -316,14 +316,20 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
             )}
           </div>
 
-          <div className="rival-cell-3d game-cell bg-red-500 flex items-center justify-center border hover-container">
+          <div className="rival-cell-3d game-cell discard-cell-cauldron rival-discard-cell flex items-center justify-center border hover-container">
+            {/* Vapor mágico */}
+            <div className="discard-magical-smoke"></div>
+
+            {/* Icono de descarte mágico */}
+            <div className="discard-magic-icon"></div>
+
             {tiles[0][2].type === 'discard' ? (
               tiles[0][2].cards.length > 0 ? (
                 <div className="relative h-[100px] w-[80px]">
                   {tiles[0][2].cards.slice(-3).map((card, i) => (
                     <div
                       key={i}
-                      className="absolute top-0 left-0 group"
+                      className="absolute top-0 left-0 group discard-card-animation"
                       style={{ top: `${i * 8}px`, zIndex: i }}
                     >
                       <div className="w-[80px] h-[85px] overflow-hidden">
@@ -339,10 +345,10 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
                   ))}
                 </div>
               ) : (
-                "Discard Rival"
+                <span className="discard-text">Caldero Rival</span>
               )
             ) : (
-              "Discard Rival"
+              <span className="discard-text">Caldero Rival</span>
             )}
           </div>
 
@@ -445,9 +451,10 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
         {/* Fila 2: Zona del Jugador - Grid normal (AHORA ABAJO) */}
         <div className="grid grid-cols-4 gap-2 auto-rows-[100px] auto-cols-[80px] -mt-5">
           <div
-            className="player-cell-3d game-cell bg-blue-500 flex items-center justify-center border cursor-pointer hover-container"
+            className="player-cell-3d defense-cell-castle game-cell flex items-center justify-center cursor-pointer hover-container"
             onClick={() => handleCellClick(tiles[2][0], 2, 0)}
           >
+            <div className="defense-shield-icon"></div>
             {tiles[2][0].type === 'deck' ? (
               tiles[2][0].cards.length > 0 ? (
                 <div className="relative h-[100px] w-[80px]">
@@ -470,10 +477,14 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
                   ))}
                 </div>
               ) : (
-                "Deck Player"
+                <div className="text-xs font-bold text-center text-stone-100">
+                  DEFENSA<br />DEL JUGADOR
+                </div>
               )
             ) : (
-              "Deck Player"
+              <div className="text-xs font-bold text-center text-stone-100">
+                DEFENSA<br />DEL JUGADOR
+              </div>
             )}
           </div>
 
@@ -502,16 +513,22 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
           </div>
 
           <div
-            className="player-cell-3d game-cell bg-blue-500 flex items-center justify-center border cursor-pointer hover-container"
+            className="player-cell-3d game-cell discard-cell-cauldron player-discard-cell flex items-center justify-center border cursor-pointer hover-container"
             onClick={() => handleCellClick(tiles[2][2], 2, 2)}
           >
+            {/* Vapor mágico */}
+            <div className="discard-magical-smoke"></div>
+
+            {/* Icono de descarte mágico */}
+            <div className="discard-magic-icon"></div>
+
             {tiles[2][2].type === 'discard' ? (
               tiles[2][2].cards.length > 0 ? (
                 <div className="relative h-[130px] w-[100px]">
                   {tiles[2][2].cards.slice(-3).map((card, i) => (
                     <div
                       key={i}
-                      className="absolute top-0 left-0 group hover-trigger"
+                      className="absolute top-0 left-0 group hover-trigger discard-card-animation"
                       style={{ top: `${i * 12}px`, zIndex: i }}
                     >
                       <div className="w-[100px] h-[105px] overflow-hidden">
@@ -534,10 +551,10 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
                   </div>
                 </div>
               ) : (
-                "Discard Player"
+                <span className="discard-text">Mi Caldero</span>
               )
             ) : (
-              "Discard Player"
+              <span className="discard-text">Mi Caldero</span>
             )}
           </div>
 
@@ -668,6 +685,11 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
         box-shadow: 
           0 2px 8px rgba(0, 0, 0, 0.15),
           inset 0 1px 2px rgba(255, 255, 255, 0.1);
+      }
+
+      /* Eliminar el blur del backdrop cuando hay hover activo */
+      .game-cell:hover {
+        backdrop-filter: none;
       }
       
       /* SOLUCIÓN PARA EL HOVER - Contexto de apilamiento separado */
@@ -830,6 +852,290 @@ z-index: 9999 !important;
     left: 50%;
     transform: translate(-50%, -50%);
     font-size: 20px;
+}
+
+/* Casilla de descarte mágica - Caldero encantado */
+.discard-cell-cauldron {
+  position: relative;
+  border-radius: 50%;
+  overflow: visible;
+  
+  /* Fondo del caldero - metal oscuro encantado */
+  background: 
+    /* Brillo mágico interior */
+    radial-gradient(ellipse 60% 40% at center 60%, 
+      rgba(138, 43, 226, 0.4) 0%, 
+      transparent 70%),
+    
+    /* Reflejos metálicos */
+    radial-gradient(ellipse 30% 20% at 70% 30%, 
+      rgba(255, 255, 255, 0.3) 0%, 
+      transparent 60%),
+    
+    /* Oxidación y pátina */
+    radial-gradient(ellipse 40% 30% at 20% 70%, 
+      rgba(34, 139, 34, 0.2) 0%, 
+      transparent 50%),
+    
+    /* Base metálica */
+    linear-gradient(135deg, 
+      #2c2c2c 0%, 
+      #1a1a1a 25%, 
+      #404040 50%, 
+      #2c2c2c 75%, 
+      #1a1a1a 100%);
+  
+  /* Sin borde - caldero liso */
+  border: none;
+  
+  /* Sombras y profundidad */
+  box-shadow: 
+    /* Sombra exterior */
+    0 8px 20px rgba(0, 0, 0, 0.6),
+    /* Profundidad interior */
+    inset 0 -10px 20px rgba(0, 0, 0, 0.8),
+    inset 0 5px 15px rgba(255, 255, 255, 0.1),
+    /* Brillo mágico sutil */
+    0 0 20px rgba(138, 43, 226, 0.3);
+  
+  transition: all 0.4s ease;
+}
+
+.discard-cell-cauldron:hover {
+  z-index: 9999 !important;
+  transform: translateY(-3px) scale(1.05);
+  
+  /* Intensificar el brillo mágico al hacer hover */
+  box-shadow: 
+    0 12px 30px rgba(0, 0, 0, 0.7),
+    inset 0 -10px 20px rgba(0, 0, 0, 0.8),
+    inset 0 5px 15px rgba(255, 255, 255, 0.2),
+    0 0 30px rgba(138, 43, 226, 0.6),
+    0 0 50px rgba(75, 0, 130, 0.4);
+}
+
+/* Asas del caldero */
+.discard-cell-cauldron::before,
+.discard-cell-cauldron::after {
+  content: '';
+  position: absolute;
+  width: 20px;
+  height: 30px;
+  border: 3px solid #4a4a4a;
+  border-radius: 50%;
+  background: transparent;
+  top: 25%;
+  z-index: 10;
+}
+
+.discard-cell-cauldron::before {
+  left: -15px;
+  border-right: none;
+}
+
+.discard-cell-cauldron::after {
+  right: -15px;
+  border-left: none;
+}
+
+/* Vapor/humo mágico */
+.discard-magical-smoke {
+  position: absolute;
+  top: -20px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60px;
+  height: 40px;
+  z-index: 5;
+  pointer-events: none;
+  opacity: 0.6;
+}
+
+.discard-magical-smoke::before {
+  content: '✨';
+  position: absolute;
+  font-size: 16px;
+  animation: float 3s ease-in-out infinite;
+  color: #dda0dd;
+}
+
+.discard-magical-smoke::after {
+  content: '🌟';
+  position: absolute;
+  font-size: 12px;
+  right: 10px;
+  top: 10px;
+  animation: float 2s ease-in-out infinite reverse;
+  color: #9370db;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px) rotate(0deg); }
+  50% { transform: translateY(-10px) rotate(180deg); }
+}
+
+/* Icono de descarte mágico */
+.discard-magic-icon {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 24px;
+  height: 24px;
+  background: radial-gradient(ellipse at center, #dda0dd 30%, #9370db 70%);
+  border: 1px solid #4a4a4a;
+  border-radius: 50%;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+}
+
+.discard-magic-icon::before {
+  content: '🗑️';
+  filter: hue-rotate(270deg) saturate(1.5);
+}
+
+/* Efecto de ondas mágicas al hover */
+.discard-cell-cauldron:hover .discard-magical-smoke {
+  opacity: 1;
+  animation: magical-pulse 2s ease-in-out infinite;
+}
+
+@keyframes magical-pulse {
+  0%, 100% { opacity: 0.6; transform: translateX(-50%) scale(1); }
+  50% { opacity: 1; transform: translateX(-50%) scale(1.2); }
+}
+
+/* Texto de descarte */
+.discard-text {
+  color: #dda0dd;
+  font-weight: bold;
+  text-shadow: 0 0 10px rgba(221, 160, 221, 0.5);
+  font-size: 0.9rem;
+  z-index: 15;
+  position: relative;
+}
+
+/* Animación de las cartas cayendo en el caldero */
+.discard-card-animation {
+  animation: fall-into-cauldron 0.8s ease-in-out;
+}
+
+@keyframes fall-into-cauldron {
+  0% { 
+    transform: translateY(-20px) rotate(0deg);
+    opacity: 1;
+  }
+  50% { 
+    transform: translateY(10px) rotate(180deg);
+    opacity: 0.7;
+  }
+  100% { 
+    transform: translateY(0) rotate(360deg);
+    opacity: 1;
+  }
+}
+
+/* Hover preview container mejorado */
+.discard-cell-cauldron .hover-preview-container {
+  position: static;
+}
+
+.discard-cell-cauldron .hover-preview-container .hover-preview {
+  position: fixed !important;
+  z-index: 10000 !important;
+  /* Fondo mágico para el preview */
+  background: linear-gradient(135deg, 
+    rgba(138, 43, 226, 0.95) 0%, 
+    rgba(75, 0, 130, 0.95) 100%);
+  border: 2px solid #dda0dd;
+  border-radius: 12px;
+  box-shadow: 
+    0 10px 30px rgba(0, 0, 0, 0.8),
+    0 0 20px rgba(138, 43, 226, 0.6);
+}
+
+/* Aplicar a la casilla rival también */
+.rival-discard-cell {
+  /* Mismo estilo pero con colores ligeramente diferentes para el rival */
+  background: 
+    radial-gradient(ellipse 60% 40% at center 60%, 
+      rgba(220, 20, 60, 0.4) 0%, 
+      transparent 70%),
+    radial-gradient(ellipse 30% 20% at 70% 30%, 
+      rgba(255, 255, 255, 0.3) 0%, 
+      transparent 60%),
+    radial-gradient(ellipse 40% 30% at 20% 70%, 
+      rgba(139, 69, 19, 0.2) 0%, 
+      transparent 50%),
+    linear-gradient(135deg, 
+      #2c2c2c 0%, 
+      #1a1a1a 25%, 
+      #404040 50%, 
+      #2c2c2c 75%, 
+      #1a1a1a 100%);
+  
+  box-shadow: 
+    0 8px 20px rgba(0, 0, 0, 0.6),
+    inset 0 -10px 20px rgba(0, 0, 0, 0.8),
+    inset 0 5px 15px rgba(255, 255, 255, 0.1),
+    0 0 20px rgba(220, 20, 60, 0.3);
+}
+
+.rival-discard-cell .discard-text {
+  color: #ff6b6b;
+  text-shadow: 0 0 10px rgba(255, 107, 107, 0.5);
+}
+
+/* Aplicar a la casilla del jugador también */
+.player-discard-cell {
+  /* Mismo estilo base con colores azul/verde para el jugador */
+  background: 
+    radial-gradient(ellipse 60% 40% at center 60%, 
+      rgba(30, 144, 255, 0.4) 0%, 
+      transparent 70%),
+    radial-gradient(ellipse 30% 20% at 70% 30%, 
+      rgba(255, 255, 255, 0.3) 0%, 
+      transparent 60%),
+    radial-gradient(ellipse 40% 30% at 20% 70%, 
+      rgba(0, 191, 255, 0.2) 0%, 
+      transparent 50%),
+    linear-gradient(135deg, 
+      #2c2c2c 0%, 
+      #1a1a1a 25%, 
+      #404040 50%, 
+      #2c2c2c 75%, 
+      #1a1a1a 100%);
+  
+  box-shadow: 
+    0 8px 20px rgba(0, 0, 0, 0.6),
+    inset 0 -10px 20px rgba(0, 0, 0, 0.8),
+    inset 0 5px 15px rgba(255, 255, 255, 0.1),
+    0 0 20px rgba(30, 144, 255, 0.3);
+}
+
+.player-discard-cell:hover {
+  box-shadow: 
+    0 12px 30px rgba(0, 0, 0, 0.7),
+    inset 0 -10px 20px rgba(0, 0, 0, 0.8),
+    inset 0 5px 15px rgba(255, 255, 255, 0.2),
+    0 0 30px rgba(30, 144, 255, 0.6),
+    0 0 50px rgba(0, 191, 255, 0.4);
+}
+
+.player-discard-cell .discard-text {
+  color: #87ceeb;
+  text-shadow: 0 0 10px rgba(135, 206, 235, 0.5);
+}
+
+/* Vapor mágico del jugador con colores azules */
+.player-discard-cell .discard-magical-smoke::before {
+  color: #87ceeb;
+}
+
+.player-discard-cell .discard-magical-smoke::after {
+  color: #4682b4;
 }
     `}</style>
       </div>
