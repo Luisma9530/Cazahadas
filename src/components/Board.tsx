@@ -6,7 +6,7 @@ import useNeoHandStore from "../store/NeoHandStore";
 import useTurnStore from "../store/TurnStore";
 import useCardStore from "../store/CardStore"; // Para la carta seleccionada
 import Card from "../components/Card";
-import { CardType, CardUnity } from "../@types/Card";
+import { CardInfo, CardType, CardUnity } from "../@types/Card";
 import { useParams } from "react-router-dom";
 import { hydrateCard } from "../utils/hydrateCard"; // Para rehidratar cartas
 import { useAuthStore } from '../store/LoginStore';
@@ -46,7 +46,7 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
       }
     } else {
       if (CardType.CATCH === card.type) {
-        return position.type === 'fairy' && (position.card === null || !position.marked) && !isBattle;
+        return position.type === 'fairy' && !position.marked && !position.captured && !isBattle;
       } else {
         return false;
       }
@@ -111,17 +111,39 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
     amIP1: boolean
   ): Tile[][] {
     const newTiles = tiles.map((row) => row.map((tile) => ({ ...tile })));
+    const cardsTop: CardInfo[] = [];    // Para casilla [0][1]
+    const cardsBottom: CardInfo[] = []; // Para casilla [2][1]
     for (let colIndex = 0; colIndex < newTiles[1].length - 1; colIndex++) {
       const tile = newTiles[1][colIndex];
-      if (
-        tile.type === 'fairy' &&
-        tile.marked &&
-        !tile.captured &&
-        tile.placedByPlayerOne === amIP1) {
-
+      if (tile.type === 'fairy') {
+        if (
+          !tile.marked &&
+          tile.captured) {
+          if (tile.placedByPlayerOne === amIP1) {
+            if (newTiles[2][1].type === 'capturedFairies' && tile.card) {
+              cardsBottom.push(tile.card);
+            }
+          } else {
+            if (newTiles[0][1].type === 'capturedFairies' && tile.card) {
+              cardsTop.push(tile.card);
+            }
+          }
+        }
       }
     }
+    if (newTiles[0][1].type === 'capturedFairies' && newTiles[2][1].type === 'capturedFairies') {
+      newTiles[0][1].cards = cardsTop;
+      newTiles[2][1].cards = cardsBottom;
+      console.log("Captured fairies updated:", newTiles[0][1].cards, newTiles[2][1].cards);
+    }
 
+    if (cardsBottom.length >= 2) {
+      socket.emit('all-fairy-captured', {
+        reason: 'captured-two-fairies',
+        winner: amIP1,
+        gameId: gameId,
+      });
+    }
 
     return newTiles
   }
@@ -189,9 +211,9 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
 
   useEffect(() => {
     var updatedTiles = tiles.map((row) => row.map((tile) => ({ ...tile })));
-    if (!isBattle) {
-      updatedTiles = checkMarkedFairiesForCapture(tiles, amIP1);
-    }
+
+    updatedTiles = checkMarkedFairiesForCapture(tiles, amIP1);
+
     setTiles(updatedTiles);
 
     if (isMyTurn) {

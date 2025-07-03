@@ -53,47 +53,6 @@ io.on("connection", (socket) => {
       endBattle = true
       currentGames[data.gameId].playerSkippedTurn = false; // Marcar que el jugador ha terminado la batalla
 
-      /*
-      const updatedTiles = data.tiles.map((row) => row.map((tile) => ({ ...tile })));
-      for (let col = 0; col < updatedTiles[1].length; col++) {
-        const fairyTile = updatedTiles[1][col];
-        if (
-          fairyTile.type === 'fairy' &&
-          fairyTile.card?.type === CardType.CATCH &&
-          fairyTile.marked &&
-          !fairyTile.captured
-        ) { // Si la hada es de tipo "catch", está marcada y no ha sido capturada
-          if (updatedTiles[1][3].type === 'variableX' && updatedTiles[0][0].type === 'deck') {
-            const valueX = updatedTiles[1][3].value
-            const rivalDeck = updatedTiles[0][0];
-            const rivalShield = rivalDeck.cards?.at(-1);
-            const hydrated = hydrateCard(rivalShield ?? {});
-            if (
-              hydrated.type === CardType.SHIELD &&
-              hydrated.defenseCondition &&
-              !hydrated.defenseCondition(valueX)
-            ) { // Si la carta de rival es un escudo y no cumple la condición de defensa
-              fairyTile.marked = true; // Marcar la hada como marcada
-              fairyTile.captured = true; // Capturar la hada
-
-              const capturedTile = fairyTile.placedByPlayerOne ? updatedTiles[2][1] : updatedTiles[0][1];
-              if (capturedTile.type === "capturedFairies" && capturedTile.cards) {
-                capturedTile.cards.push(fairyTile.card);
-                if (capturedTile.cards.length >= 2) {
-                  io.to(currentGames[data.gameId].playerIds).emit("all-fairy-captured", {
-                    reason: "captured-two-fairies",
-                    winner: fairyTile.placedByPlayerOne,
-                    gameId: data.gameId
-                  });
-                }
-              }
-            }
-          }
-        }
-        data.tiles = updatedTiles;
-      }
-      */
-
       data.tiles[1] = data.tiles[1].map(tile => {
         if (
           tile.type === "fairy" &&
@@ -107,37 +66,40 @@ io.on("connection", (socket) => {
           if (tile.placedByPlayerOne) {
             if (data.tiles[0][0].type === "deck") {
               rivalShield = data.tiles[0][0].cards?.at(-1);
+              console.log("Deck de jugador 1:", data.tiles[0][0].cards);
             }
           } else {
             if (data.tiles[2][0].type === "deck") {
               rivalShield = data.tiles[2][0].cards?.at(-1);
+              console.log("Deck de jugador 2:", data.tiles[2][0].cards);
             }
           }
-          console.log("Rival shield:", rivalShield);
           if (data.tiles[1][3].type === "variableX") {
             valueX = data.tiles[1][3].value;
           }
-          const hydrated = hydrateCard(rivalShield ?? {});
-          if (
-            hydrated.type === CardType.SHIELD &&
-            hydrated.defenseCondition &&
-            !hydrated.defenseCondition(valueX)
-          ) { // Si la carta de rival es un escudo y no cumple la condición de defensa
-            captured = true
-          } else { // Si la carta de rival es un escudo y cumple la condición de defensa
-            captured = false; 
+          console.log("Rival shield:", rivalShield);
+          if (rivalShield) {
+            const hydrated = hydrateCard(rivalShield ?? {});
+            if (
+              hydrated.type === CardType.SHIELD &&
+              hydrated.defenseCondition &&
+              !hydrated.defenseCondition(valueX)
+            ) { // Si la carta de rival es un escudo y no cumple la condición de defensa
+              captured = true
+            } else { // Si la carta de rival es un escudo y cumple la condición de defensa
+              captured = false;
+            }
+          } else {
+            captured = true; // Si no hay escudo, la hada se captura
           }
-          console.log("Hydrated rival shield:", hydrated);
           return {
             ...tile,
             marked: false,
             captured: captured,
           };
         }
-        console.log("Tile:", tile);
         return tile;
       });
-      console.log("Tiles after processing:", data.tiles);
     } else if (!currentGames[data.gameId].playerSkippedTurn) { // Si el jugador no había saltado su turno
       currentGames[data.gameId].playerSkippedTurn = true; // Marcar que el jugador ha saltado su turno
     }
