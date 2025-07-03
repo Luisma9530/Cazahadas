@@ -63,7 +63,7 @@ io.on("connection", (socket) => {
           var captured = true
           var rivalShield = null
           var valueX = 0;
-          if (tile.placedByPlayerOne) {
+          if (!tile.placedByPlayerOne) {
             if (data.tiles[0][0].type === "deck") {
               rivalShield = data.tiles[0][0].cards?.at(-1);
               console.log("Deck de jugador 1:", data.tiles[0][0].cards);
