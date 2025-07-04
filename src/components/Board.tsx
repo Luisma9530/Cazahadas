@@ -286,7 +286,9 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
             )}
           </div>
 
-          <div className="rival-cell-3d game-cell bg-red-500 flex items-center justify-center border hover-container">
+          <div className="rival-cell-3d game-cell captured-fairies-cell rival-captured-fairies-cell flex items-center justify-center hover-container">
+            <div className="fairy-particles"></div>
+            <div className="fairy-capture-icon"></div>
             {tiles[0][1].type === 'capturedFairies' ? (
               tiles[0][1].cards.length > 0 ? (
                 <div className="relative h-[100px] w-[80px]">
@@ -299,17 +301,11 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
                       <div className="w-[80px] h-[85px] overflow-hidden">
                         <Card placed={true} card={card} amIP1={amIP1} />
                       </div>
-                      {/* Hover preview individual para cada carta */}
-                      <div className="absolute z-[9999] hidden group-hover:block top-[-10px] left-[90px]">
-                        <div className="w-[120px] h-[150px] border bg-white shadow-lg rounded p-1">
-                          <Card placed={true} card={card} amIP1={amIP1} />
-                        </div>
-                      </div>
                     </div>
                   ))}
                 </div>
               ) : (
-                <div className="text-xs text-white">Captured Fairies</div>
+                <div className="captured-fairies-text">Captured<br />Fairies</div>
               )
             ) : (
               "Captured Fairies"
@@ -317,12 +313,8 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
           </div>
 
           <div className="rival-cell-3d game-cell discard-cell-cauldron rival-discard-cell flex items-center justify-center border hover-container">
-            {/* Vapor mágico */}
             <div className="discard-magical-smoke"></div>
-
-            {/* Icono de descarte mágico */}
             <div className="discard-magic-icon"></div>
-
             {tiles[0][2].type === 'discard' ? (
               tiles[0][2].cards.length > 0 ? (
                 <div className="relative h-[100px] w-[80px]">
@@ -352,7 +344,12 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
             )}
           </div>
 
-          <div className="rival-cell-3d game-cell bg-red-500 flex items-center justify-center border hover-container">
+          <div className="rival-cell-3d game-cell rival-magic-cell bg-red-500 flex items-center justify-center border hover-container">
+            <div className="dark-particles"></div>
+            <div className="magical-energy"></div>
+            <div className="magic-runes"></div>
+            <div className="grimoire-symbol"></div>
+            <div className="magic-power-icon"></div>
             {tiles[0][3].type === 'magic' ? (
               tiles[0][3].cards.length > 0 ? (
                 <div className="relative h-[100px] w-[80px]">
@@ -366,7 +363,7 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
                         <Card placed={true} card={card} amIP1={amIP1} />
                       </div>
                       {/* Hover preview individual para cada carta */}
-                      <div className="absolute z-[9999] hidden group-hover:block top-[-10px] left-[90px]">
+                      <div className="absolute z-[9999] hidden group-hover:block top-[-10px] left-[100px]">
                         <div className="w-[120px] h-[150px] border bg-white shadow-lg rounded p-1">
                           <Card placed={true} card={card} amIP1={amIP1} />
                         </div>
@@ -375,10 +372,14 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
                   ))}
                 </div>
               ) : (
-                "Magics Rival"
+                <div className="magic-text">
+                  Dark<br />Magics
+                </div>
               )
             ) : (
-              "Magics Rival"
+              <div className="magic-text">
+                Dark<br />Magics
+              </div>
             )}
           </div>
         </div>
@@ -488,7 +489,9 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
             )}
           </div>
 
-          <div className="player-cell-3d game-cell bg-blue-500 flex items-center justify-center border">
+          <div className="player-cell-3d game-cell captured-fairies-cell player-captured-fairies-cell flex items-center justify-center hover-container">
+            <div className="fairy-particles"></div>
+            <div className="fairy-capture-icon"></div>
             {tiles[2][1].type === 'capturedFairies' ? (
               tiles[2][1].cards.length > 0 ? (
                 <div className="relative h-[130px] w-[100px]">
@@ -505,10 +508,10 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
                   ))}
                 </div>
               ) : (
-                <div className="text-xs text-white">Captured Fairies</div>
+                <div className="captured-fairies-text">Captured<br />Fairies</div>
               )
             ) : (
-              "Captured Fairies"
+              <div className="captured-fairies-text">Captured<br />Fairies</div>
             )}
           </div>
 
@@ -516,12 +519,8 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
             className="player-cell-3d game-cell discard-cell-cauldron player-discard-cell flex items-center justify-center border cursor-pointer hover-container"
             onClick={() => handleCellClick(tiles[2][2], 2, 2)}
           >
-            {/* Vapor mágico */}
             <div className="discard-magical-smoke"></div>
-
-            {/* Icono de descarte mágico */}
             <div className="discard-magic-icon"></div>
-
             {tiles[2][2].type === 'discard' ? (
               tiles[2][2].cards.length > 0 ? (
                 <div className="relative h-[130px] w-[100px]">
@@ -559,9 +558,14 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
           </div>
 
           <div
-            className="player-cell-3d game-cell bg-blue-500 flex items-center justify-center border cursor-pointer hover-container"
+            className="player-cell-3d game-cell player-magic-cell bg-blue-500 flex items-center justify-center border cursor-pointer hover-container"
             onClick={() => handleCellClick(tiles[2][3], 2, 3)}
           >
+            <div className="player-light-particles"></div>
+            <div className="player-magical-energy"></div>
+            <div className="player-magic-runes"></div>
+            <div className="player-grimoire-symbol"></div>
+            <div className="player-magic-power-icon"></div>
             {tiles[2][3].type === 'magic' ? (
               tiles[2][3].cards.length > 0 ? (
                 <div className="relative h-[130px] w-[100px]">
@@ -584,10 +588,14 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
                   ))}
                 </div>
               ) : (
-                "Magics Player"
+                <div className="player-magic-text">
+                  Sacred<br />Magics
+                </div>
               )
             ) : (
-              "Magics Player"
+              <div className="player-magic-text">
+                Sacred<br />Magics
+              </div>
             )}
           </div>
         </div>
@@ -761,7 +769,7 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
     
         /* Marco de hierro forjado */
         border: 4px solid;
-        border-image: linear-gradient(45deg, 
+        [border-image]: linear-gradient(45deg, 
         #2c1810, #4a3728, #3d2f24, #2c1810, 
         #5a453a, #2c1810, #4a3728, #3d2f24
     ) 1;
@@ -1137,6 +1145,1212 @@ z-index: 9999 !important;
 .player-discard-cell .discard-magical-smoke::after {
   color: #4682b4;
 }
+
+/* Casilla de hadas capturadas - Jaula mágica encantada */
+.captured-fairies-cell {
+  position: relative;
+  border-radius: 16px;
+  overflow: visible;
+  
+  /* Fondo de jaula encantada con cristales mágicos */
+  background: 
+    /* Brillo mágico interior - luz de hadas */
+    radial-gradient(ellipse 70% 50% at center 40%, 
+      rgba(255, 192, 203, 0.6) 0%, 
+      rgba(221, 160, 221, 0.4) 40%,
+      transparent 70%),
+    
+    /* Destellos de luz mágica */
+    radial-gradient(ellipse 30% 20% at 20% 20%, 
+      rgba(255, 255, 255, 0.8) 0%, 
+      rgba(255, 215, 0, 0.4) 30%,
+      transparent 60%),
+    
+    radial-gradient(ellipse 25% 15% at 80% 70%, 
+      rgba(255, 182, 193, 0.7) 0%, 
+      rgba(255, 105, 180, 0.3) 40%,
+      transparent 60%),
+    
+    /* Polvo de hadas flotando */
+    radial-gradient(ellipse 15% 10% at 60% 30%, 
+      rgba(255, 215, 0, 0.5) 0%, 
+      transparent 50%),
+    
+    radial-gradient(ellipse 12% 8% at 30% 80%, 
+      rgba(255, 192, 203, 0.4) 0%, 
+      transparent 50%),
+    
+    /* Base de cristal mágico */
+    linear-gradient(135deg, 
+      rgba(230, 230, 250, 0.9) 0%, 
+      rgba(221, 160, 221, 0.8) 25%, 
+      rgba(255, 192, 203, 0.7) 50%, 
+      rgba(221, 160, 221, 0.8) 75%, 
+      rgba(230, 230, 250, 0.9) 100%);
+  
+  /* Sin borde - solo efectos internos */
+  border: none;
+  
+  /* Sombras y efectos mágicos */
+  box-shadow: 
+    /* Sombra exterior */
+    0 8px 25px rgba(221, 160, 221, 0.4),
+    /* Brillo mágico */
+    0 0 30px rgba(255, 192, 203, 0.6),
+    /* Profundidad interior */
+    inset 0 2px 8px rgba(255, 255, 255, 0.8),
+    inset 0 -2px 8px rgba(221, 160, 221, 0.3),
+    /* Aura mágica sutil */
+    0 0 50px rgba(255, 215, 0, 0.2);
+  
+  transition: all 0.4s ease;
+}
+
+.captured-fairies-cell:hover {
+  z-index: 9999 !important;
+  transform: translateY(-4px) scale(1.03);
+  
+  /* Intensificar el brillo mágico al hacer hover */
+  box-shadow: 
+    0 12px 35px rgba(221, 160, 221, 0.6),
+    0 0 40px rgba(255, 192, 203, 0.8),
+    inset 0 2px 8px rgba(255, 255, 255, 0.9),
+    inset 0 -2px 8px rgba(221, 160, 221, 0.4),
+    0 0 60px rgba(255, 215, 0, 0.4),
+    0 0 80px rgba(255, 105, 180, 0.3);
+}
+
+/* Barrotes de la jaula mágica */
+.captured-fairies-cell::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: 
+    /* Barrotes verticales */
+    repeating-linear-gradient(
+      90deg,
+      transparent 0px,
+      transparent 18px,
+      rgba(192, 192, 192, 0.6) 19px,
+      rgba(255, 215, 0, 0.8) 20px,
+      rgba(192, 192, 192, 0.6) 21px,
+      transparent 22px,
+      transparent 40px
+    ),
+    /* Barrotes horizontales */
+    repeating-linear-gradient(
+      0deg,
+      transparent 0px,
+      transparent 18px,
+      rgba(192, 192, 192, 0.4) 19px,
+      rgba(255, 215, 0, 0.6) 20px,
+      rgba(192, 192, 192, 0.4) 21px,
+      transparent 22px,
+      transparent 40px
+    );
+  
+  border-radius: 16px;
+  pointer-events: none;
+  z-index: 2;
+}
+
+/* Partículas mágicas flotantes */
+.fairy-particles {
+  position: absolute;
+  top: -10px;
+  left: -10px;
+  right: -10px;
+  bottom: -10px;
+  z-index: 1;
+  pointer-events: none;
+  overflow: hidden;
+  border-radius: 20px;
+}
+
+.fairy-particles::before,
+.fairy-particles::after {
+  content: '';
+  position: absolute;
+  width: 6px;
+  height: 6px;
+  background: radial-gradient(circle, #ffd700 0%, #ffb6c1 100%);
+  border-radius: 50%;
+  animation: float-sparkle 4s ease-in-out infinite;
+  box-shadow: 0 0 10px rgba(255, 215, 0, 0.8);
+}
+
+.fairy-particles::before {
+  top: 20%;
+  left: 15%;
+  animation-delay: 0s;
+}
+
+.fairy-particles::after {
+  top: 70%;
+  right: 20%;
+  animation-delay: 2s;
+  background: radial-gradient(circle, #ffb6c1 0%, #dda0dd 100%);
+}
+
+@keyframes float-sparkle {
+  0%, 100% { 
+    transform: translateY(0px) scale(1);
+    opacity: 0.8;
+  }
+  25% { 
+    transform: translateY(-8px) scale(1.2);
+    opacity: 1;
+  }
+  50% { 
+    transform: translateY(-4px) scale(0.9);
+    opacity: 0.6;
+  }
+  75% { 
+    transform: translateY(-12px) scale(1.1);
+    opacity: 1;
+  }
+}
+
+/* Icono de hada capturada */
+.fairy-capture-icon {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 36px;
+  height: 36px;
+  background: radial-gradient(ellipse at center, 
+    rgba(255, 192, 203, 0.9) 30%, 
+    rgba(255, 105, 180, 0.8) 70%);
+  border: 2px solid rgba(255, 215, 0, 0.8);
+  border-radius: 50%;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  box-shadow: 
+    0 0 15px rgba(255, 192, 203, 0.6),
+    inset 0 1px 3px rgba(255, 255, 255, 0.8);
+  animation: gentle-glow 3s ease-in-out infinite alternate;
+}
+
+.fairy-capture-icon::before {
+  content: '🧚';
+  filter: drop-shadow(0 0 5px rgba(255, 215, 0, 0.8));
+}
+
+@keyframes gentle-glow {
+  0% { 
+    box-shadow: 
+      0 0 15px rgba(255, 192, 203, 0.6),
+      inset 0 1px 3px rgba(255, 255, 255, 0.8);
+  }
+  100% { 
+    box-shadow: 
+      0 0 25px rgba(255, 192, 203, 0.9),
+      0 0 35px rgba(255, 215, 0, 0.4),
+      inset 0 1px 3px rgba(255, 255, 255, 0.9);
+  }
+}
+
+/* Texto de hadas capturadas */
+.captured-fairies-text {
+  color: #8b008b;
+  font-weight: bold;
+  font-size: 0.85rem;
+  text-shadow: 
+    0 0 8px rgba(255, 192, 203, 0.8),
+    0 1px 2px rgba(255, 255, 255, 0.9);
+  z-index: 15;
+  position: relative;
+  text-align: center;
+  line-height: 1.2;
+}
+
+/* Efecto de brillo en las cartas dentro de la jaula */
+.captured-fairies-cell .fairy-card {
+  filter: brightness(1.1) saturate(1.2);
+  box-shadow: 
+    0 0 10px rgba(255, 192, 203, 0.4),
+    0 2px 8px rgba(0, 0, 0, 0.2);
+  border-radius: 8px;
+  transition: all 0.3s ease;
+}
+
+.captured-fairies-cell .fairy-card:hover {
+  filter: brightness(1.3) saturate(1.4);
+  box-shadow: 
+    0 0 15px rgba(255, 192, 203, 0.7),
+    0 0 25px rgba(255, 215, 0, 0.5),
+    0 4px 12px rgba(0, 0, 0, 0.3);
+  transform: translateY(-2px);
+}
+
+/* Hover preview container mejorado */
+.captured-fairies-cell .hover-preview-container {
+  position: static;
+}
+
+.captured-fairies-cell .hover-preview-container .hover-preview {
+  position: fixed !important;
+  z-index: 10000 !important;
+  background: linear-gradient(135deg, 
+    rgba(255, 192, 203, 0.95) 0%, 
+    rgba(221, 160, 221, 0.95) 50%,
+    rgba(255, 182, 193, 0.95) 100%);
+  border: 3px solid rgba(255, 215, 0, 0.8);
+  border-radius: 16px;
+  box-shadow: 
+    0 15px 40px rgba(0, 0, 0, 0.8),
+    0 0 30px rgba(255, 192, 203, 0.8),
+    0 0 50px rgba(255, 215, 0, 0.4);
+  backdrop-filter: blur(5px);
+}
+
+/* Variante para el rival (colores más oscuros y siniestros) */
+.rival-captured-fairies-cell {
+  background: 
+    radial-gradient(ellipse 70% 50% at center 40%, 
+      rgba(128, 0, 128, 0.4) 0%, 
+      rgba(75, 0, 130, 0.3) 40%,
+      transparent 70%),
+    
+    radial-gradient(ellipse 30% 20% at 20% 20%, 
+      rgba(255, 255, 255, 0.6) 0%, 
+      rgba(148, 0, 211, 0.4) 30%,
+      transparent 60%),
+    
+    radial-gradient(ellipse 25% 15% at 80% 70%, 
+      rgba(139, 0, 139, 0.5) 0%, 
+      rgba(128, 0, 128, 0.3) 40%,
+      transparent 60%),
+    
+    linear-gradient(135deg, 
+      rgba(25, 25, 112, 0.8) 0%, 
+      rgba(75, 0, 130, 0.7) 25%, 
+      rgba(128, 0, 128, 0.6) 50%, 
+      rgba(75, 0, 130, 0.7) 75%, 
+      rgba(25, 25, 112, 0.8) 100%);
+  
+  /* Sin borde - solo efectos internos */
+  border: none;
+  
+  box-shadow: 
+    0 8px 25px rgba(128, 0, 128, 0.5),
+    0 0 30px rgba(75, 0, 130, 0.4),
+    inset 0 2px 8px rgba(255, 255, 255, 0.3),
+    inset 0 -2px 8px rgba(128, 0, 128, 0.4);
+}
+
+.rival-captured-fairies-cell .captured-fairies-text {
+  color: #dda0dd;
+  text-shadow: 
+    0 0 8px rgba(128, 0, 128, 0.8),
+    0 1px 2px rgba(255, 255, 255, 0.6);
+}
+
+.rival-captured-fairies-cell .fairy-capture-icon {
+  background: radial-gradient(ellipse at center, 
+    rgba(75, 0, 130, 0.9) 30%, 
+    rgba(128, 0, 128, 0.8) 70%);
+  border: 2px solid rgba(148, 0, 211, 0.8);
+}
+
+/* Variante para el jugador (colores más brillantes y amigables) */
+.player-captured-fairies-cell {
+  background: 
+    /* Brillo mágico interior - más brillante y azulado */
+    radial-gradient(ellipse 70% 50% at center 40%, 
+      rgba(135, 206, 235, 0.7) 0%, 
+      rgba(173, 216, 230, 0.5) 40%,
+      transparent 70%),
+    
+    /* Destellos de luz mágica azul-dorada */
+    radial-gradient(ellipse 30% 20% at 20% 20%, 
+      rgba(255, 255, 255, 0.9) 0%, 
+      rgba(30, 144, 255, 0.5) 30%,
+      transparent 60%),
+    
+    radial-gradient(ellipse 25% 15% at 80% 70%, 
+      rgba(176, 224, 230, 0.8) 0%, 
+      rgba(135, 206, 235, 0.4) 40%,
+      transparent 60%),
+    
+    /* Polvo de hadas flotando azul */
+    radial-gradient(ellipse 15% 10% at 60% 30%, 
+      rgba(30, 144, 255, 0.6) 0%, 
+      transparent 50%),
+    
+    radial-gradient(ellipse 12% 8% at 30% 80%, 
+      rgba(173, 216, 230, 0.5) 0%, 
+      transparent 50%),
+    
+    /* Base de cristal mágico azul */
+    linear-gradient(135deg, 
+      rgba(240, 248, 255, 0.9) 0%, 
+      rgba(173, 216, 230, 0.8) 25%, 
+      rgba(135, 206, 235, 0.7) 50%, 
+      rgba(173, 216, 230, 0.8) 75%, 
+      rgba(240, 248, 255, 0.9) 100%);
+  
+  /* Sin borde - solo efectos internos */
+  border: none;
+  
+  /* Sombras y efectos mágicos azules */
+  box-shadow: 
+    0 8px 25px rgba(135, 206, 235, 0.5),
+    0 0 30px rgba(173, 216, 230, 0.6),
+    inset 0 2px 8px rgba(255, 255, 255, 0.9),
+    inset 0 -2px 8px rgba(135, 206, 235, 0.4),
+    0 0 50px rgba(30, 144, 255, 0.3);
+}
+
+.player-captured-fairies-cell:hover {
+  box-shadow: 
+    0 12px 35px rgba(135, 206, 235, 0.7),
+    0 0 40px rgba(173, 216, 230, 0.8),
+    inset 0 2px 8px rgba(255, 255, 255, 1),
+    inset 0 -2px 8px rgba(135, 206, 235, 0.5),
+    0 0 60px rgba(30, 144, 255, 0.5),
+    0 0 80px rgba(0, 191, 255, 0.4);
+}
+
+.player-captured-fairies-cell .captured-fairies-text {
+  color: #1e90ff;
+  text-shadow: 
+    0 0 8px rgba(173, 216, 230, 0.9),
+    0 1px 2px rgba(255, 255, 255, 0.9);
+}
+
+.player-captured-fairies-cell .fairy-capture-icon {
+  background: radial-gradient(ellipse at center, 
+    rgba(173, 216, 230, 0.9) 30%, 
+    rgba(135, 206, 235, 0.8) 70%);
+  border: 2px solid rgba(30, 144, 255, 0.8);
+}
+
+.player-captured-fairies-cell .fairy-particles::before {
+  background: radial-gradient(circle, #1e90ff 0%, #87ceeb 100%);
+  box-shadow: 0 0 10px rgba(30, 144, 255, 0.8);
+}
+
+.player-captured-fairies-cell .fairy-particles::after {
+  background: radial-gradient(circle, #87ceeb 0%, #b0e0e6 100%);
+  box-shadow: 0 0 10px rgba(135, 206, 235, 0.8);
+}
+
+/* Evitar efectos borrosos en todas las variantes */
+.captured-fairies-cell,
+.rival-captured-fairies-cell,
+.player-captured-fairies-cell {
+  backdrop-filter: none !important;
+  filter: none !important;
+}
+
+.captured-fairies-cell:hover,
+.rival-captured-fairies-cell:hover,
+.player-captured-fairies-cell:hover {
+  backdrop-filter: none !important;
+  filter: none !important;
+}
+
+/* Casilla de Magias del Rival - Grimorio Oscuro Maldito */
+.rival-magic-cell {
+    position: relative;
+    border-radius: 12px;
+    overflow: visible;
+    
+    /* Fondo de grimorio maldito con runas */
+    background: 
+        /* Runas brillantes en las esquinas */
+        radial-gradient(ellipse 25% 15% at 15% 15%, 
+            rgba(220, 20, 60, 0.9) 0%, 
+            rgba(139, 0, 0, 0.6) 40%,
+            transparent 70%),
+        
+        radial-gradient(ellipse 25% 15% at 85% 15%, 
+            rgba(255, 69, 0, 0.8) 0%, 
+            rgba(178, 34, 34, 0.5) 40%,
+            transparent 70%),
+        
+        radial-gradient(ellipse 25% 15% at 15% 85%, 
+            rgba(128, 0, 128, 0.7) 0%, 
+            rgba(75, 0, 130, 0.4) 40%,
+            transparent 70%),
+        
+        radial-gradient(ellipse 25% 15% at 85% 85%, 
+            rgba(255, 140, 0, 0.8) 0%, 
+            rgba(255, 69, 0, 0.5) 40%,
+            transparent 70%),
+        
+        /* Aura mágica central */
+        radial-gradient(ellipse 60% 40% at center center, 
+            rgba(220, 20, 60, 0.3) 0%, 
+            rgba(139, 0, 0, 0.2) 50%,
+            transparent 80%),
+        
+        /* Textura de cuero oscuro envejecido */
+        repeating-linear-gradient(
+            45deg,
+            #2c1810 0px,
+            #1a0e08 3px,
+            #2c1810 6px,
+            #3d2317 9px,
+            #2c1810 12px
+        ),
+        
+        /* Base de pergamino antiguo */
+        linear-gradient(135deg, 
+            #2c1810 0%, 
+            #1a0e08 25%, 
+            #3d2317 50%, 
+            #2c1810 75%, 
+            #4a2c1d 100%);
+    
+    /* Borde de hierro forjado con runas */
+    border: 3px solid;
+    border-image: linear-gradient(45deg, 
+        #8b0000, #dc143c, #ff4500, #8b0000, 
+        #800080, #ff8c00, #8b0000, #dc143c
+    ) 1;
+    
+    /* Sombras y efectos mágicos */
+    box-shadow: 
+        /* Sombra exterior */
+        0 8px 25px rgba(220, 20, 60, 0.4),
+        /* Brillo mágico maligno */
+        0 0 30px rgba(139, 0, 0, 0.6),
+        /* Profundidad del grimorio */
+        inset 0 -4px 8px rgba(0, 0, 0, 0.8),
+        inset 0 2px 4px rgba(255, 69, 0, 0.2),
+        /* Aura siniestra */
+        0 0 50px rgba(75, 0, 130, 0.3);
+    
+    transition: all 0.4s ease;
+    /* Z-index base para la casilla */
+    z-index: 1;
+}
+
+.rival-magic-cell:hover {
+    z-index: 50 !important; /* Aumentamos el z-index base cuando hay hover */
+    transform: translateY(-3px) scale(1.02);
+    
+    /* Intensificar el poder mágico al hacer hover */
+    box-shadow: 
+        0 12px 35px rgba(220, 20, 60, 0.6),
+        0 0 40px rgba(139, 0, 0, 0.8),
+        inset 0 -4px 8px rgba(0, 0, 0, 0.9),
+        inset 0 2px 4px rgba(255, 69, 0, 0.4),
+        0 0 60px rgba(75, 0, 130, 0.5),
+        0 0 80px rgba(220, 20, 60, 0.4);
+}
+
+/* Runas mágicas flotantes */
+.magic-runes {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 2;
+    pointer-events: none;
+    overflow: hidden;
+    border-radius: 12px;
+}
+
+.magic-runes::before,
+.magic-runes::after {
+    content: '';
+    position: absolute;
+    font-size: 20px;
+    color: #dc143c;
+    text-shadow: 0 0 10px rgba(220, 20, 60, 0.8);
+    animation: float-rune 6s ease-in-out infinite;
+}
+
+.magic-runes::before {
+    content: '☥';
+    top: 10px;
+    left: 10px;
+    animation-delay: 0s;
+}
+
+.magic-runes::after {
+    content: '☽';
+    bottom: 10px;
+    right: 10px;
+    animation-delay: 3s;
+}
+
+/* Símbolo de grimorio central */
+.grimoire-symbol {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 50px;
+    height: 50px;
+    background: radial-gradient(circle at center, 
+        rgba(220, 20, 60, 0.9) 0%, 
+        rgba(139, 0, 0, 0.7) 50%,
+        rgba(75, 0, 130, 0.5) 100%);
+    border: 2px solid rgba(255, 69, 0, 0.8);
+    border-radius: 50%;
+    z-index: 5;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    box-shadow: 
+        0 0 20px rgba(220, 20, 60, 0.7),
+        inset 0 2px 4px rgba(255, 69, 0, 0.3);
+    animation: pulse-grimoire 4s ease-in-out infinite alternate;
+}
+
+.grimoire-symbol::before {
+    content: '📖';
+    filter: 
+        hue-rotate(320deg) 
+        saturate(1.5) 
+        brightness(1.2)
+        drop-shadow(0 0 8px rgba(220, 20, 60, 0.8));
+}
+
+@keyframes pulse-grimoire {
+    0% { 
+        box-shadow: 
+            0 0 20px rgba(220, 20, 60, 0.7),
+            inset 0 2px 4px rgba(255, 69, 0, 0.3);
+        transform: translate(-50%, -50%) scale(1);
+    }
+    100% { 
+        box-shadow: 
+            0 0 30px rgba(220, 20, 60, 0.9),
+            0 0 50px rgba(139, 0, 0, 0.5),
+            inset 0 2px 4px rgba(255, 69, 0, 0.5);
+        transform: translate(-50%, -50%) scale(1.1);
+    }
+}
+
+@keyframes float-rune {
+    0%, 100% { 
+        transform: translateY(0px) rotate(0deg);
+        opacity: 0.7;
+    }
+    25% { 
+        transform: translateY(-8px) rotate(90deg);
+        opacity: 1;
+    }
+    50% { 
+        transform: translateY(-4px) rotate(180deg);
+        opacity: 0.8;
+    }
+    75% { 
+        transform: translateY(-12px) rotate(270deg);
+        opacity: 1;
+    }
+}
+
+/* Energía mágica pulsante */
+.magical-energy {
+    position: absolute;
+    top: -5px;
+    left: -5px;
+    right: -5px;
+    bottom: -5px;
+    z-index: 1;
+    pointer-events: none;
+    border-radius: 16px;
+    background: 
+        radial-gradient(ellipse 100% 50% at center, 
+            rgba(220, 20, 60, 0.2) 0%, 
+            transparent 70%);
+    animation: magical-pulse 3s ease-in-out infinite;
+}
+
+@keyframes magical-pulse {
+    0%, 100% { 
+        opacity: 0.4;
+        transform: scale(1);
+    }
+    50% { 
+        opacity: 0.8;
+        transform: scale(1.05);
+    }
+}
+
+/* Texto de magias */
+.magic-text {
+    color: #dc143c;
+    font-weight: bold;
+    font-size: 0.9rem;
+    text-shadow: 
+        0 0 10px rgba(220, 20, 60, 0.8),
+        0 1px 2px rgba(0, 0, 0, 0.9);
+    z-index: 15;
+    position: relative;
+    text-align: center;
+    line-height: 1.2;
+    font-family: 'Georgia', serif;
+}
+
+/* Icono de poder mágico */
+.magic-power-icon {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    width: 32px;
+    height: 32px;
+    background: radial-gradient(ellipse at center, 
+        rgba(255, 69, 0, 0.9) 30%, 
+        rgba(220, 20, 60, 0.8) 70%);
+    border: 2px solid rgba(139, 0, 0, 0.8);
+    border-radius: 50%;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    box-shadow: 
+        0 0 15px rgba(255, 69, 0, 0.6),
+        inset 0 1px 3px rgba(255, 255, 255, 0.2);
+    animation: power-glow 2s ease-in-out infinite alternate;
+}
+
+.magic-power-icon::before {
+    content: '⚡';
+    filter: drop-shadow(0 0 5px rgba(255, 69, 0, 0.8));
+}
+
+@keyframes power-glow {
+    0% { 
+        box-shadow: 
+            0 0 15px rgba(255, 69, 0, 0.6),
+            inset 0 1px 3px rgba(255, 255, 255, 0.2);
+    }
+    100% { 
+        box-shadow: 
+            0 0 25px rgba(255, 69, 0, 0.9),
+            0 0 35px rgba(220, 20, 60, 0.4),
+            inset 0 1px 3px rgba(255, 255, 255, 0.4);
+    }
+}
+
+/* Partículas de energía oscura */
+.dark-particles {
+    position: absolute;
+    top: -10px;
+    left: -10px;
+    right: -10px;
+    bottom: -10px;
+    z-index: 1;
+    pointer-events: none;
+    overflow: hidden;
+    border-radius: 20px;
+}
+
+.dark-particles::before,
+.dark-particles::after {
+    content: '';
+    position: absolute;
+    width: 4px;
+    height: 4px;
+    background: radial-gradient(circle, #dc143c 0%, #8b0000 100%);
+    border-radius: 50%;
+    animation: float-dark-sparkle 5s ease-in-out infinite;
+    box-shadow: 0 0 8px rgba(220, 20, 60, 0.8);
+}
+
+.dark-particles::before {
+    top: 25%;
+    left: 20%;
+    animation-delay: 0s;
+}
+
+.dark-particles::after {
+    top: 75%;
+    right: 25%;
+    animation-delay: 2.5s;
+    background: radial-gradient(circle, #ff4500 0%, #8b0000 100%);
+}
+
+@keyframes float-dark-sparkle {
+    0%, 100% { 
+        transform: translateY(0px) scale(1);
+        opacity: 0.6;
+    }
+    25% { 
+        transform: translateY(-10px) scale(1.3);
+        opacity: 1;
+    }
+    50% { 
+        transform: translateY(-6px) scale(0.8);
+        opacity: 0.4;
+    }
+    75% { 
+        transform: translateY(-14px) scale(1.2);
+        opacity: 1;
+    }
+}
+
+/* Efecto de hover mejorado */
+.rival-magic-cell:hover .magical-energy {
+    animation-duration: 1s;
+    opacity: 1;
+}
+
+.rival-magic-cell:hover .dark-particles {
+    animation-duration: 2s;
+}
+
+.rival-magic-cell:hover .magic-runes::before,
+.rival-magic-cell:hover .magic-runes::after {
+    animation-duration: 3s;
+    color: #ff4500;
+    text-shadow: 0 0 15px rgba(255, 69, 0, 1);
+}
+
+/* NUEVAS REGLAS PARA HOVER PREVIEW - MUY IMPORTANTES */
+
+/* Contenedor de cartas con z-index controlado */
+.rival-magic-cell .relative {
+    z-index: 20; /* Las cartas base tienen z-index 20 */
+}
+
+/* Grupo de hover individual para cada carta */
+.rival-magic-cell .group {
+    position: relative;
+    z-index: 25; /* Cada carta individual tiene z-index 25 */
+}
+
+/* Trigger de hover */
+.rival-magic-cell .hover-trigger {
+    position: absolute;
+    z-index: 30; /* El trigger tiene z-index 30 */
+}
+
+/* HOVER PREVIEW - EL MÁS IMPORTANTE */
+.rival-magic-cell .group-hover\:block {
+    z-index: 10000 !important; /* Máximo z-index para el preview */
+    position: fixed !important; /* Cambiamos a fixed para que esté por encima de todo */
+    pointer-events: none; /* Evitamos que interfiera con otros elementos */
+}
+
+/* Alternativa si fixed no funciona bien */
+.rival-magic-cell .hover-preview {
+    position: absolute;
+    z-index: 10000 !important;
+    pointer-events: none;
+    transform: translateZ(0); /* Forzamos un nuevo contexto de apilamiento */
+}
+
+/* Estilos para el preview hover */
+.rival-magic-cell .group:hover .group-hover\:block {
+    display: block !important;
+    z-index: 10000 !important;
+    position: absolute !important;
+    top: -10px !important;
+    left: 90px !important;
+    pointer-events: none !important;
+    transform: translateZ(0) !important; /* Nuevo contexto de apilamiento */
+}
+
+/* Asegurar que el contenedor del preview tenga el z-index más alto */
+.rival-magic-cell .group:hover .group-hover\:block > div {
+    z-index: 10001 !important;
+    position: relative;
+    background: white;
+    border: 2px solid #333;
+    border-radius: 8px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
+    transform: translateZ(0);
+}
+
+/* Casilla de Magias del Jugador - Grimorio Sagrado Luminoso */
+.player-magic-cell {
+    position: relative;
+    border-radius: 12px;
+    overflow: visible;
+    
+    /* Fondo de grimorio sagrado con runas luminosas */
+    background: 
+        /* Runas brillantes en las esquinas */
+        radial-gradient(ellipse 25% 15% at 15% 15%, 
+            rgba(30, 144, 255, 0.9) 0%, 
+            rgba(70, 130, 180, 0.6) 40%,
+            transparent 70%),
+        
+        radial-gradient(ellipse 25% 15% at 85% 15%, 
+            rgba(65, 105, 225, 0.8) 0%, 
+            rgba(100, 149, 237, 0.5) 40%,
+            transparent 70%),
+        
+        radial-gradient(ellipse 25% 15% at 15% 85%, 
+            rgba(138, 43, 226, 0.7) 0%, 
+            rgba(147, 112, 219, 0.4) 40%,
+            transparent 70%),
+        
+        radial-gradient(ellipse 25% 15% at 85% 85%, 
+            rgba(0, 191, 255, 0.8) 0%, 
+            rgba(135, 206, 235, 0.5) 40%,
+            transparent 70%),
+        
+        /* Aura mágica central */
+        radial-gradient(ellipse 60% 40% at center center, 
+            rgba(30, 144, 255, 0.3) 0%, 
+            rgba(70, 130, 180, 0.2) 50%,
+            transparent 80%),
+        
+        /* Textura de cuero azul celestial */
+        repeating-linear-gradient(
+            45deg,
+            #1e3a5f 0px,
+            #0f1929 3px,
+            #1e3a5f 6px,
+            #2c4a6b 9px,
+            #1e3a5f 12px
+        ),
+        
+        /* Base de pergamino mágico */
+        linear-gradient(135deg, 
+            #1e3a5f 0%, 
+            #0f1929 25%, 
+            #2c4a6b 50%, 
+            #1e3a5f 75%, 
+            #3d5a87 100%);
+    
+    /* Borde de plata élfica con runas */
+    border: 3px solid;
+    border-image: linear-gradient(45deg, 
+        #1e90ff, #4169e1, #00bfff, #1e90ff, 
+        #8a2be2, #87ceeb, #1e90ff, #4169e1
+    ) 1;
+    
+    /* Sombras y efectos mágicos */
+    box-shadow: 
+        /* Sombra exterior */
+        0 8px 25px rgba(30, 144, 255, 0.4),
+        /* Brillo mágico benévolo */
+        0 0 30px rgba(70, 130, 180, 0.6),
+        /* Profundidad del grimorio */
+        inset 0 -4px 8px rgba(0, 0, 0, 0.8),
+        inset 0 2px 4px rgba(65, 105, 225, 0.2),
+        /* Aura celestial */
+        0 0 50px rgba(138, 43, 226, 0.3);
+    
+    transition: all 0.4s ease;
+    /* Z-index base para la casilla */
+    z-index: 1;
+}
+
+.player-magic-cell:hover {
+    z-index: 50 !important; /* Aumentamos el z-index base cuando hay hover */
+    transform: translateY(-3px) scale(1.02);
+    
+    /* Intensificar el poder mágico al hacer hover */
+    box-shadow: 
+        0 12px 35px rgba(30, 144, 255, 0.6),
+        0 0 40px rgba(70, 130, 180, 0.8),
+        inset 0 -4px 8px rgba(0, 0, 0, 0.9),
+        inset 0 2px 4px rgba(65, 105, 225, 0.4),
+        0 0 60px rgba(138, 43, 226, 0.5),
+        0 0 80px rgba(30, 144, 255, 0.4);
+}
+
+/* Runas mágicas luminosas flotantes */
+.player-magic-runes {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 2;
+    pointer-events: none;
+    overflow: hidden;
+    border-radius: 12px;
+}
+
+.player-magic-runes::before,
+.player-magic-runes::after {
+    content: '';
+    position: absolute;
+    font-size: 20px;
+    color: #4169e1;
+    text-shadow: 0 0 10px rgba(65, 105, 225, 0.8);
+    animation: float-rune 6s ease-in-out infinite;
+}
+
+.player-magic-runes::before {
+    content: '☆';
+    top: 10px;
+    left: 10px;
+    animation-delay: 0s;
+}
+
+.player-magic-runes::after {
+    content: '☾';
+    bottom: 10px;
+    right: 10px;
+    animation-delay: 3s;
+}
+
+/* Símbolo de grimorio central sagrado */
+.player-grimoire-symbol {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 50px;
+    height: 50px;
+    background: radial-gradient(circle at center, 
+        rgba(30, 144, 255, 0.9) 0%, 
+        rgba(70, 130, 180, 0.7) 50%,
+        rgba(138, 43, 226, 0.5) 100%);
+    border: 2px solid rgba(65, 105, 225, 0.8);
+    border-radius: 50%;
+    z-index: 5;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    box-shadow: 
+        0 0 20px rgba(30, 144, 255, 0.7),
+        inset 0 2px 4px rgba(65, 105, 225, 0.3);
+    animation: pulse-player-grimoire 4s ease-in-out infinite alternate;
+}
+
+.player-grimoire-symbol::before {
+    content: '📖';
+    filter: 
+        hue-rotate(200deg) 
+        saturate(1.5) 
+        brightness(1.2)
+        drop-shadow(0 0 8px rgba(30, 144, 255, 0.8));
+}
+
+@keyframes pulse-player-grimoire {
+    0% { 
+        box-shadow: 
+            0 0 20px rgba(30, 144, 255, 0.7),
+            inset 0 2px 4px rgba(65, 105, 225, 0.3);
+        transform: translate(-50%, -50%) scale(1);
+    }
+    100% { 
+        box-shadow: 
+            0 0 30px rgba(30, 144, 255, 0.9),
+            0 0 50px rgba(70, 130, 180, 0.5),
+            inset 0 2px 4px rgba(65, 105, 225, 0.5);
+        transform: translate(-50%, -50%) scale(1.1);
+    }
+}
+
+/* Energía mágica pulsante celestial */
+.player-magical-energy {
+    position: absolute;
+    top: -5px;
+    left: -5px;
+    right: -5px;
+    bottom: -5px;
+    z-index: 1;
+    pointer-events: none;
+    border-radius: 16px;
+    background: 
+        radial-gradient(ellipse 100% 50% at center, 
+            rgba(30, 144, 255, 0.2) 0%, 
+            transparent 70%);
+    animation: magical-pulse 3s ease-in-out infinite;
+}
+
+/* Texto de magias del jugador */
+.player-magic-text {
+    color: #4169e1;
+    font-weight: bold;
+    font-size: 0.9rem;
+    text-shadow: 
+        0 0 10px rgba(65, 105, 225, 0.8),
+        0 1px 2px rgba(0, 0, 0, 0.9);
+    z-index: 15;
+    position: relative;
+    text-align: center;
+    line-height: 1.2;
+    font-family: 'Georgia', serif;
+}
+
+/* Icono de poder mágico celestial */
+.player-magic-power-icon {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    width: 32px;
+    height: 32px;
+    background: radial-gradient(ellipse at center, 
+        rgba(65, 105, 225, 0.9) 30%, 
+        rgba(30, 144, 255, 0.8) 70%);
+    border: 2px solid rgba(70, 130, 180, 0.8);
+    border-radius: 50%;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    box-shadow: 
+        0 0 15px rgba(65, 105, 225, 0.6),
+        inset 0 1px 3px rgba(255, 255, 255, 0.2);
+    animation: player-power-glow 2s ease-in-out infinite alternate;
+}
+
+.player-magic-power-icon::before {
+    content: '✨';
+    filter: drop-shadow(0 0 5px rgba(65, 105, 225, 0.8));
+}
+
+@keyframes player-power-glow {
+    0% { 
+        box-shadow: 
+            0 0 15px rgba(65, 105, 225, 0.6),
+            inset 0 1px 3px rgba(255, 255, 255, 0.2);
+    }
+    100% { 
+        box-shadow: 
+            0 0 25px rgba(65, 105, 225, 0.9),
+            0 0 35px rgba(30, 144, 255, 0.4),
+            inset 0 1px 3px rgba(255, 255, 255, 0.4);
+    }
+}
+
+/* Partículas de energía luminosa */
+.player-light-particles {
+    position: absolute;
+    top: -10px;
+    left: -10px;
+    right: -10px;
+    bottom: -10px;
+    z-index: 1;
+    pointer-events: none;
+    overflow: hidden;
+    border-radius: 20px;
+}
+
+.player-light-particles::before,
+.player-light-particles::after {
+    content: '';
+    position: absolute;
+    width: 4px;
+    height: 4px;
+    background: radial-gradient(circle, #4169e1 0%, #1e90ff 100%);
+    border-radius: 50%;
+    animation: float-light-sparkle 5s ease-in-out infinite;
+    box-shadow: 0 0 8px rgba(65, 105, 225, 0.8);
+}
+
+.player-light-particles::before {
+    top: 25%;
+    left: 20%;
+    animation-delay: 0s;
+}
+
+.player-light-particles::after {
+    top: 75%;
+    right: 25%;
+    animation-delay: 2.5s;
+    background: radial-gradient(circle, #00bfff 0%, #1e90ff 100%);
+}
+
+@keyframes float-light-sparkle {
+    0%, 100% { 
+        transform: translateY(0px) scale(1);
+        opacity: 0.6;
+    }
+    25% { 
+        transform: translateY(-10px) scale(1.3);
+        opacity: 1;
+    }
+    50% { 
+        transform: translateY(-6px) scale(0.8);
+        opacity: 0.4;
+    }
+    75% { 
+        transform: translateY(-14px) scale(1.2);
+        opacity: 1;
+    }
+}
+
+/* Efecto de hover mejorado */
+.player-magic-cell:hover .player-magical-energy {
+    animation-duration: 1s;
+    opacity: 1;
+}
+
+.player-magic-cell:hover .player-light-particles {
+    animation-duration: 2s;
+}
+
+.player-magic-cell:hover .player-magic-runes::before,
+.player-magic-cell:hover .player-magic-runes::after {
+    animation-duration: 3s;
+    color: #00bfff;
+    text-shadow: 0 0 15px rgba(0, 191, 255, 1);
+}
+
+/* REGLAS PARA HOVER PREVIEW - HEREDADAS DEL RIVAL */
+
+/* Contenedor de cartas con z-index controlado */
+.player-magic-cell .relative {
+    z-index: 20; /* Las cartas base tienen z-index 20 */
+}
+
+/* Grupo de hover individual para cada carta */
+.player-magic-cell .group {
+    position: relative;
+    z-index: 25; /* Cada carta individual tiene z-index 25 */
+}
+
+/* Trigger de hover */
+.player-magic-cell .hover-trigger {
+    position: absolute;
+    z-index: 30; /* El trigger tiene z-index 30 */
+}
+
+/* HOVER PREVIEW - EL MÁS IMPORTANTE */
+.player-magic-cell .group-hover\:block {
+    z-index: 10000 !important; /* Máximo z-index para el preview */
+    position: fixed !important; /* Cambiamos a fixed para que esté por encima de todo */
+    pointer-events: none; /* Evitamos que interfiera con otros elementos */
+}
+
+/* Alternativa si fixed no funciona bien */
+.player-magic-cell .hover-preview {
+    position: absolute;
+    z-index: 10000 !important;
+    pointer-events: none;
+    transform: translateZ(0); /* Forzamos un nuevo contexto de apilamiento */
+}
+
+/* Estilos para el preview hover */
+.player-magic-cell .group:hover .group-hover\:block {
+    display: block !important;
+    z-index: 10000 !important;
+    position: absolute !important;
+    top: -10px !important;
+    left: 90px !important;
+    pointer-events: none !important;
+    transform: translateZ(0) !important; /* Nuevo contexto de apilamiento */
+}
+
+/* Asegurar que el contenedor del preview tenga el z-index más alto */
+.player-magic-cell .group:hover .group-hover\:block > div {
+    z-index: 10001 !important;
+    position: relative;
+    background: white;
+    border: 2px solid #333;
+    border-radius: 8px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
+    transform: translateZ(0);
+}
+
     `}</style>
       </div>
     </div>
