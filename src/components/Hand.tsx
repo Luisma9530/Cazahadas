@@ -18,9 +18,10 @@ export default function Hand() {
   const [playerCards] = useNeoHandStore((state) => [
     state.playerCards
   ])
-  const [selectedCard, setSelectedCard] = useCardStore((state) => [
-    state.selectedCard,
-    state.setSelectedCard,
+  const [selectedCards, toggleCardSelection, isCardSelected] = useCardStore((state) => [
+    state.selectedCards,
+    state.toggleCardSelection,
+    state.isCardSelected
   ])
   const [hoveredCard, setHoveredCard] = useCardStore((state) => [
     state.hoveredCard,
@@ -28,21 +29,21 @@ export default function Hand() {
   ])
 
   const handleCardClick = (card: CardUnity) => {
-    if (selectedCard?.id === card.id) {
-      setSelectedCard(null)
-      return;
-    }
-
-    setSelectedCard(card)
+    toggleCardSelection(card)
+    
     flickAudio.pause()
     flickAudio.currentTime = 0
     flickAudio.volume = 0.4
     flickAudio.play()
-    socket.emit("selected-card", { card });
+    
+    // Emitir las cartas seleccionadas actualizadas
+    // Necesitamos obtener el estado actualizado después del toggle
+    const updatedSelectedCards = useCardStore.getState().selectedCards
+    socket.emit("selected-cards", { cards: updatedSelectedCards });
   }
 
   const handleHoverStart = (card: CardUnity) => {
-    if (selectedCard?.id !== card.id) {
+    if (!isCardSelected(card)) {
       setHoveredCard(card)
       hoverAudio.pause()
       hoverAudio.currentTime = 0
@@ -73,26 +74,30 @@ export default function Hand() {
             const x = Math.sin(radian) * radius;
             const y = -Math.cos(radian) * radius + radius; // Crear curva de abanico real
 
+            const isSelected = isCardSelected(card)
+            const isHovered = hoveredCard?.id === card.id
+
             return (
               <motion.li
                 key={card.id}
                 initial={{ opacity: 0, x: -200, y: 0 }}
                 animate={{
                   x: x,
-                  y: y + (selectedCard?.id === card?.id ? -20 : 0), // Reducido el movimiento de selección
+                  y: y + (isSelected ? -20 : 0), // Reducido el movimiento de selección
                   opacity: 1,
                   rotate: angle,
                   transition: { duration: 0.0 }
                 }}
                 exit={{ opacity: 0, transition: { duration: 1 } }}
-                className={`border-2 border-solid shadow-lg rounded-lg cursor-pointer absolute ${selectedCard?.id === card?.id
-                  ? 'border-green-400 -translate-y-5 transform z-10' // Reducido el translate
-                  : 'border-black hover:scale-105 hover:duration-100 hover:border-blue-500'
+                className={`border-2 border-solid shadow-lg rounded-lg cursor-pointer absolute ${
+                  isSelected
+                    ? 'border-green-400 -translate-y-5 transform z-10' // Reducido el translate
+                    : 'border-black hover:scale-105 hover:duration-100 hover:border-blue-500'
                   } h-44 w-36` // Cartas más pequeñas: de h-60 w-52 a h-44 w-36
                 }
                 style={{
                   transformOrigin: 'bottom center',
-                  zIndex: (selectedCard?.id === card?.id || hoveredCard?.id === card?.id) ? 10 : index,
+                  zIndex: (isSelected || isHovered) ? 10 : index,
                   bottom: 0,
                   transition: 'transform 0.3s ease-in-out' // Transición suave
                 }}

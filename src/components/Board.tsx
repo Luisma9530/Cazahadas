@@ -16,8 +16,8 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
   const [tiles, setTiles] = useBoardStore((state) => [state.board, state.setBoard]);
   // Carta seleccionada para colocar en la zona de juego
   const [selectedCard, resetSelectedCard] = useCardStore((state) => [
-    state.selectedCard,
-    state.resetSelectedCard,
+    state.selectedCards,
+    state.resetSelectedCards,
   ]);
   const [isMyTurn, isMyFirstTurn, isBattle, setIsBattle, setIsMyFirstTurn] = useTurnStore((state) => [state.isMyTurn, state.isMyFirstTurn, state.isBattle, state.setIsBattle, state.setIsMyFirstTurn]);
 
@@ -30,25 +30,29 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
 
 
   // Validación para colocar carta en zona de juego
-  function canAddCardToPosition(card: any, position: Tile, rowIndex: number): boolean {
-    if (!card || !isMyTurn) return false;
-
-    if (rowIndex == 2) {
-      switch (card.type) {
-        case CardType.SHIELD:
-          return position.type === 'deck' || position.type === 'discard';
-        case CardType.MAGIC:
-          return (position.type === 'magic' && isBattle) || position.type === 'discard';
-        default:
-          return false; // Si no conocemos el tipo no dejamos colocar
-      }
-    } else {
-      if (CardType.CATCH === card.type) {
-        return position.type === 'fairy' && !position.marked && !position.captured && !isBattle;
+  function canAddCardToPosition(selectedCards: CardUnity[], position: Tile, rowIndex: number): boolean {
+    if (selectedCards.length === 1) {
+      const card = selectedCards[0];
+      if (!card || !isMyTurn) return false;
+      if (rowIndex == 2) {
+        switch (card.type) {
+          case CardType.SHIELD:
+            return position.type === 'deck' || position.type === 'discard';
+          case CardType.MAGIC:
+            return (position.type === 'magic' && isBattle) || position.type === 'discard';
+          default:
+            return false; // Si no conocemos el tipo no dejamos colocar
+        }
       } else {
-        return false;
+        if (CardType.CATCH === card.type) {
+          return position.type === 'fairy' && !position.marked && !position.captured && !isBattle;
+        } else {
+          return false;
+        }
       }
-    }
+    } else if (selectedCards.length > 1) {
+      return rowIndex == 2 && position.type === 'discard'
+    } else { return false; } // Si no hay cartas seleccionadas, no se puede colocar nada
   }
 
   socket.on("selected-card", (data: { card: CardUnity }) => {
@@ -98,7 +102,9 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
     if (!selectedCard || !canAddCardToPosition(selectedCard, position, rowIndex)) return;
     // Lógica para colocar la carta. Se asume que mapPawns transforma la celda y actualiza el estado.
     const newTiles = mapPawns(selectedCard, rowIndex, colIndex, tiles, amIP1);
-    placeCard(selectedCard);
+    for (const card of selectedCard) {
+      placeCard(card);
+    }
     setTiles(newTiles);
     resetSelectedCard();
     socket.emit("place-card", { tiles: newTiles, gameId: gameId, isBattle: isBattle, selectedCard: selectedCard });
@@ -187,7 +193,7 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
 
   // Función para transformar el tablero al colocar una carta en la zona de juego.
   function mapPawns(
-    card: CardUnity,
+    cards: CardUnity[],
     rowIndex: number,
     colIndex: number,
     currentTiles: Tile[][],
@@ -196,44 +202,47 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
     const newTiles = currentTiles.map((row) => row.slice());
     const currentTile = newTiles[rowIndex][colIndex];
 
-    switch (card.type) {
-      case CardType.MAGIC:
-        if (currentTile.type === 'magic') {
-          newTiles[rowIndex][colIndex] = {
-            ...currentTile,
-            cards: [...(currentTile.cards || []), { ...card, placedByPlayerOne: amIP1 }],
-          };
-          if (newTiles[1][3].type === 'variableX' && newTiles[rowIndex][colIndex].type !== 'discard') {
-            newTiles[1][3].value = card.operation(newTiles[1][3].value); // Aplicar la operación de la carta mágica a la variable X
-          }
-        }
-        break;
-      case CardType.SHIELD:
-        if (currentTile.type === 'deck') {
-          newTiles[rowIndex][colIndex] = {
-            ...currentTile,
-            cards: [...(currentTile.cards || []), { ...card, placedByPlayerOne: amIP1 }],
-          };
-        }
-        break;
-
-      case CardType.CATCH:
-        if (currentTile.type === 'fairy') {
-          if (!currentTile.captured && !currentTile.marked) { // Si la hada no ha sido capturada y no está marcada, se puede colocar la carta
-            currentTile.marked = true; // Marcar la hada como seleccionada
-            currentTile.placedByPlayerOne = amIP1; // Marcar la hada como seleccionada por el jugador 1 o 2
+    if (cards.length === 1) {
+      const card = cards[0];
+      switch (card.type) {
+        case CardType.MAGIC:
+          if (currentTile.type === 'magic') {
             newTiles[rowIndex][colIndex] = {
               ...currentTile,
-              card: { ...card, placedByPlayerOne: amIP1 }, // Colocar la carta en la celda
+              cards: [...(currentTile.cards || []), { ...card, placedByPlayerOne: amIP1 }],
             };
-            setIsBattle(true); // Cambiar el estado de batalla a verdadero
+            if (newTiles[1][3].type === 'variableX' && newTiles[rowIndex][colIndex].type !== 'discard') {
+              newTiles[1][3].value = card.operation(newTiles[1][3].value); // Aplicar la operación de la carta mágica a la variable X
+            }
           }
-        }
-        break;
+          break;
+        case CardType.SHIELD:
+          if (currentTile.type === 'deck') {
+            newTiles[rowIndex][colIndex] = {
+              ...currentTile,
+              cards: [...(currentTile.cards || []), { ...card, placedByPlayerOne: amIP1 }],
+            };
+          }
+          break;
 
-      default:
-        console.warn(`Tipo de carta no reconocido: ${(card as any).type}`);
-        break;
+        case CardType.CATCH:
+          if (currentTile.type === 'fairy') {
+            if (!currentTile.captured && !currentTile.marked) { // Si la hada no ha sido capturada y no está marcada, se puede colocar la carta
+              currentTile.marked = true; // Marcar la hada como seleccionada
+              currentTile.placedByPlayerOne = amIP1; // Marcar la hada como seleccionada por el jugador 1 o 2
+              newTiles[rowIndex][colIndex] = {
+                ...currentTile,
+                card: { ...card, placedByPlayerOne: amIP1 }, // Colocar la carta en la celda
+              };
+              setIsBattle(true); // Cambiar el estado de batalla a verdadero
+            }
+          }
+          break;
+
+        default:
+          console.warn(`Tipo de carta no reconocido: ${(card as any).type}`);
+          break;
+      }
     }
 
     return newTiles;
@@ -533,19 +542,6 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
                       </div>
                     </div>
                   ))}
-                  <div className="hover-preview-container">
-                    {tiles[2][2].cards.slice(-3).map((card, i) => (
-                      <div
-                        key={`preview-${i}`}
-                        className="hover-preview absolute z-[9999] hidden group-hover:block top-[-10px] left-[110px]"
-                        style={{ top: `${i * 12 - 10}px` }}
-                      >
-                        <div className="w-[150px] h-[200px] border bg-white shadow-lg rounded p-2">
-                          <Card placed={true} card={card} amIP1={amIP1} />
-                        </div>
-                      </div>
-                    ))}
-                  </div>
                 </div>
               ) : (
                 <span className="discard-text">Mi Caldero</span>

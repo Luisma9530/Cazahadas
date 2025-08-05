@@ -38,8 +38,12 @@ const useNeoHandStore = create<HandStore>((set) => ({
     set((state) => {
       if (isBattle) return { playerCards: state.playerCards }; // No robar si es batalla
 
-      const newDeck = [...state.deck];
+      let newDeck = [...state.deck];
       const newHand = [...state.playerCards];
+
+      if (newDeck.length === 0 && newHand.length === 0) {
+        newDeck = [...deckCards]; // Reiniciar mazo al estado inicial
+      }
 
       while (newDeck.length > 0 && newHand.length < 7) {
         const randomIndex = Math.floor(Math.random() * newDeck.length);

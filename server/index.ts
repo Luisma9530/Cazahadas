@@ -111,7 +111,7 @@ io.on("connection", (socket) => {
     });
   });
 
-  socket.on("place-card", (data: { tiles: Tile[][]; gameId: string, isBattle: boolean, selectedCard: CardUnity }) => {
+  socket.on("place-card", (data: { tiles: Tile[][]; gameId: string, isBattle: boolean, selectedCard: CardUnity[] }) => {
     currentGames[data.gameId].playerSkippedTurn = false;
     io.to(currentGames[data.gameId].playerIds).emit("new-turn", {
       tiles: data.tiles,
