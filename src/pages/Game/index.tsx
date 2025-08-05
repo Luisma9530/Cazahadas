@@ -183,7 +183,7 @@ export default function Game() {
           <div className="-mt-[13rem]">
             <SkipTurn />
           </div>
-          <div className="-mt-[6rem]">
+          <div className="-mt-[6rem] relative z-50">
             <Hand />
           </div>
         </div>
