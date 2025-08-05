@@ -1,20 +1,8 @@
 import { create } from "zustand";
-import { CardInfo, CardUnity } from "../@types/Card";
+import { CardInfo, CardUnity, CardType } from "../@types/Card";
 import { deckCards } from "../utils/deck";
 
 let index = 0;
-
-function drawInitialHand(initialDeck: CardInfo[]) {
-  const hand: CardUnity[] = [];
-
-  for (; index < 7; index++) {
-    const randomIndex = Math.floor(Math.random() * initialDeck.length);
-    hand.push({ ...initialDeck[randomIndex], id: index });
-    initialDeck.splice(randomIndex, 1);
-  }
-
-  return hand;
-}
 
 type HandStore = {
   deck: CardInfo[];
@@ -25,7 +13,6 @@ type HandStore = {
   placeCard: (card: CardUnity) => void;
   discardCard: (card: CardUnity) => void;
   drawCard: (isBattle: boolean) => void;
-  drawInitialHand: () => void;
   resetStore: () => void;
 };
 
@@ -60,16 +47,22 @@ const useNeoHandStore = create<HandStore>((set) => ({
         newHand.push({ ...drawnCard, id: index++ });
       }
 
+      const sortedHand = newHand.sort((a, b) => {
+        const typeOrder = {
+          [CardType.CATCH]: 0,
+          [CardType.SHIELD]: 1,
+          [CardType.MAGIC]: 2
+        };
+
+        return typeOrder[a.type] - typeOrder[b.type];
+      });
+
       return {
         deck: newDeck,
-        playerCards: newHand,
+        playerCards: sortedHand,
       };
     });
   },
-  drawInitialHand: () =>
-    set((state) => ({
-      playerCards: drawInitialHand(state.deck),
-    })),
   resetStore: () => {
     index = 0;
     return set({

@@ -21,8 +21,6 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
   ]);
   const [isMyTurn, isMyFirstTurn, isBattle, setIsBattle, setIsMyFirstTurn] = useTurnStore((state) => [state.isMyTurn, state.isMyFirstTurn, state.isBattle, state.setIsBattle, state.setIsMyFirstTurn]);
 
-  const [drawInitialHand] = useNeoHandStore((state) => [state.drawInitialHand])
-
   const [placeCard, drawCard] = useNeoHandStore((state) => [state.placeCard, state.drawCard]);
 
   const [logedUser, password] = useAuthStore((state) => [state.logedUser, state.password]);

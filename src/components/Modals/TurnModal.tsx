@@ -6,7 +6,6 @@ import useTurnStore from "../../store/TurnStore";
 export function TurnModal() {
   const [toggleTurnModal] = useModalStore((state) => [state.toggleTurnModal]);
   const [isMyTurn, isMyFirstTurn, setIsMyFirstTurn] = useTurnStore((state) => [state.isMyTurn, state.isMyFirstTurn, state.setIsMyFirstTurn])
-  const [drawInitialHand] = useNeoHandStore((state) => [state.drawInitialHand])
 
   return <div className="fixed mt-[320px] top-0 left-0 w-full h-full flex items-start justify-center z-50">
     <motion.div
