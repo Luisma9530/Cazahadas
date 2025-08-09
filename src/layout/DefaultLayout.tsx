@@ -11,15 +11,13 @@ import homeBackground from '../assets/images/homeBackground.png';
 import waitingRoomBackground from '../assets/images/waitingRoomBackground.png';
 import useBackgroundStore from "../store/BackgroundStore";
 import GameRulesModal from "../components/Modals/GameRulesModal";
-import ScoreboardModal from "../components/Modals/ScoreBoardModal"; // Importar el nuevo modal
-import { Sparkles, Trophy } from "lucide-react"; // Añadir icono Trophy
+import ScoreboardModal from "../components/Modals/ScoreBoardModal";
+import { Sparkles, Trophy } from "lucide-react";
 import AuthModal from '../components/Modals/AuthModal';
 import { User } from 'lucide-react';
 import { useAuthStore } from "../store/LoginStore";
 
-
 export default function DefaultLayout() {
-
   const navigate = useNavigate()
   const [resetBoardStore] = useBoardStore((state) => [state.resetStore])
   const [resetGameStore] = useGameStore((state) => [state.resetStore])
@@ -34,7 +32,6 @@ export default function DefaultLayout() {
   const [logedUser, setLogedUser, setPassword] = useAuthStore((state) => [state.logedUser, state.setLogedUser, state.setPassword]);
   const [scores, setScores] = useState([]);
   const API_URL = import.meta.env.VITE_API_URL;
-
 
   const location = useLocation();
 
@@ -61,7 +58,6 @@ export default function DefaultLayout() {
     }
   };
 
-
   const resetAllStores = () => {
     resetBoardStore()
     resetGameStore()
@@ -71,7 +67,6 @@ export default function DefaultLayout() {
     resetNeoHandStore()
     resetBackground()
   }
-
 
   const handleTitleClick = () => {
     socket.disconnect()
@@ -89,7 +84,6 @@ export default function DefaultLayout() {
     setPassword(null);
   }
 
-
   return (
     <div className="h-full overflow-x-hidden overflow-y-hidden"
       style={{
@@ -99,47 +93,60 @@ export default function DefaultLayout() {
         height: "100vh",
       }}
     >
-      {/* Botón de Información */}
-      <button
-        onClick={() => setShowRules(true)}
-        className="absolute top-4 right-4 z-50 bg-gradient-to-r from-pink-400 to-purple-500 text-white p-3 rounded-full shadow-lg hover:scale-110 transition-transform"
-        title="Ver reglas del juego"
-      >
-        <Sparkles className="w-6 h-6" />
-      </button>
+      {/* Header con botones - Responsive */}
+      <div className="absolute top-0 left-0 right-0 z-50 p-4">
+        <div className="flex justify-end items-center gap-2 sm:gap-3">
+          
+          {/* Botón de Inicio/Cierre de Sesión */}
+          {!logedUser ? (
+            <button
+              onClick={() => setShowAuth(true)}
+              className="bg-gradient-to-r from-purple-400 to-pink-500 text-white 
+                         p-2 sm:p-3 rounded-full shadow-lg hover:scale-110 transition-transform
+                         min-w-[44px] min-h-[44px] sm:min-w-[48px] sm:min-h-[48px]
+                         flex items-center justify-center"
+              title="Iniciar sesión"
+            >
+              <User className="w-4 h-4 sm:w-6 sm:h-6" />
+            </button>
+          ) : (
+            <button
+              onClick={() => closeSesion()}
+              className="bg-gradient-to-r from-purple-400 to-pink-500 text-white 
+                         px-3 py-2 sm:px-4 sm:py-3 rounded-full shadow-lg hover:scale-110 transition-transform
+                         text-xs sm:text-sm font-medium whitespace-nowrap"
+              title="Cerrar sesión"
+            >
+              <span className="hidden sm:inline">Cerrar sesión</span>
+              <span className="sm:hidden">Salir</span>
+            </button>
+          )}
 
-      {/* Botón de Scoreboard */}
-      <button
-        onClick={() => handleScoreboardClick()}
-        className="absolute top-4 right-20 z-50 bg-gradient-to-r from-green-400 to-blue-500 text-white p-3 rounded-full shadow-lg hover:scale-110 transition-transform"
-        title="Ver puntuaciones"
-      >
-        <Trophy className="w-6 h-6" />
-      </button>
+          {/* Botón de Scoreboard */}
+          <button
+            onClick={() => handleScoreboardClick()}
+            className="bg-gradient-to-r from-green-400 to-blue-500 text-white 
+                       p-2 sm:p-3 rounded-full shadow-lg hover:scale-110 transition-transform
+                       min-w-[44px] min-h-[44px] sm:min-w-[48px] sm:min-h-[48px]
+                       flex items-center justify-center"
+            title="Ver puntuaciones"
+          >
+            <Trophy className="w-4 h-4 sm:w-6 sm:h-6" />
+          </button>
 
-      {/* Botón de Inicio de Sesión */}
-      {!logedUser &&
-        <button
-          onClick={() => setShowAuth(true)}
-          className="absolute top-4 right-36 z-50 bg-gradient-to-r from-purple-400 to-pink-500 text-white p-3 rounded-full shadow-lg hover:scale-110 transition-transform"
-          title="Iniciar sesión"
-        >
-          <User className="w-6 h-6" />
-        </button>
-      }
-
-      {/* Botón de Cerrar de Sesión */}
-      {logedUser &&
-        <button
-          onClick={() => closeSesion()}
-          className="absolute top-4 right-36 z-50 bg-gradient-to-r from-purple-400 to-pink-500 text-white p-3 rounded-full shadow-lg hover:scale-110 transition-transform"
-          title="Iniciar sesión"
-        >
-          Cerrar sesión
-        </button>
-      }
-
-
+          {/* Botón de Reglas */}
+          <button
+            onClick={() => setShowRules(true)}
+            className="bg-gradient-to-r from-pink-400 to-purple-500 text-white 
+                       p-2 sm:p-3 rounded-full shadow-lg hover:scale-110 transition-transform
+                       min-w-[44px] min-h-[44px] sm:min-w-[48px] sm:min-h-[48px]
+                       flex items-center justify-center"
+            title="Ver reglas del juego"
+          >
+            <Sparkles className="w-4 h-4 sm:w-6 sm:h-6" />
+          </button>
+        </div>
+      </div>
 
       {/* Modal de Reglas */}
       {showRules &&
@@ -154,7 +161,7 @@ export default function DefaultLayout() {
         <ScoreboardModal
           isOpen={showScoreboard}
           onClose={() => setShowScoreboard(false)}
-          scores={scores} // Puedes pasar datos reales aquí
+          scores={scores}
         />
       }
 
@@ -166,10 +173,12 @@ export default function DefaultLayout() {
         />
       }
 
-      <div className="flex flex-col justify-center items-center mt-2 h-full w-full">
+      {/* Contenido principal */}
+      <div className="flex flex-col justify-center items-center h-full w-full px-4 pt-16 sm:pt-20">
         {(!showRules && !showAuth && !showScoreboard) && (
           <h1
-            className="font-light z-50 text-5xl hover:cursor-pointer font-title text-white drop-shadow-lg"
+            className="font-light z-40 text-3xl sm:text-4xl md:text-5xl hover:cursor-pointer 
+                       font-title text-white drop-shadow-lg text-center mb-4 sm:mb-8"
             onClick={handleTitleClick}
           >
             Cazahadas

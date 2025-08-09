@@ -68,67 +68,112 @@ export default function Home() {
     setPlayerName(e.target.value)
   }
 
-
   const handleChangeGameIdInput = (e: React.ChangeEvent<HTMLInputElement>) => {
     setGameId(e.target.value)
   }
 
-
   return (
     <>
-      <div className="flex flex-row items-center justify-center w-1/3 mt-48 gap-5">
-        <div className="border border-black border-solid-2 rounded-lg bg-white" >
-          <div className="flex flex-col items-center justify-center gap-6 p-10 ">
+      {/* Container principal con padding responsive */}
+      <div className="flex flex-col lg:flex-row items-center justify-center 
+                      w-full max-w-4xl mx-auto 
+                      mt-12 sm:mt-24 lg:mt-48 
+                      px-4 sm:px-6 lg:px-8 
+                      gap-4 sm:gap-5">
+        
+        {/* Botón Join Game */}
+        <div className="border border-black border-solid-2 rounded-lg bg-white 
+                        w-full sm:w-80 lg:w-72">
+          <div className="flex flex-col items-center justify-center gap-6 
+                          p-6 sm:p-8 lg:p-10">
             <button
               onClick={() => setShowJoinModal(true)}
-              className="rounded-md w-72 px-4 py-2 border text-black border-black hover:bg-gray-700 hover:border-gray-700 group active:translate-y-2"
+              className="rounded-md w-full px-4 py-3 sm:py-2 
+                         border text-black border-black 
+                         hover:bg-gray-700 hover:border-gray-700 
+                         group active:translate-y-1 sm:active:translate-y-2
+                         transition-all duration-200"
             >
-              <span className="text-2xl font-medium text-black group-hover:text-white">Join Game</span>
+              <span className="text-lg sm:text-xl lg:text-2xl font-medium 
+                             text-black group-hover:text-white">
+                Join Game
+              </span>
             </button>
           </div>
         </div>
-        <div className="border border-black border-solid-2 rounded-lg bg-white">
-          <div className="flex flex-col items-center justify-center gap-6 p-10">
+
+        {/* Botón Start Game */}
+        <div className="border border-black border-solid-2 rounded-lg bg-white 
+                        w-full sm:w-80 lg:w-72">
+          <div className="flex flex-col items-center justify-center gap-6 
+                          p-6 sm:p-8 lg:p-10">
             <button
               onClick={handleStartGame}
-              className="rounded-md w-72 px-4 py-2 border text-black border-black hover:bg-gray-700 hover:border-gray-700 group active:translate-y-2"
+              className="rounded-md w-full px-4 py-3 sm:py-2 
+                         border text-black border-black 
+                         hover:bg-gray-700 hover:border-gray-700 
+                         group active:translate-y-1 sm:active:translate-y-2
+                         transition-all duration-200"
             >
-              <span className="text-2xl font-medium text-black group-hover:text-white">Start Game</span>
+              <span className="text-lg sm:text-xl lg:text-2xl font-medium 
+                             text-black group-hover:text-white">
+                Start Game
+              </span>
             </button>
           </div>
         </div>
       </div>
 
-      {/* Modal para Join Game */}
+      {/* Modal para Join Game - Responsive */}
       {showJoinModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white border border-black border-solid-2 rounded-lg p-8 w-96">
-            <div className="flex flex-col items-center gap-6">
-              <h2 className="text-2xl font-medium text-black">Join Game</h2>
+        <div className="fixed inset-0 bg-black bg-opacity-50 
+                        flex items-center justify-center z-50 
+                        px-4 sm:px-6">
+          <div className="bg-white border border-black border-solid-2 rounded-lg 
+                          p-6 sm:p-8 
+                          w-full max-w-sm sm:max-w-md 
+                          mx-4">
+            <div className="flex flex-col items-center gap-4 sm:gap-6">
+              <h2 className="text-xl sm:text-2xl font-medium text-black text-center">
+                Join Game
+              </h2>
+              
               <input
                 value={gameId}
                 onChange={handleChangeGameIdInput}
-                className="text-sm w-full py-2 px-3 text-center border border-solid-1 border-gray-400 rounded-md"
+                className="text-sm w-full py-3 sm:py-2 px-3 text-center 
+                          border border-solid-1 border-gray-400 rounded-md
+                          focus:outline-none focus:ring-2 focus:ring-gray-500 
+                          focus:border-gray-500"
                 placeholder="Enter Game ID"
               />
-              <div className="flex gap-4 w-full">
+              
+              <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 w-full">
                 <button
                   onClick={handleJoinGame}
-                  className="rounded-md flex-1 px-4 py-2 border text-white bg-black border-black hover:bg-gray-700 hover:border-gray-700 active:translate-y-1"
+                  className="rounded-md flex-1 px-4 py-3 sm:py-2 
+                           border text-white bg-black border-black 
+                           hover:bg-gray-700 hover:border-gray-700 
+                           active:translate-y-1
+                           transition-all duration-200"
                 >
-                  <span className="text-lg font-medium">Join</span>
+                  <span className="text-base sm:text-lg font-medium">Join</span>
                 </button>
+                
                 <button
                   onClick={() => {
                     setShowJoinModal(false);
                     setErrorMessage('');
-                  }
-                  }
-                  className="rounded-md flex-1 px-4 py-2 border text-black border-gray-400 hover:bg-gray-100 active:translate-y-1"
+                  }}
+                  className="rounded-md flex-1 px-4 py-3 sm:py-2 
+                           border text-black border-gray-400 
+                           hover:bg-gray-100 active:translate-y-1
+                           transition-all duration-200"
                 >
-                  <span className="text-lg font-medium">Cancel</span>
+                  <span className="text-base sm:text-lg font-medium">Cancel</span>
                 </button>
               </div>
+              
               {!!errorMessage && (
                 <span className='text-red-500 text-sm text-center'>
                   {errorMessage}

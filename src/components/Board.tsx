@@ -8,7 +8,6 @@ import useCardStore from "../store/CardStore"; // Para la carta seleccionada
 import Card from "../components/Card";
 import { CardInfo, CardType, CardUnity } from "../@types/Card";
 import { useParams } from "react-router-dom";
-import { hydrateCard } from "../utils/hydrateCard"; // Para rehidratar cartas
 import { useAuthStore } from '../store/LoginStore';
 
 export default function Board({ amIP1 }: { amIP1: boolean }) {
@@ -250,31 +249,31 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
 
   // Renderizamos el tablero con la estructura 3x4.
   return (
-    <div className="relative w-full min-h-screen flex items-center justify-center p-4">
+    <div className="relative w-full min-h-screen flex items-center justify-center p-2 sm:p-4">
       {/* Mesa de fondo */}
       <div className="absolute inset-0 table-background"></div>
 
       {/* Tablero de juego */}
-      <div className="relative z-10 grid grid-rows-3 gap-1 p-8 w-full max-w-4xl mx-auto">
+      <div className="relative z-10 grid grid-rows-3 gap-1 p-4 sm:p-8 w-full max-w-2xl sm:max-w-4xl mx-auto">
         {/* Fila 0: Zona del Rival - Grid normal (AHORA ARRIBA) */}
-        <div className="grid grid-cols-4 gap-2 auto-rows-[100px] auto-cols-[80px] ">
+        <div className="grid grid-cols-4 gap-1 sm:gap-2 auto-rows-[60px] sm:auto-rows-[100px] auto-cols-[48px] sm:auto-cols-[80px]">
           <div className="rival-cell-3d defense-cell-castle game-cell flex items-center justify-center hover-container">
             <div className="defense-shield-icon"></div>
             {tiles[0][0].type === 'deck' ? (
               tiles[0][0].cards.length > 0 ? (
-                <div className="relative h-[100px] w-[80px]">
+                <div className="relative h-[60px] sm:h-[100px] w-[48px] sm:w-[80px]">
                   {tiles[0][0].cards.slice(-3).map((card, i) => (
                     <div
                       key={i}
                       className="absolute top-0 left-0 group"
-                      style={{ top: `${i * 8}px`, zIndex: i }}
+                      style={{ top: `${i * 4}px sm:${i * 8}px`, zIndex: i }}
                     >
-                      <div className="w-[80px] h-[85px] overflow-hidden">
+                      <div className="w-[48px] sm:w-[80px] h-[51px] sm:h-[85px] overflow-hidden">
                         <Card placed={true} card={card} amIP1={amIP1} />
                       </div>
                       {/* Hover preview individual para cada carta */}
-                      <div className="absolute z-[9999] hidden group-hover:block top-[-10px] left-[90px]">
-                        <div className="w-[120px] h-[150px] border bg-white shadow-lg rounded p-1">
+                      <div className="absolute z-[9999] hidden sm:group-hover:block top-[-10px] left-[54px] sm:left-[90px]">
+                        <div className="w-[72px] sm:w-[120px] h-[90px] sm:h-[150px] border bg-white shadow-lg rounded p-1">
                           <Card placed={true} card={card} amIP1={amIP1} />
                         </div>
                       </div>
@@ -282,12 +281,12 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
                   ))}
                 </div>
               ) : (
-                <div className="text-xs font-bold text-center text-stone-100">
+                <div className="text-[8px] sm:text-xs font-bold text-center text-stone-100">
                   DEFENSA<br />DEL HADA
                 </div>
               )
             ) : (
-              <div className="text-xs font-bold text-center text-stone-100">
+              <div className="text-[8px] sm:text-xs font-bold text-center text-stone-100">
                 DEFENSA<br />DEL HADA
               </div>
             )}
@@ -298,24 +297,24 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
             <div className="fairy-capture-icon"></div>
             {tiles[0][1].type === 'capturedFairies' ? (
               tiles[0][1].cards.length > 0 ? (
-                <div className="relative h-[100px] w-[80px]">
+                <div className="relative h-[60px] sm:h-[100px] w-[48px] sm:w-[80px]">
                   {tiles[0][1].cards.slice(-3).map((card, i) => (
                     <div
                       key={i}
                       className="absolute top-0 left-0 group"
-                      style={{ top: `${i * 8}px`, zIndex: i }}
+                      style={{ top: `${i * 4}px sm:${i * 8}px`, zIndex: i }}
                     >
-                      <div className="w-[80px] h-[85px] overflow-hidden">
+                      <div className="w-[48px] sm:w-[80px] h-[51px] sm:h-[85px] overflow-hidden">
                         <Card placed={true} card={card} amIP1={amIP1} />
                       </div>
                     </div>
                   ))}
                 </div>
               ) : (
-                <div className="captured-fairies-text">Captured<br />Fairies</div>
+                <div className="captured-fairies-text text-[8px] sm:text-xs">Captured<br />Fairies</div>
               )
             ) : (
-              "Captured Fairies"
+              <span className="text-[8px] sm:text-xs">Captured Fairies</span>
             )}
           </div>
 
@@ -324,19 +323,19 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
             <div className="discard-magic-icon"></div>
             {tiles[0][2].type === 'discard' ? (
               tiles[0][2].cards.length > 0 ? (
-                <div className="relative h-[100px] w-[80px]">
+                <div className="relative h-[60px] sm:h-[100px] w-[48px] sm:w-[80px]">
                   {tiles[0][2].cards.slice(-3).map((card, i) => (
                     <div
                       key={i}
                       className="absolute top-0 left-0 group discard-card-animation"
-                      style={{ top: `${i * 8}px`, zIndex: i }}
+                      style={{ top: `${i * 4}px sm:${i * 8}px`, zIndex: i }}
                     >
-                      <div className="w-[80px] h-[85px] overflow-hidden">
+                      <div className="w-[48px] sm:w-[80px] h-[51px] sm:h-[85px] overflow-hidden">
                         <Card placed={true} card={card} amIP1={amIP1} />
                       </div>
                       {/* Hover preview individual para cada carta */}
-                      <div className="absolute z-[9999] hidden group-hover:block top-[-10px] left-[90px]">
-                        <div className="w-[120px] h-[150px] border bg-white shadow-lg rounded p-1">
+                      <div className="absolute z-[9999] hidden sm:group-hover:block top-[-10px] left-[54px] sm:left-[90px]">
+                        <div className="w-[72px] sm:w-[120px] h-[90px] sm:h-[150px] border bg-white shadow-lg rounded p-1">
                           <Card placed={true} card={card} amIP1={amIP1} />
                         </div>
                       </div>
@@ -344,10 +343,10 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
                   ))}
                 </div>
               ) : (
-                <span className="discard-text">Caldero Rival</span>
+                <span className="discard-text text-[8px] sm:text-xs">Caldero Rival</span>
               )
             ) : (
-              <span className="discard-text">Caldero Rival</span>
+              <span className="discard-text text-[8px] sm:text-xs">Caldero Rival</span>
             )}
           </div>
 
@@ -359,19 +358,19 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
             <div className="magic-power-icon"></div>
             {tiles[0][3].type === 'magic' ? (
               tiles[0][3].cards.length > 0 ? (
-                <div className="relative h-[100px] w-[80px]">
+                <div className="relative h-[60px] sm:h-[100px] w-[48px] sm:w-[80px]">
                   {tiles[0][3].cards.slice(-3).map((card, i) => (
                     <div
                       key={i}
                       className="absolute top-0 left-0 group hover-trigger"
-                      style={{ top: `${i * 8}px`, zIndex: i }}
+                      style={{ top: `${i * 4}px sm:${i * 8}px`, zIndex: i }}
                     >
-                      <div className="w-[80px] h-[85px] overflow-hidden">
+                      <div className="w-[48px] sm:w-[80px] h-[51px] sm:h-[85px] overflow-hidden">
                         <Card placed={true} card={card} amIP1={amIP1} />
                       </div>
                       {/* Hover preview individual para cada carta */}
-                      <div className="absolute z-[9999] hidden group-hover:block top-[-10px] left-[100px]">
-                        <div className="w-[120px] h-[150px] border bg-white shadow-lg rounded p-1">
+                      <div className="absolute z-[9999] hidden sm:group-hover:block top-[-10px] left-[60px] sm:left-[100px]">
+                        <div className="w-[72px] sm:w-[120px] h-[90px] sm:h-[150px] border bg-white shadow-lg rounded p-1">
                           <Card placed={true} card={card} amIP1={amIP1} />
                         </div>
                       </div>
@@ -379,12 +378,12 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
                   ))}
                 </div>
               ) : (
-                <div className="magic-text">
+                <div className="magic-text text-[8px] sm:text-xs">
                   Dark<br />Magics
                 </div>
               )
             ) : (
-              <div className="magic-text">
+              <div className="magic-text text-[8px] sm:text-xs">
                 Dark<br />Magics
               </div>
             )}
@@ -392,7 +391,7 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
         </div>
 
         {/* Fila 1: Zona de juego - CASILLAS MÁS GRANDES (SIGUE EN EL MEDIO) */}
-        <div className="grid grid-cols-4 gap-3 auto-rows-[140px] auto-cols-[110px] justify-center mb-4 -mt-7">
+        <div className="grid grid-cols-4 gap-2 sm:gap-3 auto-rows-[84px] sm:auto-rows-[140px] auto-cols-[66px] sm:auto-cols-[110px] justify-center mb-2 sm:mb-4 -mt-4 sm:-mt-7">
           <div
             className={`middle-cell-3d game-cell flex items-center justify-center border cursor-pointer
         ${tiles[1][0].type === 'fairy' && tiles[1][0].captured
@@ -402,11 +401,11 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
             onClick={() => handleCellClick(tiles[1][0], 1, 0)}
           >
             {tiles[1][0].type === 'fairy' && tiles[1][0].card ? (
-              <div className="w-[95px] h-[125px]">
+              <div className="w-[57px] sm:w-[95px] h-[75px] sm:h-[125px]">
                 <Card placed={true} card={tiles[1][0].card} amIP1={amIP1} />
               </div>
             ) : (
-              <span className="text-base font-semibold">Fairy 1</span>
+              <span className="text-xs sm:text-base font-semibold">Fairy 1</span>
             )}
           </div>
 
@@ -419,11 +418,11 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
             onClick={() => handleCellClick(tiles[1][1], 1, 1)}
           >
             {tiles[1][1].type === 'fairy' && tiles[1][1].card ? (
-              <div className="w-[120px] h-[160px]">
+              <div className="w-[72px] sm:w-[120px] h-[96px] sm:h-[160px]">
                 <Card placed={true} card={tiles[1][1].card} amIP1={amIP1} />
               </div>
             ) : (
-              <span className="text-base font-semibold">Fairy 2</span>
+              <span className="text-xs sm:text-base font-semibold">Fairy 2</span>
             )}
           </div>
 
@@ -436,11 +435,11 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
             onClick={() => handleCellClick(tiles[1][2], 1, 2)}
           >
             {tiles[1][2].type === 'fairy' && tiles[1][2].card ? (
-              <div className="w-[120px] h-[160px]">
+              <div className="w-[72px] sm:w-[120px] h-[96px] sm:h-[160px]">
                 <Card placed={true} card={tiles[1][2].card} amIP1={amIP1} />
               </div>
             ) : (
-              <span className="text-base font-semibold">Fairy 3</span>
+              <span className="text-xs sm:text-base font-semibold">Fairy 3</span>
             )}
           </div>
 
@@ -448,7 +447,7 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
             className="middle-cell-3d game-cell bg-yellow-300 flex items-center justify-center border cursor-pointer"
             onClick={() => handleCellClick(tiles[1][3], 1, 3)}
           >
-            <span className="text-xl font-bold">
+            <span className="text-lg sm:text-xl font-bold">
               {tiles[1][3].type === 'variableX'
                 ? tiles[1][3].value
                 : "X"}
@@ -457,7 +456,7 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
         </div>
 
         {/* Fila 2: Zona del Jugador - Grid normal (AHORA ABAJO) */}
-        <div className="grid grid-cols-4 gap-2 auto-rows-[100px] auto-cols-[80px] -mt-5">
+        <div className="grid grid-cols-4 gap-1 sm:gap-2 auto-rows-[60px] sm:auto-rows-[100px] auto-cols-[48px] sm:auto-cols-[80px] -mt-3 sm:-mt-5">
           <div
             className="player-cell-3d defense-cell-castle game-cell flex items-center justify-center cursor-pointer hover-container"
             onClick={() => handleCellClick(tiles[2][0], 2, 0)}
@@ -465,19 +464,19 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
             <div className="defense-shield-icon"></div>
             {tiles[2][0].type === 'deck' ? (
               tiles[2][0].cards.length > 0 ? (
-                <div className="relative h-[100px] w-[80px]">
+                <div className="relative h-[60px] sm:h-[100px] w-[48px] sm:w-[80px]">
                   {tiles[2][0].cards.slice(-3).map((card, i) => (
                     <div
                       key={i}
                       className="absolute top-0 left-0 group hover-trigger"
-                      style={{ top: `${i * 12}px`, zIndex: i }}
+                      style={{ top: `${i * 7}px sm:${i * 12}px`, zIndex: i }}
                     >
-                      <div className="w-[80px] h-[85px] overflow-hidden">
+                      <div className="w-[48px] sm:w-[80px] h-[51px] sm:h-[85px] overflow-hidden">
                         <Card placed={true} card={card} amIP1={amIP1} />
                       </div>
                       {/* Hover preview individual para cada carta */}
-                      <div className="absolute z-[9999] hidden group-hover:block top-[-10px] left-[90px]">
-                        <div className="w-[120px] h-[150px] border bg-white shadow-lg rounded p-1">
+                      <div className="absolute z-[9999] hidden sm:group-hover:block top-[-10px] left-[54px] sm:left-[90px]">
+                        <div className="w-[72px] sm:w-[120px] h-[90px] sm:h-[150px] border bg-white shadow-lg rounded p-1">
                           <Card placed={true} card={card} amIP1={amIP1} />
                         </div>
                       </div>
@@ -485,12 +484,12 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
                   ))}
                 </div>
               ) : (
-                <div className="text-xs font-bold text-center text-stone-100">
+                <div className="text-[8px] sm:text-xs font-bold text-center text-stone-100">
                   DEFENSA<br />DEL JUGADOR
                 </div>
               )
             ) : (
-              <div className="text-xs font-bold text-center text-stone-100">
+              <div className="text-[8px] sm:text-xs font-bold text-center text-stone-100">
                 DEFENSA<br />DEL JUGADOR
               </div>
             )}
@@ -501,24 +500,24 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
             <div className="fairy-capture-icon"></div>
             {tiles[2][1].type === 'capturedFairies' ? (
               tiles[2][1].cards.length > 0 ? (
-                <div className="relative h-[130px] w-[100px]">
+                <div className="relative h-[78px] sm:h-[130px] w-[60px] sm:w-[100px]">
                   {tiles[2][1].cards.slice(-3).map((card, i) => (
                     <div
                       key={i}
                       className="absolute top-0 left-0 group"
-                      style={{ top: `${i * 8}px`, zIndex: i }}
+                      style={{ top: `${i * 4}px sm:${i * 8}px`, zIndex: i }}
                     >
-                      <div className="w-[80px] h-[85px] overflow-hidden">
+                      <div className="w-[48px] sm:w-[80px] h-[51px] sm:h-[85px] overflow-hidden">
                         <Card placed={true} card={card} amIP1={amIP1} />
                       </div>
                     </div>
                   ))}
                 </div>
               ) : (
-                <div className="captured-fairies-text">Captured<br />Fairies</div>
+                <div className="captured-fairies-text text-[8px] sm:text-xs">Captured<br />Fairies</div>
               )
             ) : (
-              <div className="captured-fairies-text">Captured<br />Fairies</div>
+              <div className="captured-fairies-text text-[8px] sm:text-xs">Captured<br />Fairies</div>
             )}
           </div>
 
@@ -530,24 +529,24 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
             <div className="discard-magic-icon"></div>
             {tiles[2][2].type === 'discard' ? (
               tiles[2][2].cards.length > 0 ? (
-                <div className="relative h-[130px] w-[100px]">
+                <div className="relative h-[78px] sm:h-[130px] w-[60px] sm:w-[100px]">
                   {tiles[2][2].cards.slice(-3).map((card, i) => (
                     <div
                       key={i}
                       className="absolute top-0 left-0 group hover-trigger discard-card-animation"
-                      style={{ top: `${i * 12}px`, zIndex: i }}
+                      style={{ top: `${i * 7}px sm:${i * 12}px`, zIndex: i }}
                     >
-                      <div className="w-[100px] h-[105px] overflow-hidden">
+                      <div className="w-[60px] sm:w-[100px] h-[63px] sm:h-[105px] overflow-hidden">
                         <Card placed={true} card={card} amIP1={amIP1} />
                       </div>
                     </div>
                   ))}
                 </div>
               ) : (
-                <span className="discard-text">Mi Caldero</span>
+                <span className="discard-text text-[8px] sm:text-xs">Mi Caldero</span>
               )
             ) : (
-              <span className="discard-text">Mi Caldero</span>
+              <span className="discard-text text-[8px] sm:text-xs">Mi Caldero</span>
             )}
           </div>
 
@@ -562,19 +561,19 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
             <div className="player-magic-power-icon"></div>
             {tiles[2][3].type === 'magic' ? (
               tiles[2][3].cards.length > 0 ? (
-                <div className="relative h-[130px] w-[100px]">
+                <div className="relative h-[78px] sm:h-[130px] w-[60px] sm:w-[100px]">
                   {tiles[2][3].cards.slice(-3).map((card, i) => (
                     <div
                       key={i}
                       className="absolute top-0 left-0 group hover-trigger"
-                      style={{ top: `${i * 12}px`, zIndex: i }}
+                      style={{ top: `${i * 7}px sm:${i * 12}px`, zIndex: i }}
                     >
-                      <div className="w-[100px] h-[105px] overflow-hidden">
+                      <div className="w-[60px] sm:w-[100px] h-[63px] sm:h-[105px] overflow-hidden">
                         <Card placed={true} card={card} amIP1={amIP1} />
                       </div>
                       {/* Hover preview individual para cada carta */}
-                      <div className="absolute z-[9999] hidden group-hover:block top-[-10px] left-[100px]">
-                        <div className="w-[120px] h-[150px] border bg-white shadow-lg rounded p-1">
+                      <div className="absolute z-[9999] hidden sm:group-hover:block top-[-10px] left-[60px] sm:left-[100px]">
+                        <div className="w-[72px] sm:w-[120px] h-[90px] sm:h-[150px] border bg-white shadow-lg rounded p-1">
                           <Card placed={true} card={card} amIP1={amIP1} />
                         </div>
                       </div>
@@ -582,17 +581,18 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
                   ))}
                 </div>
               ) : (
-                <div className="player-magic-text">
+                <div className="player-magic-text text-[8px] sm:text-xs">
                   Sacred<br />Magics
                 </div>
               )
             ) : (
-              <div className="player-magic-text">
+              <div className="player-magic-text text-[8px] sm:text-xs">
                 Sacred<br />Magics
               </div>
             )}
           </div>
         </div>
+
 
         {/* Estilos CSS actualizados */}
         <style>{`

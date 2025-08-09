@@ -17,10 +17,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCopy } from "@fortawesome/free-regular-svg-icons";
 import useBackgroundStore from "../../store/BackgroundStore";
 import homeBackground from '../../assets/images/homeBackground.png';
-import wizard from "../../assets/images/wizard.png";
-import e from "cors";
-import { CardType, CardUnity } from "../../@types/Card";
-
+import { CardUnity } from "../../@types/Card";
 
 export default function Game() {
   const [loading, setLoading] = useState(true)
@@ -50,7 +47,6 @@ export default function Game() {
     socket.on('player-connected', (data: { firstPlayer: boolean }) => {
       setAmIP1(data.firstPlayer)
     })
-
 
     socket.on('game-start', (data) => {
       setLoading(false)
@@ -157,40 +153,53 @@ export default function Game() {
     document.body.removeChild(textArea);
   };
 
-
-
   const shouldShowBoard = !loading && !gameBusy
 
   return (
     <div className="h-full overflow-x-hidden w-full">
-      {
-        loading && <div className="flex flex-col items-center gap-10">
-          <p className="text-center text-white text-xl">Waiting for another player...</p>
-          <div className="flex gap-6" title={`${isCopied ? 'Copied!' : 'Copy'}`}>
-            <h1 className="text-5xl text-white font-bold">{gameId}</h1>
-            <button className="cursor-pointer text-white hover:text-gray-300 transition-colors" onClick={() => handleGameIdClick(gameId)}>
+      {/* Loading State - Mantiene diseño original pero responsive */}
+      {loading && (
+        <div className="flex flex-col items-center gap-6 sm:gap-10 px-4 sm:px-0">
+          <p className="text-center text-white text-lg sm:text-xl">
+            Waiting for another player...
+          </p>
+          <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-6" 
+               title={`${isCopied ? 'Copied!' : 'Copy'}`}>
+            <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl text-white font-bold break-all sm:break-normal">
+              {gameId}
+            </h1>
+            <button 
+              className="cursor-pointer text-white hover:text-gray-300 transition-colors" 
+              onClick={() => handleGameIdClick(gameId)}
+            >
               <FontAwesomeIcon icon={faCopy} size={"xl"} />
             </button>
           </div>
         </div>
-      }
-      {
-        shouldShowBoard &&
-        <div>
-          <div className="scale-[0.65] -mt-16">
+      )}
+
+      {/* Game Board - Mantiene estructura EXACTA original con mejoras móviles mínimas */}
+      {shouldShowBoard && (
+        <div className="overflow-x-auto">
+          <div className="scale-[0.7] xs:scale-[0.8] sm:scale-[0.5] md:scale-[0.6] lg:scale-[0.65] 
+                          -mt-4 xs:-mt-6 sm:-mt-12 md:-mt-14 lg:-mt-16 min-w-fit">
             <Board amIP1={amIP1} />
           </div>
-          <div className="-mt-[13rem]">
+          <div className="-mt-[6rem] xs:-mt-[7rem] sm:-mt-[10rem] md:-mt-[12rem] lg:-mt-[13rem]">
             <SkipTurn />
           </div>
-          <div className="-mt-[6rem] relative z-50">
+          <div className="-mt-[2rem] xs:-mt-[2.5rem] sm:-mt-[4rem] md:-mt-[5rem] lg:-mt-[6rem] relative z-50">
             <Hand />
           </div>
         </div>
-      }
-      {
-        gameBusy && <h1 className="text-center">Game is busy. Please try again later.</h1>
-      }
+      )}
+
+      {/* Game Busy - Mantiene diseño original */}
+      {gameBusy && (
+        <h1 className="text-center px-4">Game is busy. Please try again later.</h1>
+      )}
+
+      {/* Modales - Sin cambios */}
       {gameStartModal && !gameOver && <GameStartModal />}
       {turnModal && !gameOver && <TurnModal />}
       {gameOver && <EndGameModal amIP1={amIP1} winner={gameResult} />}
