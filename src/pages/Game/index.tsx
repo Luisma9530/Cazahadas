@@ -7,6 +7,7 @@ import useBoardStore from "../../store/BoardStore";
 import { Result, useGameStore } from "../../store/GameStore";
 import { usePointStore } from "../../store/PointsStore";
 import SkipTurn from "../../components/SkipTurn";
+import TurnIndicator from "../../components/TurnIndicator.tsx";
 import { useModalStore } from "../../store/ModalStore";
 import { GameStartModal } from "../../components/Modals/GameStartModal";
 import { TurnModal } from "../../components/Modals/TurnModal";
@@ -156,20 +157,21 @@ export default function Game() {
   const shouldShowBoard = !loading && !gameBusy
 
   return (
-    <div className="h-full overflow-x-hidden w-full">
+    <div className="h-full w-full overflow-hidden">
+
       {/* Loading State - Mantiene diseño original pero responsive */}
       {loading && (
         <div className="flex flex-col items-center gap-6 sm:gap-10 px-4 sm:px-0">
           <p className="text-center text-white text-lg sm:text-xl">
             Waiting for another player...
           </p>
-          <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-6" 
-               title={`${isCopied ? 'Copied!' : 'Copy'}`}>
+          <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-6"
+            title={`${isCopied ? 'Copied!' : 'Copy'}`}>
             <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl text-white font-bold break-all sm:break-normal">
               {gameId}
             </h1>
-            <button 
-              className="cursor-pointer text-white hover:text-gray-300 transition-colors" 
+            <button
+              className="cursor-pointer text-white hover:text-gray-300 transition-colors"
               onClick={() => handleGameIdClick(gameId)}
             >
               <FontAwesomeIcon icon={faCopy} size={"xl"} />
@@ -178,14 +180,17 @@ export default function Game() {
         </div>
       )}
 
-      {/* Game Board - Mantiene estructura EXACTA original con mejoras móviles mínimas */}
+      {/* Game Board - Mantiene estructura EXACTA original */}
       {shouldShowBoard && (
-        <div className="overflow-x-auto">
+        <div>
+          <div>
+            <TurnIndicator />
+          </div>
           <div className="scale-[0.7] xs:scale-[0.8] sm:scale-[0.5] md:scale-[0.6] lg:scale-[0.65] 
-                          -mt-4 xs:-mt-6 sm:-mt-12 md:-mt-14 lg:-mt-16 min-w-fit">
+                          -mt-4 xs:-mt-6 sm:-mt-12 md:-mt-14 lg:-mt-[13rem] min-w-fit">
             <Board amIP1={amIP1} />
           </div>
-          <div className="-mt-[6rem] xs:-mt-[7rem] sm:-mt-[10rem] md:-mt-[12rem] lg:-mt-[13rem]">
+          <div className="-mt-[6rem] xs:-mt-[7rem] sm:-mt-[10rem] md:-mt-[12rem] lg:-mt-">
             <SkipTurn />
           </div>
           <div className="-mt-[2rem] xs:-mt-[2.5rem] sm:-mt-[4rem] md:-mt-[5rem] lg:-mt-[6rem] relative z-50">

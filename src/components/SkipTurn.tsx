@@ -15,7 +15,7 @@ export default function SkipTurn() {
   const [isMyTurn, playerSkippedTurn, isBattle] = useTurnStore((state) => [state.isMyTurn, state.playerSkippedTurn, state.isBattle])
 
   const [resetSelectedCard] = useCardStore((state) => [
-    state.resetSelectedCard,
+    state.resetSelectedCards,
   ])
 
   const [gameOver] = useGameStore((state) => [state.gameOver, state.amIP1])

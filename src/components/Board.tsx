@@ -318,38 +318,6 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
             )}
           </div>
 
-          <div className="rival-cell-3d game-cell discard-cell-cauldron rival-discard-cell flex items-center justify-center border hover-container">
-            <div className="discard-magical-smoke"></div>
-            <div className="discard-magic-icon"></div>
-            {tiles[0][2].type === 'discard' ? (
-              tiles[0][2].cards.length > 0 ? (
-                <div className="relative h-[60px] sm:h-[100px] w-[48px] sm:w-[80px]">
-                  {tiles[0][2].cards.slice(-3).map((card, i) => (
-                    <div
-                      key={i}
-                      className="absolute top-0 left-0 group discard-card-animation"
-                      style={{ top: `${i * 4}px sm:${i * 8}px`, zIndex: i }}
-                    >
-                      <div className="w-[48px] sm:w-[80px] h-[51px] sm:h-[85px] overflow-hidden">
-                        <Card placed={true} card={card} amIP1={amIP1} />
-                      </div>
-                      {/* Hover preview individual para cada carta */}
-                      <div className="absolute z-[9999] hidden sm:group-hover:block top-[-10px] left-[54px] sm:left-[90px]">
-                        <div className="w-[72px] sm:w-[120px] h-[90px] sm:h-[150px] border bg-white shadow-lg rounded p-1">
-                          <Card placed={true} card={card} amIP1={amIP1} />
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <span className="discard-text text-[8px] sm:text-xs">Caldero Rival</span>
-              )
-            ) : (
-              <span className="discard-text text-[8px] sm:text-xs">Caldero Rival</span>
-            )}
-          </div>
-
           <div className="rival-cell-3d game-cell rival-magic-cell bg-red-500 flex items-center justify-center border hover-container">
             <div className="dark-particles"></div>
             <div className="magical-energy"></div>
