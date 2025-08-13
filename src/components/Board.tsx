@@ -247,6 +247,148 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
     return newTiles;
   }
 
+  // Método para determinar si una casilla es válida para las cartas seleccionadas
+  const getValidCells = (selectedCards: CardUnity[]): boolean[][] => {
+    // Inicializar matriz de casillas válidas (3x4)
+    const validCells = Array(3).fill(null).map(() => Array(4).fill(false));
+
+    if (selectedCards.length === 0) {
+      return validCells;
+    }
+
+    // La zona de descarte [2][2] siempre es válida si hay cartas seleccionadas
+    validCells[2][2] = true;
+
+    // Si hay exactamente una carta, aplicar reglas específicas
+    if (selectedCards.length === 1) {
+      const card = selectedCards[0];
+
+      switch (card.type) {
+        case CardType.CATCH:
+          // Cartas CATCH pueden ir en casillas de hadas [1][0], [1][1], [1][2]
+          validCells[1][0] = true;
+          validCells[1][1] = true;
+          validCells[1][2] = true;
+          break;
+
+        case CardType.MAGIC:
+          // Cartas MAGIC pueden ir en la zona de magia del jugador [2][3]
+          validCells[2][3] = true;
+          break;
+
+        case CardType.SHIELD:
+          // Cartas SHIELD pueden ir en la zona de defensa del jugador [2][0]
+          validCells[2][0] = true;
+          break;
+      }
+    }
+
+    return validCells;
+  };
+
+  // Método para verificar si una casilla específica es válida
+  const isCellValid = (row: number, col: number, selectedCards: CardUnity[]): boolean => {
+    const validCells = getValidCells(selectedCards);
+    return validCells[row] && validCells[row][col];
+  };
+
+  // Método para obtener las clases CSS de una casilla según si es válida o no
+  const getCellHighlightClasses = (row: number, col: number, selectedCards: CardUnity[], baseClasses: string): string => {
+    const isValid = isCellValid(row, col, selectedCards);
+    
+    if (isValid) {
+      return `${baseClasses} relative before:content-['✨'] before:absolute before:-top-2 before:-right-2 before:text-2xl before:animate-bounce 
+            after:content-[''] after:absolute after:inset-0 after:bg-gradient-to-r after:from-yellow-300 after:via-orange-300 after:to-yellow-300 
+            after:opacity-30 after:animate-pulse after:rounded 
+            ring-6 ring-orange-400 shadow-[0_0_30px_rgba(255,165,0,0.8)] transform scale-110 transition-all duration-300 z-20 
+            border-4 border-yellow-300 animate-[wiggle_1s_ease-in-out_infinite]`;
+    }
+
+    return baseClasses;
+  };
+
+  // Ejemplo de cómo usar en el JSX del return:
+  // Para cada casilla, reemplazar las clases existentes con:
+
+  /* 
+  EJEMPLO DE USO EN EL JSX:
+  
+  // Casilla [1][0] - Fairy 1
+  <div
+    className={getCellHighlightClasses(1, 0, selectedCards, 
+      `middle-cell-3d game-cell flex items-center justify-center border cursor-pointer
+      ${tiles[1][0].type === 'fairy' && tiles[1][0].captured ? 'bg-gray-500' : 'bg-gray-200'}`
+    )}
+    onClick={() => handleCellClick(tiles[1][0], 1, 0)}
+  >
+  
+  // Casilla [2][0] - Defensa del jugador
+  <div
+    className={getCellHighlightClasses(2, 0, selectedCards,
+      "player-cell-3d defense-cell-castle game-cell flex items-center justify-center cursor-pointer hover-container"
+    )}
+    onClick={() => handleCellClick(tiles[2][0], 2, 0)}
+  >
+  
+  // Casilla [2][2] - Descarte
+  <div
+    className={getCellHighlightClasses(2, 2, selectedCards,
+      "player-cell-3d game-cell discard-cell-cauldron player-discard-cell flex items-center justify-center border cursor-pointer hover-container"
+    )}
+    onClick={() => handleCellClick(tiles[2][2], 2, 2)}
+  >
+  
+  // Casilla [2][3] - Magia del jugador
+  <div
+    className={getCellHighlightClasses(2, 3, selectedCards,
+      "player-cell-3d game-cell player-magic-cell bg-blue-500 flex items-center justify-center border cursor-pointer hover-container"
+    )}
+    onClick={() => handleCellClick(tiles[2][3], 2, 3)}
+  >
+  */
+
+  // Método adicional para personalizar las reglas de validación fácilmente
+  const updateValidationRules = (selectedCards: CardUnity[]): { [key: string]: number[][] } => {
+    const rules = {
+      CATCH: [[1, 0], [1, 1], [1, 2]], // Casillas de hadas
+      MAGIC: [[2, 3]], // Casilla de magia del jugador
+      SHIELD: [[2, 0]], // Casilla de defensa del jugador
+      DISCARD: [[2, 2]], // Zona de descarte (siempre válida)
+    };
+
+    return rules;
+  };
+
+  // Versión alternativa más flexible del método getValidCells
+  const getValidCellsFlexible = (selectedCards: CardUnity[]): boolean[][] => {
+    const validCells = Array(3).fill(null).map(() => Array(4).fill(false));
+
+    if (selectedCards.length === 0) {
+      return validCells;
+    }
+
+    const rules = updateValidationRules(selectedCards);
+
+    // La zona de descarte siempre es válida
+    rules.DISCARD.forEach(([row, col]) => {
+      validCells[row][col] = true;
+    });
+
+    // Si hay exactamente una carta, aplicar reglas específicas
+    if (selectedCards.length === 1) {
+      const card = selectedCards[0];
+      const cardRules = rules[card.type.toUpperCase()];
+
+      if (cardRules) {
+        cardRules.forEach(([row, col]) => {
+          validCells[row][col] = true;
+        });
+      }
+    }
+
+    return validCells;
+  };
+
   // Renderizamos el tablero con la estructura 3x4.
   return (
     <div className="relative w-full min-h-screen flex items-center justify-center p-2 sm:p-4">
@@ -361,11 +503,12 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
         {/* Fila 1: Zona de juego - CASILLAS MÁS GRANDES (SIGUE EN EL MEDIO) */}
         <div className="grid grid-cols-4 gap-2 sm:gap-3 auto-rows-[84px] sm:auto-rows-[140px] auto-cols-[66px] sm:auto-cols-[110px] justify-center mb-2 sm:mb-4 -mt-4 sm:-mt-7">
           <div
-            className={`middle-cell-3d game-cell flex items-center justify-center border cursor-pointer
-        ${tiles[1][0].type === 'fairy' && tiles[1][0].captured
+            className={getCellHighlightClasses(1, 0, selectedCard,
+              `middle-cell-3d game-cell flex items-center justify-center border cursor-pointer
+              ${tiles[1][0].type === 'fairy' && tiles[1][0].captured
                 ? 'bg-gray-500'
-                : 'bg-gray-200'
-              }`}
+                : 'bg-gray-200'}`
+            )}
             onClick={() => handleCellClick(tiles[1][0], 1, 0)}
           >
             {tiles[1][0].type === 'fairy' && tiles[1][0].card ? (
@@ -426,7 +569,9 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
         {/* Fila 2: Zona del Jugador - Grid normal (AHORA ABAJO) */}
         <div className="grid grid-cols-4 gap-1 sm:gap-2 auto-rows-[60px] sm:auto-rows-[100px] auto-cols-[48px] sm:auto-cols-[80px] -mt-3 sm:-mt-5">
           <div
-            className="player-cell-3d defense-cell-castle game-cell flex items-center justify-center cursor-pointer hover-container"
+            className={getCellHighlightClasses(2, 0, selectedCard,
+              "player-cell-3d defense-cell-castle game-cell flex items-center justify-center cursor-pointer hover-container"
+            )}
             onClick={() => handleCellClick(tiles[2][0], 2, 0)}
           >
             <div className="defense-shield-icon"></div>
@@ -490,7 +635,9 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
           </div>
 
           <div
-            className="player-cell-3d game-cell discard-cell-cauldron player-discard-cell flex items-center justify-center border cursor-pointer hover-container"
+            className={getCellHighlightClasses(2, 2, selectedCard,
+              "player-cell-3d game-cell discard-cell-cauldron player-discard-cell flex items-center justify-center border cursor-pointer hover-container"
+            )}
             onClick={() => handleCellClick(tiles[2][2], 2, 2)}
           >
             <div className="discard-magical-smoke"></div>
@@ -519,7 +666,9 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
           </div>
 
           <div
-            className="player-cell-3d game-cell player-magic-cell bg-blue-500 flex items-center justify-center border cursor-pointer hover-container"
+            className={getCellHighlightClasses(2, 3, selectedCard,
+              "player-cell-3d game-cell player-magic-cell bg-blue-500 flex items-center justify-center border cursor-pointer hover-container"
+            )}
             onClick={() => handleCellClick(tiles[2][3], 2, 3)}
           >
             <div className="player-light-particles"></div>
