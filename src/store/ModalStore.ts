@@ -10,6 +10,8 @@ type useModalStoreType = {
   turnModal: boolean;
   toggleTurnModal: () => void;
   resetStore: () => void;
+  battleModal: boolean;
+  toggleBattleModal: () => void;
 };
 
 export const useModalStore = create<useModalStoreType>((set) => ({
@@ -34,4 +36,7 @@ export const useModalStore = create<useModalStoreType>((set) => ({
   },
   resetStore: () =>
     set({ gameStartModal: false, endGameModal: false, turnModal: false }),
+  battleModal: false,
+  toggleBattleModal: () =>
+    set((state) => ({ battleModal: !state.battleModal })),
 }));

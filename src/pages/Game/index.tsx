@@ -11,6 +11,7 @@ import TurnIndicator from "../../components/TurnIndicator.tsx";
 import { useModalStore } from "../../store/ModalStore";
 import { GameStartModal } from "../../components/Modals/GameStartModal";
 import { TurnModal } from "../../components/Modals/TurnModal";
+import { BattleModal } from "../../components/Modals/BattleModal";
 import useTurnStore from "../../store/TurnStore";
 import { EndGameModal } from "../../components/Modals/EndGameModal";
 import { useParams } from "react-router-dom";
@@ -25,7 +26,7 @@ export default function Game() {
   const [gameBusy, setGameBusy] = useState(false)
   const [isCopied, setIsCopied] = useState(false);
 
-  const [isMyTurn, toggleTurn, setPlayerSkippedTurn, setIsBattle, isBattle] = useTurnStore((state) => [state.isMyTurn, state.toggleTurn, state.setPlayerSkippedTurn, state.setIsBattle, state.isBattle])
+  const [isMyTurn, toggleTurn, setPlayerSkippedTurn, setIsBattle, isBattle, setIsMyFirstTurnBattle] = useTurnStore((state) => [state.isMyTurn, state.toggleTurn, state.setPlayerSkippedTurn, state.setIsBattle, state.isBattle, state.setIsMyFirstTurnBattle]);
   const [setBoard] = useBoardStore((state) => [state.setBoard])
   const [amIP1, setAmIP1, gameOver, setGameOver, setPlayerOneName, setPlayerTwoName, setPlayerDisconnected, setGameResult, gameResult] = useGameStore((state) => [state.amIP1, state.setAmIP1, state.gameOver, state.setGameOver, state.setPlayerOneName, state.setPlayerTwoName, state.setPlayerDisconnected, state.setGameResult, state.gameResult])
   const [setPoints] = usePointStore((state) => [state.setPoints])
@@ -33,7 +34,13 @@ export default function Game() {
 
   const { id: gameId } = useParams<{ id: string }>()
 
-  const [gameStartModal, toggleGameStartModal, turnModal, toggleTurnModal] = useModalStore((state) => [state.gameStartModal, state.toggleGameStartModal, state.turnModal, state.toggleTurnModal])
+  const [gameStartModal, toggleGameStartModal, turnModal, toggleTurnModal, battleModal, toggleBattleModal] = useModalStore((state) => [state.gameStartModal, state.toggleGameStartModal, state.turnModal, state.toggleTurnModal, state.battleModal, state.toggleBattleModal])
+
+  useEffect(() => {
+    if (isBattle) {
+      toggleBattleModal()
+    }
+  }, [isBattle]);
 
   function mirrorBoard(tiles: Tile[][]): Tile[][] {
     // Cambia filas: 0 <-> 2, mantiene columnas
@@ -64,6 +71,7 @@ export default function Game() {
       if (isBattle && data.endBattle) { // Si es una batalla y se terminó, se reinicia el estado de batalla
         setPlayerSkippedTurn(false)
         setIsBattle(false)
+        setIsMyFirstTurnBattle(false);
       } else { // Si no es una batalla o no se terminó, se actualiza el estado de si el jugador saltó su turno
         setPlayerSkippedTurn(data.playerSkippedTurn)
       }
@@ -207,6 +215,7 @@ export default function Game() {
       {/* Modales - Sin cambios */}
       {gameStartModal && !gameOver && <GameStartModal />}
       {turnModal && !gameOver && <TurnModal />}
+      {battleModal && !gameOver && <BattleModal />}
       {gameOver && <EndGameModal amIP1={amIP1} winner={gameResult} />}
     </div>
   )

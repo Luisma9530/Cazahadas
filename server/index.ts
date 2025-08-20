@@ -5,6 +5,7 @@ import { Server as SocketIOServer } from "socket.io";
 import { Tile } from "../src/@types/Tile";
 import { CardType, CardUnity } from '../src/@types/Card';
 import { hydrateCard } from "../src/utils/hydrateCard"; // Para rehidratar cartas
+import { Console } from 'console';
 
 
 
@@ -42,15 +43,19 @@ let currentGames = {} as {
 io.on("connection", (socket) => {
   console.log("A Player with id", socket.id, "connected");
 
-  socket.on("skip-turn", (data: { tiles: Tile[][]; gameId: string, isBattle: boolean }) => {
+  socket.on("skip-turn", (data: { tiles: Tile[][]; gameId: string, isBattle: boolean, isMyFirstTurnBattle: boolean }) => {
     var endBattle = false;
+    console.log("Firts turn battle:", data.isMyFirstTurnBattle);
+    console.log("Is battle:", data.isBattle);
+    console.log("Player skipped turn:", currentGames[data.gameId].playerSkippedTurn);
     if (currentGames[data.gameId].playerSkippedTurn && !data.isBattle) { // Si el jugador ya había saltado su turno y no es una batalla
       io.to(currentGames[data.gameId].playerIds).emit("game-end", {
         tiles: data.tiles,
         reason: "player-skipped-turn",
       }); // Terminar el juego porque el jugador ya había saltado su turno
       return;
-    } else if (currentGames[data.gameId].playerSkippedTurn && data.isBattle) { // Si el jugador ya había saltado su turno y es una batalla
+    } else if (currentGames[data.gameId].playerSkippedTurn && data.isBattle && !data.isMyFirstTurnBattle) { // Si el jugador ya había saltado su turno y es una batalla
+
       endBattle = true
       currentGames[data.gameId].playerSkippedTurn = false; // Marcar que el jugador ha terminado la batalla
 
@@ -101,6 +106,30 @@ io.on("connection", (socket) => {
         }
         return tile;
       });
+    } else if (data.isBattle && data.isMyFirstTurnBattle) { // Si es el primer turno de batalla
+      endBattle = true;
+      currentGames[data.gameId].playerSkippedTurn = false;
+
+      // Marcar todas las hadas como capturadas si el jugador saltó su turno en la primera batalla
+      data.tiles[1] = data.tiles[1].map(tile => {
+        if (
+          tile.type === "fairy" &&
+          tile.card?.type === CardType.CATCH &&
+          tile.marked &&
+          !tile.captured
+        ) {
+          return {
+            ...tile,
+            marked: false,
+            captured: true,
+          };
+        }
+        return tile;
+      });
+
+      io.to(currentGames[data.gameId].playerIds).emit("end-battle");
+
+      console.log("Battle ended for game in first turn:", data.gameId);
     } else if (!currentGames[data.gameId].playerSkippedTurn) { // Si el jugador no había saltado su turno
       currentGames[data.gameId].playerSkippedTurn = true; // Marcar que el jugador ha saltado su turno
     }
@@ -118,6 +147,10 @@ io.on("connection", (socket) => {
       playerSkippedTurn: currentGames[data.gameId].playerSkippedTurn,
       endBattle: false
     });
+  });
+
+  socket.on("start-battle", (data: { gameId: string }) => {
+    io.to(currentGames[data.gameId].playerIds).emit("start-battle");
   });
 
   socket.on("disconnect", () => {

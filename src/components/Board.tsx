@@ -18,7 +18,7 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
     state.selectedCards,
     state.resetSelectedCards,
   ]);
-  const [isMyTurn, isMyFirstTurn, isBattle, setIsBattle, setIsMyFirstTurn] = useTurnStore((state) => [state.isMyTurn, state.isMyFirstTurn, state.isBattle, state.setIsBattle, state.setIsMyFirstTurn]);
+  const [isMyTurn, isMyFirstTurn, isBattle, setIsBattle, setIsMyFirstTurn, isMyFirstTurnBattle, setIsMyFirstTurnBattle] = useTurnStore((state) => [state.isMyTurn, state.isMyFirstTurn, state.isBattle, state.setIsBattle, state.setIsMyFirstTurn, state.isMyFirstTurnBattle, state.setIsMyFirstTurnBattle]);
 
   const [placeCard, drawCard] = useNeoHandStore((state) => [state.placeCard, state.drawCard]);
 
@@ -54,21 +54,14 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
     } else { return false; } // Si no hay cartas seleccionadas, no se puede colocar nada
   }
 
-  socket.on("selected-card", (data: { card: CardUnity }) => {
-    switch (data.card.type) {
-      case CardType.MAGIC:
+  socket.on("start-battle", () => {
+    setIsBattle(true);
+    setIsMyFirstTurnBattle(true);
+  });
 
-        break;
-      case CardType.SHIELD:
-
-        break;
-      case CardType.CATCH:
-
-        break;
-      default:
-        console.warn(`Tipo de carta no reconocido: ${(data.card as any).type}`);
-        break;
-    }
+  socket.on("end-battle", () => {
+    setIsBattle(false);
+    setIsMyFirstTurnBattle(false);
   });
 
   async function sendCapturedFairies() {
@@ -98,6 +91,8 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
   // Al hacer clic en una celda de la zona de juego (fila 1, columnas 0 a 2)
   function handleCellClick(position: Tile, rowIndex: number, colIndex: number) {
     console.log(tiles)
+    console.log("Is battle:", isBattle);
+    console.log("Is first turn battle:", isMyFirstTurnBattle);
     if (!selectedCard || !canAddCardToPosition(selectedCard, position, rowIndex)) return;
     // Lógica para colocar la carta. Se asume que mapPawns transforma la celda y actualiza el estado.
     const newTiles = mapPawns(selectedCard, rowIndex, colIndex, tiles, amIP1);
@@ -154,7 +149,14 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
   useEffect(() => {
     // Ejecutar drawCard una vez al cargar el componente por primera vez
     drawCard(false);
+    setIsMyFirstTurnBattle(false);
   }, []);
+
+  useEffect(() => {
+    if (isBattle) {
+      setIsMyFirstTurnBattle(true);
+    }
+  }, [isBattle]);
 
   useEffect(() => {
     var updatedTiles = tiles.map((row) => row.map((tile) => ({ ...tile })));
@@ -234,6 +236,7 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
                 card: { ...card, placedByPlayerOne: amIP1 }, // Colocar la carta en la celda
               };
               setIsBattle(true); // Cambiar el estado de batalla a verdadero
+              socket.emit("start-battle",  {gameId: gameId});
             }
           }
           break;
@@ -247,55 +250,16 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
     return newTiles;
   }
 
-  // Método para determinar si una casilla es válida para las cartas seleccionadas
-  const getValidCells = (selectedCards: CardUnity[]): boolean[][] => {
-    // Inicializar matriz de casillas válidas (3x4)
-    const validCells = Array(3).fill(null).map(() => Array(4).fill(false));
-
-    if (selectedCards.length === 0) {
-      return validCells;
-    }
-
-    // La zona de descarte [2][2] siempre es válida si hay cartas seleccionadas
-    validCells[2][2] = true;
-
-    // Si hay exactamente una carta, aplicar reglas específicas
-    if (selectedCards.length === 1) {
-      const card = selectedCards[0];
-
-      switch (card.type) {
-        case CardType.CATCH:
-          // Cartas CATCH pueden ir en casillas de hadas [1][0], [1][1], [1][2]
-          validCells[1][0] = true;
-          validCells[1][1] = true;
-          validCells[1][2] = true;
-          break;
-
-        case CardType.MAGIC:
-          // Cartas MAGIC pueden ir en la zona de magia del jugador [2][3]
-          validCells[2][3] = true;
-          break;
-
-        case CardType.SHIELD:
-          // Cartas SHIELD pueden ir en la zona de defensa del jugador [2][0]
-          validCells[2][0] = true;
-          break;
-      }
-    }
-
-    return validCells;
-  };
-
   // Método para verificar si una casilla específica es válida
   const isCellValid = (row: number, col: number, selectedCards: CardUnity[]): boolean => {
-    const validCells = getValidCells(selectedCards);
+    const validCells = getValidCellsFlexible(selectedCards);
     return validCells[row] && validCells[row][col];
   };
 
   // Método para obtener las clases CSS de una casilla según si es válida o no
   const getCellHighlightClasses = (row: number, col: number, selectedCards: CardUnity[], baseClasses: string): string => {
     const isValid = isCellValid(row, col, selectedCards);
-    
+
     if (isValid) {
       return `${baseClasses} relative before:content-['✨'] before:absolute before:-top-2 before:-right-2 before:text-2xl before:animate-bounce 
             after:content-[''] after:absolute after:inset-0 after:bg-gradient-to-r after:from-yellow-300 after:via-orange-300 after:to-yellow-300 
@@ -307,48 +271,8 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
     return baseClasses;
   };
 
-  // Ejemplo de cómo usar en el JSX del return:
-  // Para cada casilla, reemplazar las clases existentes con:
-
-  /* 
-  EJEMPLO DE USO EN EL JSX:
-  
-  // Casilla [1][0] - Fairy 1
-  <div
-    className={getCellHighlightClasses(1, 0, selectedCards, 
-      `middle-cell-3d game-cell flex items-center justify-center border cursor-pointer
-      ${tiles[1][0].type === 'fairy' && tiles[1][0].captured ? 'bg-gray-500' : 'bg-gray-200'}`
-    )}
-    onClick={() => handleCellClick(tiles[1][0], 1, 0)}
-  >
-  
-  // Casilla [2][0] - Defensa del jugador
-  <div
-    className={getCellHighlightClasses(2, 0, selectedCards,
-      "player-cell-3d defense-cell-castle game-cell flex items-center justify-center cursor-pointer hover-container"
-    )}
-    onClick={() => handleCellClick(tiles[2][0], 2, 0)}
-  >
-  
-  // Casilla [2][2] - Descarte
-  <div
-    className={getCellHighlightClasses(2, 2, selectedCards,
-      "player-cell-3d game-cell discard-cell-cauldron player-discard-cell flex items-center justify-center border cursor-pointer hover-container"
-    )}
-    onClick={() => handleCellClick(tiles[2][2], 2, 2)}
-  >
-  
-  // Casilla [2][3] - Magia del jugador
-  <div
-    className={getCellHighlightClasses(2, 3, selectedCards,
-      "player-cell-3d game-cell player-magic-cell bg-blue-500 flex items-center justify-center border cursor-pointer hover-container"
-    )}
-    onClick={() => handleCellClick(tiles[2][3], 2, 3)}
-  >
-  */
-
   // Método adicional para personalizar las reglas de validación fácilmente
-  const updateValidationRules = (selectedCards: CardUnity[]): { [key: string]: number[][] } => {
+  const updateValidationRules = (): { [key: string]: number[][] } => {
     const rules = {
       CATCH: [[1, 0], [1, 1], [1, 2]], // Casillas de hadas
       MAGIC: [[2, 3]], // Casilla de magia del jugador
@@ -367,11 +291,11 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
       return validCells;
     }
 
-    const rules = updateValidationRules(selectedCards);
+    const rules = updateValidationRules();
 
     // La zona de descarte siempre es válida
     rules.DISCARD.forEach(([row, col]) => {
-      validCells[row][col] = true;
+      validCells[row][col] = true
     });
 
     // Si hay exactamente una carta, aplicar reglas específicas
@@ -381,7 +305,9 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
 
       if (cardRules) {
         cardRules.forEach(([row, col]) => {
-          validCells[row][col] = true;
+          if (canAddCardToPosition(selectedCards, tiles[row][col], row)) {
+            validCells[row][col] = true;
+          }
         });
       }
     }
@@ -521,11 +447,12 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
           </div>
 
           <div
-            className={`middle-cell-3d game-cell flex items-center justify-center border cursor-pointer
-        ${tiles[1][1].type === 'fairy' && tiles[1][1].captured
+            className={getCellHighlightClasses(1, 1, selectedCard,
+              `middle-cell-3d game-cell flex items-center justify-center border cursor-pointer
+              ${tiles[1][1].type === 'fairy' && tiles[1][1].captured
                 ? 'bg-gray-500'
-                : 'bg-gray-200'
-              }`}
+                : 'bg-gray-200'}`
+            )}
             onClick={() => handleCellClick(tiles[1][1], 1, 1)}
           >
             {tiles[1][1].type === 'fairy' && tiles[1][1].card ? (
@@ -538,11 +465,12 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
           </div>
 
           <div
-            className={`middle-cell-3d game-cell flex items-center justify-center border cursor-pointer
-        ${tiles[1][2].type === 'fairy' && tiles[1][2].captured
+            className={getCellHighlightClasses(1, 2, selectedCard,
+              `middle-cell-3d game-cell flex items-center justify-center border cursor-pointer
+              ${tiles[1][2].type === 'fairy' && tiles[1][2].captured
                 ? 'bg-gray-500'
-                : 'bg-gray-200'
-              }`}
+                : 'bg-gray-200'}`
+            )}
             onClick={() => handleCellClick(tiles[1][2], 1, 2)}
           >
             {tiles[1][2].type === 'fairy' && tiles[1][2].card ? (

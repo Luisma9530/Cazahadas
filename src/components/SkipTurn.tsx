@@ -12,7 +12,7 @@ export default function SkipTurn() {
     state.board,
   ])
 
-  const [isMyTurn, playerSkippedTurn, isBattle] = useTurnStore((state) => [state.isMyTurn, state.playerSkippedTurn, state.isBattle])
+  const [isMyTurn, playerSkippedTurn, isBattle, isMyFirstTurnBattle] = useTurnStore((state) => [state.isMyTurn, state.playerSkippedTurn, state.isBattle, state.isMyFirstTurnBattle])
 
   const [resetSelectedCard] = useCardStore((state) => [
     state.resetSelectedCards,
@@ -25,7 +25,7 @@ export default function SkipTurn() {
 
   function handleSkipTurn() {
     resetSelectedCard()
-    socket.emit('skip-turn', { tiles, gameId, isBattle })
+    socket.emit('skip-turn', { tiles, gameId, isBattle, isMyFirstTurnBattle })
   }
 
   return (
@@ -40,7 +40,7 @@ export default function SkipTurn() {
       shadow-xl cursor-pointer text-black border-4 border-yellow-400 py-1 px-12 z-10`}
           onClick={handleSkipTurn}
         > 
-        {playerSkippedTurn ? (isBattle ? 'End battle' : 'End game') : 'Skip turn'} 
+        {(playerSkippedTurn || isMyFirstTurnBattle)  ? ((isBattle) ? 'End battle' : 'End game') : 'Skip turn'} 
         </motion.span>
       )}
     </AnimatePresence>
