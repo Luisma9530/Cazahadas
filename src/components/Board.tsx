@@ -12,7 +12,7 @@ import { useAuthStore } from '../store/LoginStore';
 
 export default function Board({ amIP1 }: { amIP1: boolean }) {
   // Obtenemos el estado del tablero (estructura 3x4) desde el store
-  const [tiles, setTiles] = useBoardStore((state) => [state.board, state.setBoard]);
+  const [tiles, setTiles, clearDeckAndMagic] = useBoardStore((state) => [state.board, state.setBoard, state.clearDeckAndMagic]);
   // Carta seleccionada para colocar en la zona de juego
   const [selectedCard, resetSelectedCard] = useCardStore((state) => [
     state.selectedCards,
@@ -61,6 +61,12 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
 
   socket.on("end-battle", () => {
     setIsBattle(false);
+    setIsMyFirstTurnBattle(false);
+    clearDeckAndMagic();
+    console.log("Battle ended, store reset");
+  });
+
+  socket.on("end-first-turn-battle", () => {
     setIsMyFirstTurnBattle(false);
   });
 

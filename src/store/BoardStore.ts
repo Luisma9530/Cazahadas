@@ -5,6 +5,7 @@ type BoardStore = {
   board: Tile[][]
   setBoard: (board: Tile[][]) => void
   resetStore: () => void
+  clearDeckAndMagic: () => void
 }
 
 //MATRIZ 3x4 ACTUALIZADA
@@ -41,10 +42,22 @@ const initialBoard: Tile[][] = new Array(3).fill(null).map((_, rowIndex) =>
   })
 )
 
-const useBoardStore = create<BoardStore>((set) => ({
+const useBoardStore = create<BoardStore>((set, get) => ({
   board: initialBoard,
   setBoard: (board) => set({ board }),
   resetStore: () => set({ board: initialBoard }),
+  clearDeckAndMagic: () => {
+    const currentBoard = get().board
+    const updatedBoard = currentBoard.map(row =>
+      row.map(tile => {
+        if (tile.type === 'deck' || tile.type === 'magic') {
+          return { ...tile, cards: [] }
+        }
+        return tile
+      })
+    )
+    set({ board: updatedBoard })
+  },
 }))
 
 export default useBoardStore

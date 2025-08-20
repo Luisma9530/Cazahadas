@@ -126,22 +126,27 @@ io.on("connection", (socket) => {
         }
         return tile;
       });
-
-      io.to(currentGames[data.gameId].playerIds).emit("end-battle");
-
       console.log("Battle ended for game in first turn:", data.gameId);
     } else if (!currentGames[data.gameId].playerSkippedTurn) { // Si el jugador no había saltado su turno
       currentGames[data.gameId].playerSkippedTurn = true; // Marcar que el jugador ha saltado su turno
     }
-    io.to(currentGames[data.gameId].playerIds).emit("new-turn", { // Enviar el nuevo turno a todos los jugadores
-      tiles: data.tiles,
-      playerSkippedTurn: currentGames[data.gameId].playerSkippedTurn,
-      endBattle: endBattle,
-    });
+    if (!data.isMyFirstTurnBattle) {
+      console.log("Is my turn:", data.isMyFirstTurnBattle);
+      io.to(currentGames[data.gameId].playerIds).emit("new-turn", { // Enviar el nuevo turno a todos los jugadores
+        tiles: data.tiles,
+        playerSkippedTurn: currentGames[data.gameId].playerSkippedTurn,
+        endBattle: endBattle,
+      });
+    } else if ((data.isBattle && data.isMyFirstTurnBattle) || endBattle) {
+      io.to(currentGames[data.gameId].playerIds).emit("end-battle");
+    }
   });
 
   socket.on("place-card", (data: { tiles: Tile[][]; gameId: string, isBattle: boolean, selectedCard: CardUnity[] }) => {
     currentGames[data.gameId].playerSkippedTurn = false;
+    if (data.isBattle) {
+      io.to(currentGames[data.gameId].playerIds).emit("end-first-turn-battle");
+    }
     io.to(currentGames[data.gameId].playerIds).emit("new-turn", {
       tiles: data.tiles,
       playerSkippedTurn: currentGames[data.gameId].playerSkippedTurn,
