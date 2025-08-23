@@ -63,7 +63,9 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
     setIsBattle(false);
     setIsMyFirstTurnBattle(false);
     clearDeckAndMagic();
-    console.log("Battle ended, store reset");
+    if (tiles[1][3].type === 'variableX') {
+      tiles[1][3].value = 0; // Resetear el valor de la variable X al terminar la batalla
+    }
   });
 
   socket.on("end-first-turn-battle", () => {
@@ -242,7 +244,7 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
                 card: { ...card, placedByPlayerOne: amIP1 }, // Colocar la carta en la celda
               };
               setIsBattle(true); // Cambiar el estado de batalla a verdadero
-              socket.emit("start-battle",  {gameId: gameId});
+              socket.emit("start-battle", { gameId: gameId });
             }
           }
           break;
