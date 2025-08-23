@@ -43,7 +43,7 @@ let currentGames = {} as {
 io.on("connection", (socket) => {
   console.log("A Player with id", socket.id, "connected");
 
-  socket.on("skip-turn", (data: { tiles: Tile[][]; gameId: string, isBattle: boolean, isMyFirstTurnBattle: boolean }) => {
+  socket.on("skip-turn", (data: { tiles: Tile[][]; gameId: string, isBattle: boolean, isMyFirstTurnBattle: boolean, amIP1: boolean }) => {
     var endBattle = false;
     console.log("Firts turn battle:", data.isMyFirstTurnBattle);
     console.log("Is battle:", data.isBattle);
@@ -55,9 +55,10 @@ io.on("connection", (socket) => {
       }); // Terminar el juego porque el jugador ya había saltado su turno
       return;
     } else if (currentGames[data.gameId].playerSkippedTurn && data.isBattle && !data.isMyFirstTurnBattle) { // Si el jugador ya había saltado su turno y es una batalla
-
+      var captured = false
       endBattle = true
       currentGames[data.gameId].playerSkippedTurn = false; // Marcar que el jugador ha terminado la batalla
+      var player = true
 
       data.tiles[1] = data.tiles[1].map(tile => {
         if (
@@ -66,7 +67,7 @@ io.on("connection", (socket) => {
           tile.marked &&
           !tile.captured
         ) {
-          var captured = true
+
           var rivalShield = null
           var valueX = 0;
           if (!tile.placedByPlayerOne) {
@@ -98,6 +99,7 @@ io.on("connection", (socket) => {
           } else {
             captured = true; // Si no hay escudo, la hada se captura
           }
+          player = tile.placedByPlayerOne ?? true
           return {
             ...tile,
             marked: false,
@@ -106,7 +108,14 @@ io.on("connection", (socket) => {
         }
         return tile;
       });
+      if (captured) {
+        io.to(currentGames[data.gameId].playerIds).emit("captured-fairy", {
+          player: player
+        });
+      }
+
     } else if (data.isBattle && data.isMyFirstTurnBattle) { // Si es el primer turno de batalla
+      var player = true
       endBattle = true;
       currentGames[data.gameId].playerSkippedTurn = false;
 
@@ -118,6 +127,7 @@ io.on("connection", (socket) => {
           tile.marked &&
           !tile.captured
         ) {
+          player = tile.placedByPlayerOne ?? true
           return {
             ...tile,
             marked: false,
@@ -126,7 +136,9 @@ io.on("connection", (socket) => {
         }
         return tile;
       });
-      console.log("Battle ended for game in first turn:", data.gameId);
+      io.to(currentGames[data.gameId].playerIds).emit("captured-fairy", {
+        player: player
+      });
     } else if (!currentGames[data.gameId].playerSkippedTurn) { // Si el jugador no había saltado su turno
       currentGames[data.gameId].playerSkippedTurn = true; // Marcar que el jugador ha saltado su turno
     }
@@ -139,6 +151,9 @@ io.on("connection", (socket) => {
       });
     } else if ((data.isBattle && data.isMyFirstTurnBattle) || endBattle) {
       io.to(currentGames[data.gameId].playerIds).emit("end-battle");
+      io.to(currentGames[data.gameId].playerIds).emit("update-tiles", {
+        tiles: data.tiles
+      });
     }
   });
 

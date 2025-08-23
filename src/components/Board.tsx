@@ -27,6 +27,8 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
   const { id: gameId } = useParams<{ id: string }>();
   const API_URL = import.meta.env.VITE_API_URL;
 
+  var count = 0
+
 
   // Validación para colocar carta en zona de juego
   function canAddCardToPosition(selectedCards: CardUnity[], position: Tile, rowIndex: number): boolean {
@@ -57,6 +59,23 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
   socket.on("start-battle", () => {
     setIsBattle(true);
     setIsMyFirstTurnBattle(true);
+    console.log("Battle started");
+  });
+
+  socket.on("captured-fairy", (data: { player: boolean }) => {
+    if (amIP1 == data.player) {
+      if (logedUser) {
+        sendCapturedFairies()
+      }
+      if (tiles[2][1].type == "capturedFairies" && tiles[2][1].cards.length >= 2) {
+        console.log('Fin del juego: Capturadas dos hadas');
+        socket.emit('all-fairy-captured', {
+          reason: 'captured-two-fairies',
+          winner: amIP1,
+          gameId: gameId,
+        });
+      }
+    }
   });
 
   socket.on("end-battle", () => {
@@ -66,7 +85,17 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
     if (tiles[1][3].type === 'variableX') {
       tiles[1][3].value = 0; // Resetear el valor de la variable X al terminar la batalla
     }
+    console.log("Battle ended");
   });
+
+  function mirrorBoard(tiles: Tile[][]): Tile[][] {
+    // Cambia filas: 0 <-> 2, mantiene columnas
+    return [
+      tiles[2].map((col) => ({ ...col })), // fila 0 <- antes fila 2
+      tiles[1].map((col) => ({ ...col })), // fila 1 igual
+      tiles[0].map((col) => ({ ...col })), // fila 2 <- antes fila 0
+    ];
+  }
 
   socket.on("end-first-turn-battle", () => {
     setIsMyFirstTurnBattle(false);
@@ -158,6 +187,24 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
     // Ejecutar drawCard una vez al cargar el componente por primera vez
     drawCard(false);
     setIsMyFirstTurnBattle(false);
+
+    const handleUpdateTiles = (data: { tiles: Tile[][] }) => {
+      var updatedTiles = data.tiles.map((row) => row.map((tile) => ({ ...tile })));
+
+      updatedTiles = checkMarkedFairiesForCapture(data.tiles, amIP1);
+
+      setTiles(updatedTiles);
+      
+      console.log("Tiles updated:", updatedTiles);
+      count += 1;
+      console.log("Update count:", count);
+    };
+
+    socket.on('update-tiles', handleUpdateTiles);
+
+    return () => {
+      socket.off('update-tiles', handleUpdateTiles);
+    };
   }, []);
 
   useEffect(() => {
@@ -173,10 +220,6 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
 
     setTiles(updatedTiles);
 
-    if (isMyTurn) {
-      setIsBattle(checkIsBattle(updatedTiles)); // Verificar si es batalla
-    }
-
     // Ejecutar la lógica de captura al iniciar turno
     if (!isMyFirstTurn) {
       drawCard(isBattle);
@@ -185,19 +228,6 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
       setIsMyFirstTurn(false)
     }
   }, [isMyTurn]);
-
-  function checkIsBattle(tiles: Tile[][]): boolean {
-    // Es batalla si hay una carta de tipo "catch" en la zona de las hadas, que corresponde a la fila 1
-    // Además la carta debe estar marcada y no capturada
-    return tiles[1].some((tile) => {
-      return (
-        tile.type === 'fairy' &&
-        tile.card?.type === CardType.CATCH &&
-        tile.marked &&
-        !tile.captured
-      );
-    });
-  }
 
 
   // Función para transformar el tablero al colocar una carta en la zona de juego.

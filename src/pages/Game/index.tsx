@@ -27,7 +27,7 @@ export default function Game() {
   const [isCopied, setIsCopied] = useState(false);
 
   const [isMyTurn, toggleTurn, setPlayerSkippedTurn, setIsBattle, isBattle, setIsMyFirstTurnBattle] = useTurnStore((state) => [state.isMyTurn, state.toggleTurn, state.setPlayerSkippedTurn, state.setIsBattle, state.isBattle, state.setIsMyFirstTurnBattle]);
-  const [setBoard] = useBoardStore((state) => [state.setBoard])
+  const [setBoard, board] = useBoardStore((state) => [state.setBoard, state.board])
   const [amIP1, setAmIP1, gameOver, setGameOver, setPlayerOneName, setPlayerTwoName, setPlayerDisconnected, setGameResult, gameResult] = useGameStore((state) => [state.amIP1, state.setAmIP1, state.gameOver, state.setGameOver, state.setPlayerOneName, state.setPlayerTwoName, state.setPlayerDisconnected, state.setGameResult, state.gameResult])
   const [setPoints] = usePointStore((state) => [state.setPoints])
   const { setBackground } = useBackgroundStore();
@@ -86,6 +86,8 @@ export default function Game() {
       toggleTurn()
     })
 
+
+
     socket.on('game-end', (data: { tiles: Tile[][], playerDisconnected: boolean, winner: boolean, reason: string }) => {
       setPlayerSkippedTurn(false)
       if (data?.playerDisconnected) {
@@ -104,17 +106,25 @@ export default function Game() {
         }
       }
       if (data?.reason === 'player-skipped-turn') {
-        var playe1Fairies = 0
+        var player1Fairies = 0
         var player2Fairies = 0
-        if (data.tiles[0][1].type === 'capturedFairies') {
-          player2Fairies = data.tiles[0][1].cards.length;
-        }
-        if (data.tiles[2][1].type === 'capturedFairies') {
-          playe1Fairies = data.tiles[2][1].cards.length;
-        }
-        if (playe1Fairies > player2Fairies) {
+        data.tiles.forEach(row => {
+          row.forEach(tile => {
+            if (tile.type === 'capturedFairies' && tile.cards) {
+              // Contar cartas por propietario
+              tile.cards.forEach(card => {
+                if (card.placedByPlayerOne) {
+                  player1Fairies++;
+                } else {
+                  player2Fairies++;
+                }
+              });
+            }
+          });
+        });
+        if (player1Fairies > player2Fairies) {
           setGameResult(Result.PLAYER1WIN)
-        } else if (playe1Fairies < player2Fairies) {
+        } else if (player1Fairies < player2Fairies) {
           setGameResult(Result.PLAYER2WIN)
         } else {
           setGameResult(Result.DRAW)

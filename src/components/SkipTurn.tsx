@@ -18,14 +18,14 @@ export default function SkipTurn() {
     state.resetSelectedCards,
   ])
 
-  const [gameOver] = useGameStore((state) => [state.gameOver, state.amIP1])
+  const [gameOver, amIP1] = useGameStore((state) => [state.gameOver, state.amIP1])
 
   const { id: gameId } = useParams<{ id: string }>()
 
 
   function handleSkipTurn() {
     resetSelectedCard()
-    socket.emit('skip-turn', { tiles, gameId, isBattle, isMyFirstTurnBattle })
+    socket.emit('skip-turn', { tiles, gameId, isBattle, isMyFirstTurnBattle, amIP1 })
   }
 
   return (
