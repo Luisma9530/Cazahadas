@@ -12,7 +12,7 @@ import { useAuthStore } from '../store/LoginStore';
 
 export default function Board({ amIP1 }: { amIP1: boolean }) {
   // Obtenemos el estado del tablero (estructura 3x4) desde el store
-  const [tiles, setTiles, clearDeckAndMagic] = useBoardStore((state) => [state.board, state.setBoard, state.clearDeckAndMagic]);
+  const [tiles, setTiles, clearDeckAndMagic, resetVariableX] = useBoardStore((state) => [state.board, state.setBoard, state.clearDeckAndMagic, state.resetVariableX]);
   // Carta seleccionada para colocar en la zona de juego
   const [selectedCard, resetSelectedCard] = useCardStore((state) => [
     state.selectedCards,
@@ -38,7 +38,7 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
       if (rowIndex == 2) {
         switch (card.type) {
           case CardType.SHIELD:
-            return position.type === 'deck' || position.type === 'discard';
+            return (position.type === 'deck' && isBattle) || position.type === 'discard';
           case CardType.MAGIC:
             return (position.type === 'magic' && isBattle) || position.type === 'discard';
           default:
@@ -82,20 +82,9 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
     setIsBattle(false);
     setIsMyFirstTurnBattle(false);
     clearDeckAndMagic();
-    if (tiles[1][3].type === 'variableX') {
-      tiles[1][3].value = 0; // Resetear el valor de la variable X al terminar la batalla
-    }
+    resetVariableX();
     console.log("Battle ended");
   });
-
-  function mirrorBoard(tiles: Tile[][]): Tile[][] {
-    // Cambia filas: 0 <-> 2, mantiene columnas
-    return [
-      tiles[2].map((col) => ({ ...col })), // fila 0 <- antes fila 2
-      tiles[1].map((col) => ({ ...col })), // fila 1 igual
-      tiles[0].map((col) => ({ ...col })), // fila 2 <- antes fila 0
-    ];
-  }
 
   socket.on("end-first-turn-battle", () => {
     setIsMyFirstTurnBattle(false);
@@ -169,7 +158,6 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
     if (newTiles[0][1].type === 'capturedFairies' && newTiles[2][1].type === 'capturedFairies') {
       newTiles[0][1].cards = cardsTop;
       newTiles[2][1].cards = cardsBottom;
-      console.log("Captured fairies updated:", newTiles[0][1].cards, newTiles[2][1].cards);
     }
 
     if (cardsBottom.length >= 2) {
@@ -194,10 +182,11 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
       updatedTiles = checkMarkedFairiesForCapture(data.tiles, amIP1);
 
       setTiles(updatedTiles);
-      
-      console.log("Tiles updated:", updatedTiles);
-      count += 1;
-      console.log("Update count:", count);
+
+      setIsBattle(false);
+      setIsMyFirstTurnBattle(false);
+      clearDeckAndMagic();
+      resetVariableX();
     };
 
     socket.on('update-tiles', handleUpdateTiles);

@@ -6,6 +6,8 @@ type BoardStore = {
   setBoard: (board: Tile[][]) => void
   resetStore: () => void
   clearDeckAndMagic: () => void
+  resetVariableX: () => void
+  endBattle: () => void
 }
 
 //MATRIZ 3x4 ACTUALIZADA
@@ -52,6 +54,35 @@ const useBoardStore = create<BoardStore>((set, get) => ({
       row.map(tile => {
         if (tile.type === 'deck' || tile.type === 'magic') {
           return { ...tile, cards: [] }
+        }
+        return tile
+      })
+    )
+    set({ board: updatedBoard })
+  },
+  resetVariableX: () => {
+    const currentBoard = get().board
+    const updatedBoard = currentBoard.map((row, rowIndex) =>
+      row.map((tile, colIndex) => {
+        if (rowIndex === 1 && colIndex === 3 && tile.type === 'variableX') {
+          return { ...tile, value: 0 }
+        }
+        return tile
+      })
+    )
+    set({ board: updatedBoard })
+  },
+  endBattle: () => {
+    const currentBoard = get().board
+    const updatedBoard = currentBoard.map((row, rowIndex) =>
+      row.map((tile, colIndex) => {
+        // Limpiar deck y magic
+        if (tile.type === 'deck' || tile.type === 'magic') {
+          return { ...tile, cards: [] }
+        }
+        // Resetear variable X
+        if (rowIndex === 1 && colIndex === 3 && tile.type === 'variableX') {
+          return { ...tile, value: 0 }
         }
         return tile
       })

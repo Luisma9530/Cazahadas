@@ -5,8 +5,6 @@ import { Server as SocketIOServer } from "socket.io";
 import { Tile } from "../src/@types/Tile";
 import { CardType, CardUnity } from '../src/@types/Card';
 import { hydrateCard } from "../src/utils/hydrateCard"; // Para rehidratar cartas
-import { Console } from 'console';
-
 
 
 const app = fastify();
@@ -45,9 +43,6 @@ io.on("connection", (socket) => {
 
   socket.on("skip-turn", (data: { tiles: Tile[][]; gameId: string, isBattle: boolean, isMyFirstTurnBattle: boolean, amIP1: boolean }) => {
     var endBattle = false;
-    console.log("Firts turn battle:", data.isMyFirstTurnBattle);
-    console.log("Is battle:", data.isBattle);
-    console.log("Player skipped turn:", currentGames[data.gameId].playerSkippedTurn);
     if (currentGames[data.gameId].playerSkippedTurn && !data.isBattle) { // Si el jugador ya había saltado su turno y no es una batalla
       io.to(currentGames[data.gameId].playerIds).emit("game-end", {
         tiles: data.tiles,
@@ -73,18 +68,15 @@ io.on("connection", (socket) => {
           if (!tile.placedByPlayerOne) {
             if (data.tiles[0][0].type === "deck") {
               rivalShield = data.tiles[0][0].cards?.at(-1);
-              console.log("Deck de jugador 1:", data.tiles[0][0].cards);
             }
           } else {
             if (data.tiles[2][0].type === "deck") {
               rivalShield = data.tiles[2][0].cards?.at(-1);
-              console.log("Deck de jugador 2:", data.tiles[2][0].cards);
             }
           }
           if (data.tiles[1][3].type === "variableX") {
             valueX = data.tiles[1][3].value;
           }
-          console.log("Rival shield:", rivalShield);
           if (rivalShield) {
             const hydrated = hydrateCard(rivalShield ?? {});
             if (
@@ -113,7 +105,6 @@ io.on("connection", (socket) => {
           player: player
         });
       }
-
     } else if (data.isBattle && data.isMyFirstTurnBattle) { // Si es el primer turno de batalla
       var player = true
       endBattle = true;
@@ -143,17 +134,18 @@ io.on("connection", (socket) => {
       currentGames[data.gameId].playerSkippedTurn = true; // Marcar que el jugador ha saltado su turno
     }
     if (!data.isMyFirstTurnBattle) {
-      console.log("Is my turn:", data.isMyFirstTurnBattle);
       io.to(currentGames[data.gameId].playerIds).emit("new-turn", { // Enviar el nuevo turno a todos los jugadores
         tiles: data.tiles,
         playerSkippedTurn: currentGames[data.gameId].playerSkippedTurn,
         endBattle: endBattle,
       });
-    } else if ((data.isBattle && data.isMyFirstTurnBattle) || endBattle) {
-      io.to(currentGames[data.gameId].playerIds).emit("end-battle");
+    }
+    if ((data.isBattle && data.isMyFirstTurnBattle) || endBattle) {
+
       io.to(currentGames[data.gameId].playerIds).emit("update-tiles", {
         tiles: data.tiles
       });
+      
     }
   });
 
