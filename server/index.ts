@@ -214,6 +214,7 @@ io.on("connection", (socket) => {
   );
 
   socket.on("join-game", (data: { playerName: string; gameId: string }) => {
+    console.log("Player", data.playerName, "is trying to join game", data.gameId);
     if (currentGames[data.gameId]["playerIds"].includes(socket.id)) {
       currentGames[data.gameId].playerNames.push(data.playerName);
       io.to(socket.id).emit("player-connected", {

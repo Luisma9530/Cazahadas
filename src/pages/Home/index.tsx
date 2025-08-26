@@ -26,7 +26,15 @@ export default function Home() {
     socket.on('game-found', (data: {
       gameIdFound: string
     }) => {
-      navigate(`/waiting-room/${data.gameIdFound}`)
+      if (logedUser) {
+        setPlayerName(logedUser)
+      }
+      console.log('Joining game', data.gameIdFound)
+      navigate(`/game/${data.gameIdFound}`)
+      socket.emit('join-game', {
+        playerName,
+        gameId: data.gameIdFound
+      })
     })
 
     return () => {
@@ -80,7 +88,7 @@ export default function Home() {
                       mt-12 sm:mt-24 lg:mt-48 
                       px-4 sm:px-6 lg:px-8 
                       gap-4 sm:gap-5">
-        
+
         {/* Botón Join Game */}
         <div className="border border-black border-solid-2 rounded-lg bg-white 
                         w-full sm:w-80 lg:w-72">
@@ -137,7 +145,7 @@ export default function Home() {
               <h2 className="text-xl sm:text-2xl font-medium text-black text-center">
                 Join Game
               </h2>
-              
+
               <input
                 value={gameId}
                 onChange={handleChangeGameIdInput}
@@ -147,7 +155,7 @@ export default function Home() {
                           focus:border-gray-500"
                 placeholder="Enter Game ID"
               />
-              
+
               <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 w-full">
                 <button
                   onClick={handleJoinGame}
@@ -159,7 +167,7 @@ export default function Home() {
                 >
                   <span className="text-base sm:text-lg font-medium">Join</span>
                 </button>
-                
+
                 <button
                   onClick={() => {
                     setShowJoinModal(false);
@@ -173,7 +181,7 @@ export default function Home() {
                   <span className="text-base sm:text-lg font-medium">Cancel</span>
                 </button>
               </div>
-              
+
               {!!errorMessage && (
                 <span className='text-red-500 text-sm text-center'>
                   {errorMessage}
