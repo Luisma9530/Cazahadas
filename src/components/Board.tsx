@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useState, useEffect } from "react";
 import socket from "../socket";
 import { Tile } from "../@types/Tile";
 import useBoardStore from "../store/BoardStore";
@@ -9,6 +9,7 @@ import Card from "../components/Card";
 import { CardInfo, CardType, CardUnity } from "../@types/Card";
 import { useParams } from "react-router-dom";
 import { useAuthStore } from '../store/LoginStore';
+import BattleConfirmModal from "./Modals/BattleStartModal";
 
 export default function Board({ amIP1 }: { amIP1: boolean }) {
   // Obtenemos el estado del tablero (estructura 3x4) desde el store
@@ -18,7 +19,7 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
     state.selectedCards,
     state.resetSelectedCards,
   ]);
-  const [isMyTurn, isMyFirstTurn, isBattle, setIsBattle, setIsMyFirstTurn, isMyFirstTurnBattle, setIsMyFirstTurnBattle] = useTurnStore((state) => [state.isMyTurn, state.isMyFirstTurn, state.isBattle, state.setIsBattle, state.setIsMyFirstTurn, state.isMyFirstTurnBattle, state.setIsMyFirstTurnBattle]);
+  const [isMyTurn, isMyFirstTurn, isBattle, setIsBattle, setIsMyFirstTurn, isMyFirstTurnBattle, setIsMyFirstTurnBattle, showBattleModal, setShowBattleModal] = useTurnStore((state) => [state.isMyTurn, state.isMyFirstTurn, state.isBattle, state.setIsBattle, state.setIsMyFirstTurn, state.isMyFirstTurnBattle, state.setIsMyFirstTurnBattle, state.showBattleModal, state.setShowBattleModal]);
 
   const [placeCard, drawCard] = useNeoHandStore((state) => [state.placeCard, state.drawCard]);
 
@@ -27,23 +28,22 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
   const { id: gameId } = useParams<{ id: string }>();
   const API_URL = import.meta.env.VITE_API_URL;
 
-  var count = 0
-
-
   // Validación para colocar carta en zona de juego
   function canAddCardToPosition(selectedCards: CardUnity[], position: Tile, rowIndex: number): boolean {
     if (selectedCards.length === 1) {
       const card = selectedCards[0];
-      if (!card || !isMyTurn) return false;
+      if (!card || !isMyTurn || showBattleModal) return false;
       if (rowIndex == 2) {
         switch (card.type) {
           case CardType.SHIELD:
             return (position.type === 'deck' && isBattle) || position.type === 'discard';
           case CardType.MAGIC:
-            return (position.type === 'magic' && isBattle) || position.type === 'discard';
+            return position.type === 'discard';
           default:
             return false; // Si no conocemos el tipo no dejamos colocar
         }
+      } else if (rowIndex == 1 && CardType.MAGIC === card.type) {
+        return (position.type === 'magic' && isBattle);
       } else {
         if (CardType.CATCH === card.type) {
           return position.type === 'fairy' && !position.marked && !position.captured && !isBattle;
@@ -56,10 +56,15 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
     } else { return false; } // Si no hay cartas seleccionadas, no se puede colocar nada
   }
 
-  socket.on("start-battle", () => {
+  socket.on("start-battle-player", (data: { amIP1: boolean }) => {
     setIsBattle(true);
     setIsMyFirstTurnBattle(true);
     console.log("Battle started");
+    console.log("amIP1:", data.amIP1, " | I am:", amIP1);
+    if (data.amIP1 !== amIP1) {
+      setShowBattleModal(true)
+      console.log("Battle modal shown");
+    }
   });
 
   socket.on("captured-fairy", (data: { player: boolean }) => {
@@ -76,14 +81,6 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
         });
       }
     }
-  });
-
-  socket.on("end-battle", () => {
-    setIsBattle(false);
-    setIsMyFirstTurnBattle(false);
-    clearDeckAndMagic();
-    resetVariableX();
-    console.log("Battle ended");
   });
 
   socket.on("end-first-turn-battle", () => {
@@ -263,7 +260,10 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
                 card: { ...card, placedByPlayerOne: amIP1 }, // Colocar la carta en la celda
               };
               setIsBattle(true); // Cambiar el estado de batalla a verdadero
-              socket.emit("start-battle", { gameId: gameId });
+              socket.emit("start-battle", {
+                gameId: gameId,
+                amIP1: amIP1
+              });
             }
           }
           break;
@@ -302,7 +302,7 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
   const updateValidationRules = (): { [key: string]: number[][] } => {
     const rules = {
       CATCH: [[1, 0], [1, 1], [1, 2]], // Casillas de hadas
-      MAGIC: [[2, 3]], // Casilla de magia del jugador
+      MAGIC: [[1, 4]], // Casilla de magia del jugador
       SHIELD: [[2, 0]], // Casilla de defensa del jugador
       DISCARD: [[2, 2]], // Zona de descarte (siempre válida)
     };
@@ -345,6 +345,7 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
   // Renderizamos el tablero con la estructura 3x4.
   return (
     <div className="relative w-full min-h-screen flex items-center justify-center p-2 sm:p-4">
+
       {/* Mesa de fondo */}
       <div className="absolute inset-0 table-background"></div>
 
@@ -412,49 +413,10 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
               <span className="text-[8px] sm:text-xs">Captured Fairies</span>
             )}
           </div>
-
-          <div className="rival-cell-3d game-cell rival-magic-cell bg-red-500 flex items-center justify-center border hover-container">
-            <div className="dark-particles"></div>
-            <div className="magical-energy"></div>
-            <div className="magic-runes"></div>
-            <div className="grimoire-symbol"></div>
-            <div className="magic-power-icon"></div>
-            {tiles[0][3].type === 'magic' ? (
-              tiles[0][3].cards.length > 0 ? (
-                <div className="relative h-[60px] sm:h-[100px] w-[48px] sm:w-[80px]">
-                  {tiles[0][3].cards.slice(-3).map((card, i) => (
-                    <div
-                      key={i}
-                      className="absolute top-0 left-0 group hover-trigger"
-                      style={{ top: `${i * 4}px sm:${i * 8}px`, zIndex: i }}
-                    >
-                      <div className="w-[48px] sm:w-[80px] h-[51px] sm:h-[85px] overflow-hidden">
-                        <Card placed={true} card={card} amIP1={amIP1} />
-                      </div>
-                      {/* Hover preview individual para cada carta */}
-                      <div className="absolute z-[9999] hidden sm:group-hover:block top-[-10px] left-[60px] sm:left-[100px]">
-                        <div className="w-[72px] sm:w-[120px] h-[90px] sm:h-[150px] border bg-white shadow-lg rounded p-1">
-                          <Card placed={true} card={card} amIP1={amIP1} />
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <div className="magic-text text-[8px] sm:text-xs">
-                  Dark<br />Magics
-                </div>
-              )
-            ) : (
-              <div className="magic-text text-[8px] sm:text-xs">
-                Dark<br />Magics
-              </div>
-            )}
-          </div>
         </div>
 
         {/* Fila 1: Zona de juego - CASILLAS MÁS GRANDES (SIGUE EN EL MEDIO) */}
-        <div className="grid grid-cols-4 gap-2 sm:gap-3 auto-rows-[84px] sm:auto-rows-[140px] auto-cols-[66px] sm:auto-cols-[110px] justify-center mb-2 sm:mb-4 -mt-4 sm:-mt-7">
+        <div className="grid grid-cols-5 gap-2 sm:gap-3 auto-rows-[84px] sm:auto-rows-[140px] auto-cols-[66px] sm:auto-cols-[110px] justify-center mb-2 sm:mb-4 -mt-4 sm:-mt-7">
           <div
             className={getCellHighlightClasses(1, 0, selectedCard,
               `middle-cell-3d game-cell flex items-center justify-center border cursor-pointer
@@ -518,6 +480,51 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
                 ? tiles[1][3].value
                 : "X"}
             </span>
+          </div>
+
+
+          <div
+            className={getCellHighlightClasses(1, 4, selectedCard,
+              "player-cell-3d game-cell player-magic-cell bg-blue-500 flex items-center justify-center border cursor-pointer hover-container"
+            )}
+            onClick={() => handleCellClick(tiles[1][4], 1, 4)}
+          >
+            <div className="player-light-particles"></div>
+            <div className="player-magical-energy"></div>
+            <div className="player-magic-runes"></div>
+            <div className="player-grimoire-symbol"></div>
+            <div className="player-magic-power-icon"></div>
+            {tiles[1][4].type === 'magic' ? (
+              tiles[1][4].cards.length > 0 ? (
+                <div className="relative h-[78px] sm:h-[130px] w-[60px] sm:w-[100px]">
+                  {tiles[1][4].cards.slice(-3).map((card, i) => (
+                    <div
+                      key={i}
+                      className="absolute top-0 left-0 group hover-trigger"
+                      style={{ top: `${i * 7}px sm:${i * 12}px`, zIndex: i }}
+                    >
+                      <div className="w-[60px] sm:w-[100px] h-[63px] sm:h-[105px] overflow-hidden">
+                        <Card placed={true} card={card} amIP1={amIP1} />
+                      </div>
+                      {/* Hover preview individual para cada carta */}
+                      <div className="absolute z-[9999] hidden sm:group-hover:block top-[-10px] left-[60px] sm:left-[100px]">
+                        <div className="w-[72px] sm:w-[120px] h-[90px] sm:h-[150px] border bg-white shadow-lg rounded p-1">
+                          <Card placed={true} card={card} amIP1={amIP1} />
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="player-magic-text text-[8px] sm:text-xs">
+                  Sacred<br />Magics
+                </div>
+              )
+            ) : (
+              <div className="player-magic-text text-[8px] sm:text-xs">
+                Sacred<br />Magics
+              </div>
+            )}
           </div>
         </div>
 
@@ -619,52 +626,7 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
               <span className="discard-text text-[8px] sm:text-xs">Mi Caldero</span>
             )}
           </div>
-
-          <div
-            className={getCellHighlightClasses(2, 3, selectedCard,
-              "player-cell-3d game-cell player-magic-cell bg-blue-500 flex items-center justify-center border cursor-pointer hover-container"
-            )}
-            onClick={() => handleCellClick(tiles[2][3], 2, 3)}
-          >
-            <div className="player-light-particles"></div>
-            <div className="player-magical-energy"></div>
-            <div className="player-magic-runes"></div>
-            <div className="player-grimoire-symbol"></div>
-            <div className="player-magic-power-icon"></div>
-            {tiles[2][3].type === 'magic' ? (
-              tiles[2][3].cards.length > 0 ? (
-                <div className="relative h-[78px] sm:h-[130px] w-[60px] sm:w-[100px]">
-                  {tiles[2][3].cards.slice(-3).map((card, i) => (
-                    <div
-                      key={i}
-                      className="absolute top-0 left-0 group hover-trigger"
-                      style={{ top: `${i * 7}px sm:${i * 12}px`, zIndex: i }}
-                    >
-                      <div className="w-[60px] sm:w-[100px] h-[63px] sm:h-[105px] overflow-hidden">
-                        <Card placed={true} card={card} amIP1={amIP1} />
-                      </div>
-                      {/* Hover preview individual para cada carta */}
-                      <div className="absolute z-[9999] hidden sm:group-hover:block top-[-10px] left-[60px] sm:left-[100px]">
-                        <div className="w-[72px] sm:w-[120px] h-[90px] sm:h-[150px] border bg-white shadow-lg rounded p-1">
-                          <Card placed={true} card={card} amIP1={amIP1} />
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <div className="player-magic-text text-[8px] sm:text-xs">
-                  Sacred<br />Magics
-                </div>
-              )
-            ) : (
-              <div className="player-magic-text text-[8px] sm:text-xs">
-                Sacred<br />Magics
-              </div>
-            )}
-          </div>
         </div>
-
 
         {/* Estilos CSS actualizados */}
         <style>{`

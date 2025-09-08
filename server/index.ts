@@ -145,7 +145,7 @@ io.on("connection", (socket) => {
       io.to(currentGames[data.gameId].playerIds).emit("update-tiles", {
         tiles: data.tiles
       });
-      
+
     }
   });
 
@@ -161,8 +161,33 @@ io.on("connection", (socket) => {
     });
   });
 
-  socket.on("start-battle", (data: { gameId: string }) => {
-    io.to(currentGames[data.gameId].playerIds).emit("start-battle");
+  socket.on("end-battle", (data: { gameId: string, tiles: Tile[][] }) => {
+    var player = true
+    data.tiles[1] = data.tiles[1].map(tile => {
+      if (
+        tile.type === "fairy" &&
+        tile.card?.type === CardType.CATCH &&
+        tile.marked &&
+        !tile.captured
+      ) {
+        player = tile.placedByPlayerOne ?? true
+        return {
+          ...tile,
+          marked: false,
+          captured: true,
+        };
+      }
+      return tile;
+    });
+    io.to(currentGames[data.gameId].playerIds).emit("update-tiles", {
+      tiles: data.tiles
+    });
+  });
+
+  socket.on("start-battle", (data: { gameId: string, amIP1: boolean }) => {
+    io.to(currentGames[data.gameId].playerIds).emit("start-battle-player", {
+      amIP1: data.amIP1
+    });
   });
 
   socket.on("disconnect", () => {

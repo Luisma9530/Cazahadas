@@ -82,28 +82,32 @@ export default function Home() {
 
   return (
     <>
-      {/* Container principal con padding responsive */}
+      {/* Container principal con escalado viewport */}
       <div className="flex flex-col lg:flex-row items-center justify-center 
-                      w-full max-w-4xl mx-auto 
-                      mt-12 sm:mt-24 lg:mt-48 
-                      px-4 sm:px-6 lg:px-8 
-                      gap-4 sm:gap-5">
+                      w-full max-w-7xl mx-auto 
+                      mt-[8vh] sm:mt-[12vh] lg:mt-[20vh]
+                      px-[4vw] sm:px-[6vw] lg:px-[8vw]
+                      gap-[2vh] sm:gap-[3vh]">
 
         {/* Botón Join Game */}
-        <div className="border border-black border-solid-2 rounded-lg bg-white 
-                        w-full sm:w-80 lg:w-72">
-          <div className="flex flex-col items-center justify-center gap-6 
-                          p-6 sm:p-8 lg:p-10">
+        <div className="border-2 border-black rounded-xl bg-white shadow-lg
+                        w-full sm:w-[40vw] lg:w-[25vw] max-w-sm
+                        min-h-[15vh]">
+          <div className="flex flex-col items-center justify-center 
+                          p-[3vh] sm:p-[4vh] lg:p-[5vh]">
             <button
               onClick={() => setShowJoinModal(true)}
-              className="rounded-md w-full px-4 py-3 sm:py-2 
-                         border text-black border-black 
+              className="rounded-lg w-full 
+                         px-[2vw] py-[2vh] sm:py-[1.5vh]
+                         border-2 text-black border-black 
                          hover:bg-gray-700 hover:border-gray-700 
                          group active:translate-y-1 sm:active:translate-y-2
-                         transition-all duration-200"
+                         transition-all duration-200
+                         min-h-[8vh] flex items-center justify-center"
             >
-              <span className="text-lg sm:text-xl lg:text-2xl font-medium 
-                             text-black group-hover:text-white">
+              <span className="text-[4vw] sm:text-[3vw] lg:text-[1.8vw] xl:text-[1.5vw] 
+                             font-medium text-black group-hover:text-white
+                             min-[1600px]:text-2xl">
                 Join Game
               </span>
             </button>
@@ -111,20 +115,24 @@ export default function Home() {
         </div>
 
         {/* Botón Start Game */}
-        <div className="border border-black border-solid-2 rounded-lg bg-white 
-                        w-full sm:w-80 lg:w-72">
-          <div className="flex flex-col items-center justify-center gap-6 
-                          p-6 sm:p-8 lg:p-10">
+        <div className="border-2 border-black rounded-xl bg-white shadow-lg
+                        w-full sm:w-[40vw] lg:w-[25vw] max-w-sm
+                        min-h-[15vh]">
+          <div className="flex flex-col items-center justify-center 
+                          p-[3vh] sm:p-[4vh] lg:p-[5vh]">
             <button
               onClick={handleStartGame}
-              className="rounded-md w-full px-4 py-3 sm:py-2 
-                         border text-black border-black 
+              className="rounded-lg w-full 
+                         px-[2vw] py-[2vh] sm:py-[1.5vh]
+                         border-2 text-black border-black 
                          hover:bg-gray-700 hover:border-gray-700 
                          group active:translate-y-1 sm:active:translate-y-2
-                         transition-all duration-200"
+                         transition-all duration-200
+                         min-h-[8vh] flex items-center justify-center"
             >
-              <span className="text-lg sm:text-xl lg:text-2xl font-medium 
-                             text-black group-hover:text-white">
+              <span className="text-[4vw] sm:text-[3vw] lg:text-[1.8vw] xl:text-[1.5vw] 
+                             font-medium text-black group-hover:text-white
+                             min-[1600px]:text-2xl">
                 Start Game
               </span>
             </button>
@@ -132,40 +140,51 @@ export default function Home() {
         </div>
       </div>
 
-      {/* Modal para Join Game - Responsive */}
+      {/* Modal para Join Game - Escalado viewport */}
       {showJoinModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 
                         flex items-center justify-center z-50 
-                        px-4 sm:px-6">
-          <div className="bg-white border border-black border-solid-2 rounded-lg 
-                          p-6 sm:p-8 
-                          w-full max-w-sm sm:max-w-md 
+                        px-[4vw] sm:px-[6vw]">
+          <div className="bg-white border-2 border-black rounded-xl shadow-2xl
+                          p-[4vh] sm:p-[5vh]
+                          w-full max-w-[90vw] sm:max-w-[70vw] lg:max-w-[40vw] xl:max-w-[35vw]
+                          min-[1600px]:max-w-lg
                           mx-4">
-            <div className="flex flex-col items-center gap-4 sm:gap-6">
-              <h2 className="text-xl sm:text-2xl font-medium text-black text-center">
+            <div className="flex flex-col items-center gap-[3vh] sm:gap-[4vh]">
+              <h2 className="text-[5vw] sm:text-[4vw] lg:text-[2.5vw] xl:text-[2vw]
+                           min-[1600px]:text-3xl
+                           font-medium text-black text-center">
                 Join Game
               </h2>
 
               <input
                 value={gameId}
                 onChange={handleChangeGameIdInput}
-                className="text-sm w-full py-3 sm:py-2 px-3 text-center 
-                          border border-solid-1 border-gray-400 rounded-md
+                className="text-[3.5vw] sm:text-[2.5vw] lg:text-[1.5vw] xl:text-[1.2vw]
+                          min-[1600px]:text-lg
+                          w-full py-[2vh] sm:py-[1.5vh] px-[2vw] text-center 
+                          border-2 border-gray-400 rounded-lg
                           focus:outline-none focus:ring-2 focus:ring-gray-500 
                           focus:border-gray-500"
                 placeholder="Enter Game ID"
               />
 
-              <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 w-full">
+              <div className="flex flex-col sm:flex-row gap-[2vh] sm:gap-[2vw] w-full">
                 <button
                   onClick={handleJoinGame}
-                  className="rounded-md flex-1 px-4 py-3 sm:py-2 
-                           border text-white bg-black border-black 
+                  className="rounded-lg flex-1 
+                           px-[2vw] py-[2vh] sm:py-[1.5vh]
+                           border-2 text-white bg-black border-black 
                            hover:bg-gray-700 hover:border-gray-700 
                            active:translate-y-1
-                           transition-all duration-200"
+                           transition-all duration-200
+                           min-h-[6vh] flex items-center justify-center"
                 >
-                  <span className="text-base sm:text-lg font-medium">Join</span>
+                  <span className="text-[3.5vw] sm:text-[2.5vw] lg:text-[1.5vw] xl:text-[1.2vw]
+                                 min-[1600px]:text-lg 
+                                 font-medium">
+                    Join
+                  </span>
                 </button>
 
                 <button
@@ -173,17 +192,25 @@ export default function Home() {
                     setShowJoinModal(false);
                     setErrorMessage('');
                   }}
-                  className="rounded-md flex-1 px-4 py-3 sm:py-2 
-                           border text-black border-gray-400 
+                  className="rounded-lg flex-1 
+                           px-[2vw] py-[2vh] sm:py-[1.5vh]
+                           border-2 text-black border-gray-400 
                            hover:bg-gray-100 active:translate-y-1
-                           transition-all duration-200"
+                           transition-all duration-200
+                           min-h-[6vh] flex items-center justify-center"
                 >
-                  <span className="text-base sm:text-lg font-medium">Cancel</span>
+                  <span className="text-[3.5vw] sm:text-[2.5vw] lg:text-[1.5vw] xl:text-[1.2vw]
+                                 min-[1600px]:text-lg 
+                                 font-medium">
+                    Cancel
+                  </span>
                 </button>
               </div>
 
               {!!errorMessage && (
-                <span className='text-red-500 text-sm text-center'>
+                <span className="text-red-500 text-[3vw] sm:text-[2vw] lg:text-[1.2vw] xl:text-[1vw]
+                               min-[1600px]:text-base 
+                               text-center">
                   {errorMessage}
                 </span>
               )}

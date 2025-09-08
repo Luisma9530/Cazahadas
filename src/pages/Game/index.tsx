@@ -20,13 +20,14 @@ import { faCopy } from "@fortawesome/free-regular-svg-icons";
 import useBackgroundStore from "../../store/BackgroundStore";
 import homeBackground from '../../assets/images/homeBackground.png';
 import { CardUnity } from "../../@types/Card";
+import BattleConfirmModal from "../../components/Modals/BattleStartModal.tsx";
 
 export default function Game() {
   const [loading, setLoading] = useState(true)
   const [gameBusy, setGameBusy] = useState(false)
   const [isCopied, setIsCopied] = useState(false);
 
-  const [isMyTurn, toggleTurn, setPlayerSkippedTurn, setIsBattle, isBattle, setIsMyFirstTurnBattle] = useTurnStore((state) => [state.isMyTurn, state.toggleTurn, state.setPlayerSkippedTurn, state.setIsBattle, state.isBattle, state.setIsMyFirstTurnBattle]);
+  const [isMyTurn, toggleTurn, setPlayerSkippedTurn, setIsBattle, isBattle, setIsMyFirstTurnBattle, showBattleModal, setShowBattleModal] = useTurnStore((state) => [state.isMyTurn, state.toggleTurn, state.setPlayerSkippedTurn, state.setIsBattle, state.isBattle, state.setIsMyFirstTurnBattle, state.showBattleModal, state.setShowBattleModal]);
   const [setBoard, board] = useBoardStore((state) => [state.setBoard, state.board])
   const [amIP1, setAmIP1, gameOver, setGameOver, setPlayerOneName, setPlayerTwoName, setPlayerDisconnected, setGameResult, gameResult] = useGameStore((state) => [state.amIP1, state.setAmIP1, state.gameOver, state.setGameOver, state.setPlayerOneName, state.setPlayerTwoName, state.setPlayerDisconnected, state.setGameResult, state.gameResult])
   const [setPoints] = usePointStore((state) => [state.setPoints])
@@ -201,6 +202,22 @@ export default function Game() {
       {/* Game Board - Mantiene estructura EXACTA original */}
       {shouldShowBoard && (
         <div>
+          <div className="-mt-[2rem] xs:-mt-[2.5rem] sm:-mt-[4rem] md:-mt-[5rem] lg:-mt-[6rem] relative z-[51]">
+            {showBattleModal &&
+              <BattleConfirmModal
+                isOpen={showBattleModal}
+                onAccept={() => {
+                  console.log("Battle confirmed");
+                  setShowBattleModal(false);
+                }}
+                onReject={() => {
+                  console.log("Battle rejected");
+                  socket.emit("end-battle", { gameId: gameId, tiles: board });
+                  setShowBattleModal(false);
+                }}
+              />
+            }
+          </div>
           <div>
             <TurnIndicator />
           </div>
@@ -208,7 +225,7 @@ export default function Game() {
                           -mt-4 xs:-mt-6 sm:-mt-12 md:-mt-14 lg:-mt-[13rem] min-w-fit">
             <Board amIP1={amIP1} />
           </div>
-          <div className="-mt-[6rem] xs:-mt-[7rem] sm:-mt-[10rem] md:-mt-[12rem] lg:-mt-">
+          <div className="-mt-[6rem] xs:-mt-[7rem] sm:-mt-[10rem] md:-mt-[12rem] lg:-mt- z-[52]">
             <SkipTurn />
           </div>
           <div className="-mt-[2rem] xs:-mt-[2.5rem] sm:-mt-[4rem] md:-mt-[5rem] lg:-mt-[6rem] relative z-50">

@@ -5,7 +5,7 @@ export function BattleModal() {
   const [toggleBattleModal] = useModalStore((state) => [state.toggleBattleModal]);
 
   return (
-    <div className="fixed mt-[320px] top-0 left-0 w-full h-full flex items-start justify-center z-50">
+    <div className="fixed mt-[320px] top-0 left-0 w-full h-full flex items-start justify-center z-[53]">
       <motion.div
         animate={{ 
           opacity: [0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0], 

@@ -12,12 +12,15 @@ type useTurnStore = {
   isMyFirstTurnBattle: boolean;
   setIsBattle: (isBattle: boolean) => void;
   setIsMyFirstTurnBattle: (value: boolean) => void;
+  showBattleModal: boolean;
+  setShowBattleModal: (value: boolean) => void;
 };
 
 const useTurnStore = create<useTurnStore>((set) => ({
   isMyTurn: false,
   isMyFirstTurn: true,
   isBattle: false,
+  showBattleModal: false,
   setIsBattle: (isBattle: boolean) => set({ isBattle }),
   toggleTurn: () => set((state) => ({ isMyTurn: !state.isMyTurn })),
   setIsMyFirstTurn: (value) => set({ isMyFirstTurn: value }),
@@ -28,6 +31,7 @@ const useTurnStore = create<useTurnStore>((set) => ({
     set({ isMyTurn: false, isMyFirstTurn: true, playerSkippedTurn: false, isBattle: false }),
   isMyFirstTurnBattle: true,
   setIsMyFirstTurnBattle: (value: boolean) => set({ isMyFirstTurnBattle: value }),
+  setShowBattleModal: (value: boolean) => set({ showBattleModal: value }),
 }));
 
 export default useTurnStore;
