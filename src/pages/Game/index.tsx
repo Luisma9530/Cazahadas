@@ -204,19 +204,19 @@ export default function Game() {
           <div className="block sm:hidden h-full flex flex-col">
             {/* Battle Modal */}
             {showBattleModal &&
-                <BattleConfirmModal
-                  isOpen={showBattleModal}
-                  onAccept={() => {
-                    console.log("Battle confirmed");
-                    setShowBattleModal(false);
-                  }}
-                  onReject={() => {
-                    console.log("Battle rejected");
-                    socket.emit("end-battle", { gameId: gameId, tiles: board });
-                    setShowBattleModal(false);
-                  }}
-                />
-              }
+              <BattleConfirmModal
+                isOpen={showBattleModal}
+                onAccept={() => {
+                  console.log("Battle confirmed");
+                  setShowBattleModal(false);
+                }}
+                onReject={() => {
+                  console.log("Battle rejected");
+                  socket.emit("end-battle", { gameId: gameId, tiles: board });
+                  setShowBattleModal(false);
+                }}
+              />
+            }
 
             {/* Turn Indicator */}
             <div className="flex-shrink-0 py-1 z-[51]">
