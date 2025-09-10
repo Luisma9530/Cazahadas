@@ -1,0 +1,81 @@
+/* Mesa de fondo con textura de madera - AJUSTADA PARA ESTAR MÁS ARRIBA */
+.table-background {
+  background: 
+    /* Patas de la mesa (sombras en las esquinas) */
+    radial-gradient(ellipse 100px 200px at 10% 90%, rgba(74, 44, 29, 0.8) 0%, transparent 60%),
+    radial-gradient(ellipse 100px 200px at 90% 90%, rgba(74, 44, 29, 0.8) 0%, transparent 60%),
+    radial-gradient(ellipse 80px 150px at 15% 85%, rgba(54, 32, 19, 0.6) 0%, transparent 50%),
+    radial-gradient(ellipse 80px 150px at 85% 85%, rgba(54, 32, 19, 0.6) 0%, transparent 50%),
+    
+    /* Borde de la mesa visible */
+    linear-gradient(
+      180deg,
+      transparent 0%,
+      transparent 70%,
+      rgba(74, 44, 29, 0.8) 80%,
+      rgba(54, 32, 19, 1) 90%,
+      rgba(74, 44, 29, 0.9) 100%
+    ),
+    
+    /* Vetas de la madera con perspectiva */
+    repeating-linear-gradient(
+      75deg,
+      #4A2C1D 0px,
+      #5D2F1A 12px,
+      #6B3621 24px,
+      #5D2F1A 36px,
+      #4A2C1D 48px
+    ),
+    
+    /* Textura base de madera */
+    linear-gradient(
+      165deg,
+      #8B4513 0%,
+      #6B3621 25%,
+      #5D2F1A 50%,
+      #6B3621 75%,
+      #A0522D 100%
+    ),
+    
+    /* Nudos y marcas naturales */
+    radial-gradient(ellipse 400px 150px at 30% 40%, rgba(139, 69, 19, 0.7) 0%, transparent 60%),
+    radial-gradient(ellipse 250px 100px at 70% 60%, rgba(107, 54, 33, 0.5) 0%, transparent 50%),
+    radial-gradient(ellipse 180px 80px at 50% 30%, rgba(93, 47, 26, 0.6) 0%, transparent 50%);
+  
+  background-size: 
+    200px 300px,
+    200px 300px,
+    150px 250px,
+    150px 250px,
+    100% 100%,
+    120px 100%,
+    100% 100%,
+    800px 500px,
+    400px 300px,
+    300px 200px;
+  
+  background-position:
+    0% 100%,
+    100% 100%,
+    5% 95%,
+    95% 95%,
+    0 0,
+    0 0,
+    0 0,
+    0 0,
+    100% 100%,
+    50% 80%;
+  
+  /* Perspectiva ajustada - menos inclinación y más arriba */
+  transform: perspective(800px) rotateX(60deg) translateY(-50px);
+  transform-origin: center center;
+  
+  /* Efectos de profundidad y realismo */
+  box-shadow: 
+    inset 0 0 300px rgba(74, 44, 29, 0.3),
+    inset 0 -50px 100px rgba(54, 32, 19, 0.4),
+    0 20px 40px rgba(0, 0, 0, 0.6);
+  
+  /* Acabado satinado */
+  filter: contrast(1.15) brightness(0.9) saturate(1.1);
+}

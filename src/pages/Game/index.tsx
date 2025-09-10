@@ -87,8 +87,6 @@ export default function Game() {
       toggleTurn()
     })
 
-
-
     socket.on('game-end', (data: { tiles: Tile[][], playerDisconnected: boolean, winner: boolean, reason: string }) => {
       setPlayerSkippedTurn(false)
       if (data?.playerDisconnected) {
@@ -178,72 +176,129 @@ export default function Game() {
   return (
     <div className="h-full w-full overflow-hidden">
 
-      {/* Loading State - Mantiene diseño original pero responsive */}
+      {/* Loading State - Optimizado para móvil */}
       {loading && (
-        <div className="flex flex-col items-center gap-6 sm:gap-10 px-4 sm:px-0">
-          <p className="text-center text-white text-lg sm:text-xl">
+        <div className="flex flex-col items-center justify-center h-full gap-4 sm:gap-6 px-4">
+          <p className="text-center text-white text-base sm:text-lg md:text-xl">
             Waiting for another player...
           </p>
-          <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-6"
+          <div className="flex flex-col items-center gap-3 sm:gap-4 w-full max-w-sm"
             title={`${isCopied ? 'Copied!' : 'Copy'}`}>
-            <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl text-white font-bold break-all sm:break-normal">
+            <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl text-white font-bold break-all text-center">
               {gameId}
             </h1>
             <button
-              className="cursor-pointer text-white hover:text-gray-300 transition-colors"
+              className="cursor-pointer text-white hover:text-gray-300 transition-colors p-2"
               onClick={() => handleGameIdClick(gameId)}
             >
-              <FontAwesomeIcon icon={faCopy} size={"xl"} />
+              <FontAwesomeIcon icon={faCopy} size={"lg"} />
             </button>
           </div>
         </div>
       )}
 
-      {/* Game Board - Mantiene estructura EXACTA original */}
+      {/* Game Board - Diseño original para desktop, optimizado para móvil */}
       {shouldShowBoard && (
-        <div>
-          <div className="-mt-[2rem] xs:-mt-[2.5rem] sm:-mt-[4rem] md:-mt-[5rem] lg:-mt-[6rem] relative z-[51]">
+        <>
+          {/* Layout para móvil (sm y menor) */}
+          <div className="block sm:hidden h-full flex flex-col">
+            {/* Battle Modal */}
             {showBattleModal &&
-              <BattleConfirmModal
-                isOpen={showBattleModal}
-                onAccept={() => {
-                  console.log("Battle confirmed");
-                  setShowBattleModal(false);
-                }}
-                onReject={() => {
-                  console.log("Battle rejected");
-                  socket.emit("end-battle", { gameId: gameId, tiles: board });
-                  setShowBattleModal(false);
-                }}
-              />
-            }
-          </div>
-          <div>
-            <TurnIndicator />
-          </div>
-          <div className="scale-[0.7] xs:scale-[0.8] sm:scale-[0.5] md:scale-[0.6] lg:scale-[0.65] 
-                          -mt-4 xs:-mt-6 sm:-mt-12 md:-mt-14 lg:-mt-[13rem] min-w-fit">
-            <Board amIP1={amIP1} />
-          </div>
-          <div className="-mt-[6rem] xs:-mt-[7rem] sm:-mt-[10rem] md:-mt-[12rem] lg:-mt- z-[52]">
-            <SkipTurn />
-          </div>
-          <div className="-mt-[2rem] xs:-mt-[2.5rem] sm:-mt-[4rem] md:-mt-[5rem] lg:-mt-[6rem] relative z-50">
-            <Hand />
-          </div>
-        </div>
-      )}
+                <BattleConfirmModal
+                  isOpen={showBattleModal}
+                  onAccept={() => {
+                    console.log("Battle confirmed");
+                    setShowBattleModal(false);
+                  }}
+                  onReject={() => {
+                    console.log("Battle rejected");
+                    socket.emit("end-battle", { gameId: gameId, tiles: board });
+                    setShowBattleModal(false);
+                  }}
+                />
+              }
 
-      {/* Game Busy - Mantiene diseño original */}
-      {gameBusy && (
-        <h1 className="text-center px-4">Game is busy. Please try again later.</h1>
-      )}
+            {/* Turn Indicator */}
+            <div className="flex-shrink-0 py-1 z-[51]">
+              <TurnIndicator />
+            </div>
 
-      {/* Modales - Sin cambios */}
+            {/* Board Container optimizado para móvil */}
+            <div className="flex-1 flex items-center justify-center min-h-0">
+              <div className="w-full h-full flex items-center justify-center">
+                <div className="scale-[0.7] xs:scale-[0.95] origin-center">
+                  <Board amIP1={amIP1} />
+                </div>
+              </div>
+            </div>
+
+            {/* Skip Turn */}
+            <div className="flex-shrink-0 py-1 z-[52] flex justify-end pr-4">
+              <div className="scale-[0.4] xs:scale-[0.95] origin-right">
+                <SkipTurn />
+              </div>
+            </div>
+
+            {/* Hand - Escalado proporcional manteniendo diseño original */}
+            <div className="flex-shrink-0 pb-2 z-50">
+              <div className="scale-[0.45] xs:scale-[0.8] origin-top">
+                <Hand />
+              </div>
+            </div>
+          </div>
+
+          {/* Layout original para desktop (sm y mayor) */}
+          <div className="hidden sm:block">
+            <div className="-mt-[2rem] xs:-mt-[2.5rem] sm:-mt-[4rem] md:-mt-[5rem] lg:-mt-[6rem] relative z-[51]">
+              {showBattleModal &&
+                <BattleConfirmModal
+                  isOpen={showBattleModal}
+                  onAccept={() => {
+                    console.log("Battle confirmed");
+                    setShowBattleModal(false);
+                  }}
+                  onReject={() => {
+                    console.log("Battle rejected");
+                    socket.emit("end-battle", { gameId: gameId, tiles: board });
+                    setShowBattleModal(false);
+                  }}
+                />
+              }
+            </div>
+            <div>
+              <TurnIndicator />
+            </div>
+            <div className="scale-[0.7] xs:scale-[0.8] sm:scale-[0.5] md:scale-[0.6] lg:scale-[0.65] 
+                            -mt-4 xs:-mt-6 sm:-mt-12 md:-mt-14 lg:-mt-[13rem] min-w-fit">
+              <Board amIP1={amIP1} />
+            </div>
+            <div className="-mt-[6rem] xs:-mt-[7rem] sm:-mt-[10rem] md:-mt-[12rem] lg:-mt- z-[52]">
+              <SkipTurn />
+            </div>
+            <div className="-mt-[2rem] xs:-mt-[2.5rem] sm:-mt-[4rem] md:-mt-[5rem] lg:-mt-[6rem] relative z-50">
+              <Hand />
+            </div>
+          </div>
+        </>
+      )
+      }
+
+      {/* Game Busy - Centrado */}
+      {
+        gameBusy && (
+          <div className="flex items-center justify-center h-full">
+            <h1 className="text-center text-white px-4 text-lg">
+              Game is busy. Please try again later.
+            </h1>
+          </div>
+        )
+      }
+
+      {/* Modales - Sin cambios en funcionalidad */}
       {gameStartModal && !gameOver && <GameStartModal />}
       {turnModal && !gameOver && <TurnModal />}
       {battleModal && !gameOver && <BattleModal />}
       {gameOver && <EndGameModal amIP1={amIP1} winner={gameResult} />}
-    </div>
+    </div >
   )
 }

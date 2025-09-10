@@ -1,0 +1,183 @@
+/* Casillas de Magias - Grimorios Mágicos */
+
+/* Casilla de Magias del Rival - Grimorio Oscuro Maldito */
+.rival-magic-cell {
+    position: relative;
+    border-radius: 12px;
+    overflow: visible;
+    
+    /* Fondo de grimorio maldito con runas */
+    background: 
+        /* Runas brillantes en las esquinas */
+        radial-gradient(ellipse 25% 15% at 15% 15%, 
+            rgba(220, 20, 60, 0.9) 0%, 
+            rgba(139, 0, 0, 0.6) 40%,
+            transparent 70%),
+        
+        radial-gradient(ellipse 25% 15% at 85% 15%, 
+            rgba(255, 69, 0, 0.8) 0%, 
+            rgba(178, 34, 34, 0.5) 40%,
+            transparent 70%),
+        
+        radial-gradient(ellipse 25% 15% at 15% 85%, 
+            rgba(128, 0, 128, 0.7) 0%, 
+            rgba(75, 0, 130, 0.4) 40%,
+            transparent 70%),
+        
+        radial-gradient(ellipse 25% 15% at 85% 85%, 
+            rgba(255, 140, 0, 0.8) 0%, 
+            rgba(255, 69, 0, 0.5) 40%,
+            transparent 70%),
+        
+        /* Aura mágica central */
+        radial-gradient(ellipse 60% 40% at center center, 
+            rgba(220, 20, 60, 0.3) 0%, 
+            rgba(139, 0, 0, 0.2) 50%,
+            transparent 80%),
+        
+        /* Textura de cuero oscuro envejecido */
+        repeating-linear-gradient(
+            45deg,
+            #2c1810 0px,
+            #1a0e08 3px,
+            #2c1810 6px,
+            #3d2317 9px,
+            #2c1810 12px
+        ),
+        
+        /* Base de pergamino antiguo */
+        linear-gradient(135deg, 
+            #2c1810 0%, 
+            #1a0e08 25%, 
+            #3d2317 50%, 
+            #2c1810 75%, 
+            #4a2c1d 100%);
+    
+    /* Borde de hierro forjado con runas */
+    border: 3px solid;
+    border-image: linear-gradient(45deg, 
+        #8b0000, #dc143c, #ff4500, #8b0000, 
+        #800080, #ff8c00, #8b0000, #dc143c
+    ) 1;
+    
+    /* Sombras y efectos mágicos */
+    box-shadow: 
+        /* Sombra exterior */
+        0 8px 25px rgba(220, 20, 60, 0.4),
+        /* Brillo mágico maligno */
+        0 0 30px rgba(139, 0, 0, 0.6),
+        /* Profundidad del grimorio */
+        inset 0 -4px 8px rgba(0, 0, 0, 0.8),
+        inset 0 2px 4px rgba(255, 69, 0, 0.2),
+        /* Aura siniestra */
+        0 0 50px rgba(75, 0, 130, 0.3);
+    
+    transition: all 0.4s ease;
+    /* Z-index base para la casilla */
+    z-index: 1;
+}
+
+.rival-magic-cell:hover {
+    z-index: 50 !important; /* Aumentamos el z-index base cuando hay hover */
+    transform: translateY(-3px) scale(1.02);
+    
+    /* Intensificar el poder mágico al hacer hover */
+    box-shadow: 
+        0 12px 35px rgba(220, 20, 60, 0.6),
+        0 0 40px rgba(139, 0, 0, 0.8),
+        inset 0 -4px 8px rgba(0, 0, 0, 0.9),
+        inset 0 2px 4px rgba(255, 69, 0, 0.4),
+        0 0 60px rgba(75, 0, 130, 0.5),
+        0 0 80px rgba(220, 20, 60, 0.4);
+}
+
+/* Casilla de Magias del Jugador - Grimorio Sagrado Luminoso */
+.player-magic-cell {
+    position: relative;
+    border-radius: 12px;
+    overflow: visible;
+    
+    /* Fondo de grimorio sagrado con runas luminosas */
+    background: 
+        /* Runas brillantes en las esquinas */
+        radial-gradient(ellipse 25% 15% at 15% 15%, 
+            rgba(30, 144, 255, 0.9) 0%, 
+            rgba(70, 130, 180, 0.6) 40%,
+            transparent 70%),
+        
+        radial-gradient(ellipse 25% 15% at 85% 15%, 
+            rgba(65, 105, 225, 0.8) 0%, 
+            rgba(100, 149, 237, 0.5) 40%,
+            transparent 70%),
+        
+        radial-gradient(ellipse 25% 15% at 15% 85%, 
+            rgba(138, 43, 226, 0.7) 0%, 
+            rgba(147, 112, 219, 0.4) 40%,
+            transparent 70%),
+        
+        radial-gradient(ellipse 25% 15% at 85% 85%, 
+            rgba(0, 191, 255, 0.8) 0%, 
+            rgba(135, 206, 235, 0.5) 40%,
+            transparent 70%),
+        
+        /* Aura mágica central */
+        radial-gradient(ellipse 60% 40% at center center, 
+            rgba(30, 144, 255, 0.3) 0%, 
+            rgba(70, 130, 180, 0.2) 50%,
+            transparent 80%),
+        
+        /* Textura de cuero azul celestial */
+        repeating-linear-gradient(
+            45deg,
+            #1e3a5f 0px,
+            #0f1929 3px,
+            #1e3a5f 6px,
+            #2c4a6b 9px,
+            #1e3a5f 12px
+        ),
+        
+        /* Base de pergamino mágico */
+        linear-gradient(135deg, 
+            #1e3a5f 0%, 
+            #0f1929 25%, 
+            #2c4a6b 50%, 
+            #1e3a5f 75%, 
+            #3d5a87 100%);
+    
+    /* Borde de plata élfica con runas */
+    border: 3px solid;
+    border-image: linear-gradient(45deg, 
+        #1e90ff, #4169e1, #00bfff, #1e90ff, 
+        #8a2be2, #87ceeb, #1e90ff, #4169e1
+    ) 1;
+    
+    /* Sombras y efectos mágicos */
+    box-shadow: 
+        /* Sombra exterior */
+        0 8px 25px rgba(30, 144, 255, 0.4),
+        /* Brillo mágico benévolo */
+        0 0 30px rgba(70, 130, 180, 0.6),
+        /* Profundidad del grimorio */
+        inset 0 -4px 8px rgba(0, 0, 0, 0.8),
+        inset 0 2px 4px rgba(65, 105, 225, 0.2),
+        /* Aura celestial */
+        0 0 50px rgba(138, 43, 226, 0.3);
+    
+    transition: all 0.4s ease;
+    /* Z-index base para la casilla */
+    z-index: 1;
+}
+
+.player-magic-cell:hover {
+    z-index: 50 !important; /* Aumentamos el z-index base cuando hay hover */
+    transform: translateY(-3px) scale(1.02);
+    
+    /* Intensificar el poder mágico al hacer hover */
+    box-shadow: 
+        0 12px 35px rgba(30, 144, 255, 0.6),
+        0 0 40px rgba(70, 130, 180, 0.8),
+        inset 0 -4px 8px rgba(0, 0, 0, 0.9),
+        inset 0 2px 4px rgba(65, 105, 225, 0.4),
+        0 0 60px rgba(138, 43, 226, 0.5),
+        0 0 80px rgba(30, 144, 255, 0.4);
+}

@@ -1,0 +1,100 @@
+/* Casilla de defensa con estilo de castillo */
+
+.defense-cell-castle {
+  position: relative;
+  border-radius: 8px;
+
+  /* Marco de hierro forjado */
+  border: 4px solid;
+  border-image: linear-gradient(45deg, 
+    #2c1810, #4a3728, #3d2f24, #2c1810, 
+    #5a453a, #2c1810, #4a3728, #3d2f24
+  ) 1;
+
+  /* Fondo de muro de castillo */
+  background: 
+    /* Grietas y detalles */
+    radial-gradient(ellipse 20px 5px at 20% 30%, rgba(0,0,0,0.3) 0%, transparent 70%),
+    radial-gradient(ellipse 15px 3px at 70% 60%, rgba(0,0,0,0.2) 0%, transparent 70%),
+    radial-gradient(ellipse 10px 8px at 85% 20%, rgba(0,0,0,0.25) 0%, transparent 60%),
+    
+    /* Patrón de bloques de piedra */
+    repeating-linear-gradient(
+      0deg,
+      #8b7d6b 0px,
+      #8b7d6b 25px,
+      #756b5a 25px,
+      #756b5a 27px
+    ),
+    repeating-linear-gradient(
+      90deg,
+      #8b7d6b 0px,
+      #8b7d6b 40px,
+      #756b5a 40px,
+      #756b5a 42px
+    ),
+    
+    /* Base de piedra */
+    linear-gradient(135deg, 
+      #a0927f 0%, 
+      #8b7d6b 25%, 
+      #756b5a 50%, 
+      #8b7d6b 75%, 
+      #9a8c79 100%
+    );
+
+  /* Sombras y profundidad */
+  box-shadow: 
+    0 0 0 2px #2c1810,
+    0 0 0 4px #4a3728,
+    inset 0 2px 4px rgba(0,0,0,0.3),
+    inset 0 -2px 4px rgba(255,255,255,0.1),
+    0 4px 12px rgba(0,0,0,0.4);
+
+  transition: all 0.3s ease;
+}
+
+.defense-cell-castle:hover {
+  z-index: 9999 !important;
+  transform: translateY(-2px);
+  box-shadow: 
+    0 0 0 2px #2c1810,
+    0 0 0 4px #4a3728,
+    inset 0 2px 4px rgba(0,0,0,0.3),
+    inset 0 -2px 4px rgba(255,255,255,0.2),
+    0 8px 20px rgba(0,0,0,0.5),
+    0 0 15px rgba(218, 165, 32, 0.3);
+}
+
+.defense-cell-castle .hover-preview-container {
+  /* Crear un contexto que permita salirse */
+  position: static;
+}
+
+.defense-cell-castle .hover-preview-container .hover-preview {
+  /* Posición absoluta respecto al documento, no a la casilla */
+  position: fixed !important;
+  z-index: 10000 !important;
+}
+
+/* Icono de escudo */
+.defense-shield-icon {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  width: 32px;
+  height: 32px;
+  background: radial-gradient(ellipse at center, #daa520 30%, #b8860b 70%);
+  border: 1px solid #8b7d6b;
+  border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+  z-index: 10;
+}
+
+.defense-shield-icon::before {
+  content: '🛡️';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 20px;
+}

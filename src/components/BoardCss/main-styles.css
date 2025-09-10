@@ -1,0 +1,21 @@
+/* Archivo principal que importa todos los estilos del juego */
+
+/* Estilos base y fondo */
+@import './table-background.css';
+@import './base-cell.css';
+@import './perspective-3d.css';
+
+/* Casillas especiales */
+@import './defense-castle.css';
+@import './discard-cauldron.css';
+
+/* Sistema de hadas capturadas */
+@import './captured-fairies.css';
+@import './fairy-variants.css';
+
+/* Sistema de magia y grimorios */
+@import './magic-grimoires.css';
+@import './magic-elements.css';
+
+/* Sistema de hover y z-index */
+@import './hover-previews.css';

@@ -1,0 +1,148 @@
+/* Variantes de la casilla de hadas capturadas */
+
+/* Variante para el rival (colores más oscuros y siniestros) */
+.rival-captured-fairies-cell {
+  background: 
+    radial-gradient(ellipse 70% 50% at center 40%, 
+      rgba(128, 0, 128, 0.4) 0%, 
+      rgba(75, 0, 130, 0.3) 40%,
+      transparent 70%),
+    
+    radial-gradient(ellipse 30% 20% at 20% 20%, 
+      rgba(255, 255, 255, 0.6) 0%, 
+      rgba(148, 0, 211, 0.4) 30%,
+      transparent 60%),
+    
+    radial-gradient(ellipse 25% 15% at 80% 70%, 
+      rgba(139, 0, 139, 0.5) 0%, 
+      rgba(128, 0, 128, 0.3) 40%,
+      transparent 60%),
+    
+    linear-gradient(135deg, 
+      rgba(25, 25, 112, 0.8) 0%, 
+      rgba(75, 0, 130, 0.7) 25%, 
+      rgba(128, 0, 128, 0.6) 50%, 
+      rgba(75, 0, 130, 0.7) 75%, 
+      rgba(25, 25, 112, 0.8) 100%);
+  
+  /* Sin borde - solo efectos internos */
+  border: none;
+  
+  box-shadow: 
+    0 8px 25px rgba(128, 0, 128, 0.5),
+    0 0 30px rgba(75, 0, 130, 0.4),
+    inset 0 2px 8px rgba(255, 255, 255, 0.3),
+    inset 0 -2px 8px rgba(128, 0, 128, 0.4);
+}
+
+.rival-captured-fairies-cell .captured-fairies-text {
+  color: #dda0dd;
+  text-shadow: 
+    0 0 8px rgba(128, 0, 128, 0.8),
+    0 1px 2px rgba(255, 255, 255, 0.6);
+}
+
+.rival-captured-fairies-cell .fairy-capture-icon {
+  background: radial-gradient(ellipse at center, 
+    rgba(75, 0, 130, 0.9) 30%, 
+    rgba(128, 0, 128, 0.8) 70%);
+  border: 2px solid rgba(148, 0, 211, 0.8);
+}
+
+/* Variante para el jugador (colores más brillantes y amigables) */
+.player-captured-fairies-cell {
+  background: 
+    /* Brillo mágico interior - más brillante y azulado */
+    radial-gradient(ellipse 70% 50% at center 40%, 
+      rgba(135, 206, 235, 0.7) 0%, 
+      rgba(173, 216, 230, 0.5) 40%,
+      transparent 70%),
+    
+    /* Destellos de luz mágica azul-dorada */
+    radial-gradient(ellipse 30% 20% at 20% 20%, 
+      rgba(255, 255, 255, 0.9) 0%, 
+      rgba(30, 144, 255, 0.5) 30%,
+      transparent 60%),
+    
+    radial-gradient(ellipse 25% 15% at 80% 70%, 
+      rgba(176, 224, 230, 0.8) 0%, 
+      rgba(135, 206, 235, 0.4) 40%,
+      transparent 60%),
+    
+    /* Polvo de hadas flotando azul */
+    radial-gradient(ellipse 15% 10% at 60% 30%, 
+      rgba(30, 144, 255, 0.6) 0%, 
+      transparent 50%),
+    
+    radial-gradient(ellipse 12% 8% at 30% 80%, 
+      rgba(173, 216, 230, 0.5) 0%, 
+      transparent 50%),
+    
+    /* Base de cristal mágico azul */
+    linear-gradient(135deg, 
+      rgba(240, 248, 255, 0.9) 0%, 
+      rgba(173, 216, 230, 0.8) 25%, 
+      rgba(135, 206, 235, 0.7) 50%, 
+      rgba(173, 216, 230, 0.8) 75%, 
+      rgba(240, 248, 255, 0.9) 100%);
+  
+  /* Sin borde - solo efectos internos */
+  border: none;
+  
+  /* Sombras y efectos mágicos azules */
+  box-shadow: 
+    0 8px 25px rgba(135, 206, 235, 0.5),
+    0 0 30px rgba(173, 216, 230, 0.6),
+    inset 0 2px 8px rgba(255, 255, 255, 0.9),
+    inset 0 -2px 8px rgba(135, 206, 235, 0.4),
+    0 0 50px rgba(30, 144, 255, 0.3);
+}
+
+.player-captured-fairies-cell:hover {
+  box-shadow: 
+    0 12px 35px rgba(135, 206, 235, 0.7),
+    0 0 40px rgba(173, 216, 230, 0.8),
+    inset 0 2px 8px rgba(255, 255, 255, 1),
+    inset 0 -2px 8px rgba(135, 206, 235, 0.5),
+    0 0 60px rgba(30, 144, 255, 0.5),
+    0 0 80px rgba(0, 191, 255, 0.4);
+}
+
+.player-captured-fairies-cell .captured-fairies-text {
+  color: #1e90ff;
+  text-shadow: 
+    0 0 8px rgba(173, 216, 230, 0.9),
+    0 1px 2px rgba(255, 255, 255, 0.9);
+}
+
+.player-captured-fairies-cell .fairy-capture-icon {
+  background: radial-gradient(ellipse at center, 
+    rgba(173, 216, 230, 0.9) 30%, 
+    rgba(135, 206, 235, 0.8) 70%);
+  border: 2px solid rgba(30, 144, 255, 0.8);
+}
+
+.player-captured-fairies-cell .fairy-particles::before {
+  background: radial-gradient(circle, #1e90ff 0%, #87ceeb 100%);
+  box-shadow: 0 0 10px rgba(30, 144, 255, 0.8);
+}
+
+.player-captured-fairies-cell .fairy-particles::after {
+  background: radial-gradient(circle, #87ceeb 0%, #b0e0e6 100%);
+  box-shadow: 0 0 10px rgba(135, 206, 235, 0.8);
+}
+
+/* Evitar efectos borrosos en todas las variantes */
+.captured-fairies-cell,
+.rival-captured-fairies-cell,
+.player-captured-fairies-cell {
+  backdrop-filter: none !important;
+  filter: none !important;
+}
+
+.captured-fairies-cell:hover,
+.rival-captured-fairies-cell:hover,
+.player-captured-fairies-cell:hover {
+  backdrop-filter: none !important;
+  filter: none !important;
+}

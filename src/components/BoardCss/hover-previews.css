@@ -1,0 +1,174 @@
+/* Sistema de hover previews y z-index para las casillas mágicas */
+
+/* REGLAS GENERALES PARA HOVER PREVIEW */
+
+/* Contenedor de cartas con z-index controlado */
+.rival-magic-cell .relative,
+.player-magic-cell .relative {
+    z-index: 20; /* Las cartas base tienen z-index 20 */
+}
+
+/* Grupo de hover individual para cada carta */
+.rival-magic-cell .group,
+.player-magic-cell .group {
+    position: relative;
+    z-index: 25; /* Cada carta individual tiene z-index 25 */
+}
+
+/* Trigger de hover */
+.rival-magic-cell .hover-trigger,
+.player-magic-cell .hover-trigger {
+    position: absolute;
+    z-index: 30; /* El trigger tiene z-index 30 */
+}
+
+/* HOVER PREVIEW - EL MÁS IMPORTANTE */
+.rival-magic-cell .group-hover\:block,
+.player-magic-cell .group-hover\:block {
+    z-index: 10000 !important; /* Máximo z-index para el preview */
+    position: fixed !important; /* Fixed para que esté por encima de todo */
+    pointer-events: none; /* Evitamos que interfiera con otros elementos */
+}
+
+/* Alternativa si fixed no funciona bien */
+.rival-magic-cell .hover-preview,
+.player-magic-cell .hover-preview {
+    position: absolute;
+    z-index: 10000 !important;
+    pointer-events: none;
+    transform: translateZ(0); /* Forzamos un nuevo contexto de apilamiento */
+}
+
+/* Estilos para el preview hover */
+.rival-magic-cell .group:hover .group-hover\:block,
+.player-magic-cell .group:hover .group-hover\:block {
+    display: block !important;
+    z-index: 10000 !important;
+    position: absolute !important;
+    top: -10px !important;
+    left: 90px !important;
+    pointer-events: none !important;
+    transform: translateZ(0) !important; /* Nuevo contexto de apilamiento */
+}
+
+/* Asegurar que el contenedor del preview tenga el z-index más alto */
+.rival-magic-cell .group:hover .group-hover\:block > div,
+.player-magic-cell .group:hover .group-hover\:block > div {
+    z-index: 10001 !important;
+    position: relative;
+    background: white;
+    border: 2px solid #333;
+    border-radius: 8px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
+    transform: translateZ(0);
+}
+
+/* Efectos de hover mejorados para las casillas mágicas */
+.rival-magic-cell:hover .magical-energy,
+.player-magic-cell:hover .player-magical-energy {
+    animation-duration: 1s;
+    opacity: 1;
+}
+
+.rival-magic-cell:hover .dark-particles,
+.player-magic-cell:hover .player-light-particles {
+    animation-duration: 2s;
+}
+
+.rival-magic-cell:hover .magic-runes::before,
+.rival-magic-cell:hover .magic-runes::after {
+    animation-duration: 3s;
+    color: #ff4500;
+    text-shadow: 0 0 15px rgba(255, 69, 0, 1);
+}
+
+.player-magic-cell:hover .player-magic-runes::before,
+.player-magic-cell:hover .player-magic-runes::after {
+    animation-duration: 3s;
+    color: #00bfff;
+    text-shadow: 0 0 15px rgba(0, 191, 255, 1);
+}
+
+/* Preview backgrounds específicos para cada tipo de casilla */
+
+/* Preview para casillas de descarte */
+.discard-cell-cauldron .hover-preview-container .hover-preview {
+    background: linear-gradient(135deg, 
+        rgba(138, 43, 226, 0.95) 0%, 
+        rgba(75, 0, 130, 0.95) 100%) !important;
+    border: 2px solid #dda0dd !important;
+    border-radius: 12px !important;
+    box-shadow: 
+        0 10px 30px rgba(0, 0, 0, 0.8),
+        0 0 20px rgba(138, 43, 226, 0.6) !important;
+}
+
+/* Preview para casillas de hadas capturadas */
+.captured-fairies-cell .hover-preview-container .hover-preview {
+    background: linear-gradient(135deg, 
+        rgba(255, 192, 203, 0.95) 0%, 
+        rgba(221, 160, 221, 0.95) 50%,
+        rgba(255, 182, 193, 0.95) 100%) !important;
+    border: 3px solid rgba(255, 215, 0, 0.8) !important;
+    border-radius: 16px !important;
+    box-shadow: 
+        0 15px 40px rgba(0, 0, 0, 0.8),
+        0 0 30px rgba(255, 192, 203, 0.8),
+        0 0 50px rgba(255, 215, 0, 0.4) !important;
+    backdrop-filter: blur(5px) !important;
+}
+
+/* Preview para casillas de defensa */
+.defense-cell-castle .hover-preview-container .hover-preview {
+    background: linear-gradient(135deg, 
+        rgba(139, 125, 107, 0.95) 0%, 
+        rgba(117, 107, 90, 0.95) 100%) !important;
+    border: 3px solid rgba(218, 165, 32, 0.8) !important;
+    border-radius: 8px !important;
+    box-shadow: 
+        0 12px 30px rgba(0, 0, 0, 0.8),
+        0 0 20px rgba(218, 165, 32, 0.6) !important;
+}
+
+/* Asegurar que todos los previews estén por encima */
+.hover-preview-container .hover-preview {
+    position: fixed !important;
+    z-index: 10000 !important;
+    pointer-events: none !important;
+    transform: translateZ(0) !important;
+}
+
+/* Fallback para casos específicos */
+.captured-fairies-cell .hover-preview-container,
+.discard-cell-cauldron .hover-preview-container,
+.defense-cell-castle .hover-preview-container {
+    position: static !important;
+}
+
+/* Z-index específicos para elementos que deben estar siempre visibles */
+.fairy-particles,
+.discard-magical-smoke,
+.magic-runes,
+.magical-energy,
+.player-magical-energy,
+.dark-particles,
+.player-light-particles {
+    z-index: 5 !important;
+}
+
+.grimoire-symbol,
+.player-grimoire-symbol,
+.fairy-capture-icon,
+.discard-magic-icon,
+.defense-shield-icon,
+.magic-power-icon,
+.player-magic-power-icon {
+    z-index: 10 !important;
+}
+
+.magic-text,
+.player-magic-text,
+.captured-fairies-text,
+.discard-text {
+    z-index: 15 !important;
+}

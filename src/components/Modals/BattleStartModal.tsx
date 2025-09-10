@@ -30,7 +30,7 @@ const BattleConfirmModal: React.FC<BattleConfirmModalProps> = ({
     if (!isOpen) return null;
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
             <div className="relative max-w-lg w-full">
                 {/* Rodillo Superior */}
                 <div className="absolute -top-3 left-6 right-6 h-4 bg-gradient-to-r from-amber-800 via-yellow-700 to-amber-800 rounded-full shadow-lg z-20 border-2 border-amber-900">

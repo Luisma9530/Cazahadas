@@ -76,7 +76,7 @@ const ScoreboardModal: React.FC<ScoreboardModalProps> = ({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4">
+    <div className="fixed inset-0 z-[100] bg-black/80 flex items-center justify-center p-4">
       <div className="relative max-w-2xl w-full max-h-[90vh]">
 
         {/* Efecto de escanlines retro */}
