@@ -184,6 +184,12 @@ io.on("connection", (socket) => {
     });
   });
 
+  socket.on("request-draw", (data: { gameId: string, amIP1: boolean }) => {
+    io.to(currentGames[data.gameId].playerIds).emit("request-draw-player", {
+      amIP1: data.amIP1
+    });
+  });
+
   socket.on("start-battle", (data: { gameId: string, amIP1: boolean }) => {
     io.to(currentGames[data.gameId].playerIds).emit("start-battle-player", {
       amIP1: data.amIP1
@@ -210,6 +216,14 @@ io.on("connection", (socket) => {
     io.to(game.playerIds).emit("game-end", {
       reason: data.reason,
       winner: data.winner,
+    });
+  });
+  socket.on("draw-game", (data) => {
+    const game = currentGames[data.gameId];
+    if (!game) return;
+
+    io.to(game.playerIds).emit('game-end', {
+      reason: 'draw-request'
     });
   });
 

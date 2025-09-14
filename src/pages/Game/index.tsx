@@ -21,13 +21,15 @@ import useBackgroundStore from "../../store/BackgroundStore";
 import homeBackground from '../../assets/images/homeBackground.png';
 import { CardUnity } from "../../@types/Card";
 import BattleConfirmModal from "../../components/Modals/BattleStartModal.tsx";
+import DrawConfirmModal from "../../components/Modals/drawConfirmModal.tsx";
+import RequestDraw from "../../components/drawGame.tsx";
 
 export default function Game() {
   const [loading, setLoading] = useState(true)
   const [gameBusy, setGameBusy] = useState(false)
   const [isCopied, setIsCopied] = useState(false);
 
-  const [isMyTurn, toggleTurn, setPlayerSkippedTurn, setIsBattle, isBattle, setIsMyFirstTurnBattle, showBattleModal, setShowBattleModal] = useTurnStore((state) => [state.isMyTurn, state.toggleTurn, state.setPlayerSkippedTurn, state.setIsBattle, state.isBattle, state.setIsMyFirstTurnBattle, state.showBattleModal, state.setShowBattleModal]);
+  const [isMyTurn, toggleTurn, setPlayerSkippedTurn, setIsBattle, isBattle, setIsMyFirstTurnBattle, showBattleModal, setShowBattleModal, showDrawModal, setShowDrawModal] = useTurnStore((state) => [state.isMyTurn, state.toggleTurn, state.setPlayerSkippedTurn, state.setIsBattle, state.isBattle, state.setIsMyFirstTurnBattle, state.showBattleModal, state.setShowBattleModal, state.showDrawModal, state.setShowDrawModal]);
   const [setBoard, board] = useBoardStore((state) => [state.setBoard, state.board])
   const [amIP1, setAmIP1, gameOver, setGameOver, setPlayerOneName, setPlayerTwoName, setPlayerDisconnected, setGameResult, gameResult] = useGameStore((state) => [state.amIP1, state.setAmIP1, state.gameOver, state.setGameOver, state.setPlayerOneName, state.setPlayerTwoName, state.setPlayerDisconnected, state.setGameResult, state.gameResult])
   const [setPoints] = usePointStore((state) => [state.setPoints])
@@ -89,7 +91,7 @@ export default function Game() {
 
     socket.on('game-end', (data: { tiles: Tile[][], playerDisconnected: boolean, winner: boolean, reason: string }) => {
       setPlayerSkippedTurn(false)
-      if (data?.playerDisconnected) {
+      if (data?.playerDisconnected && !gameOver) {
         setPlayerDisconnected(true)
         if (amIP1) {
           setGameResult(Result.PLAYER1WIN)
@@ -128,6 +130,9 @@ export default function Game() {
         } else {
           setGameResult(Result.DRAW)
         }
+      }
+      if (data?.reason === 'draw-request') {
+        setGameResult(Result.DRAW)
       }
       setGameOver(true)
     })
@@ -174,7 +179,7 @@ export default function Game() {
   const shouldShowBoard = !loading && !gameBusy
 
   return (
-    <div className="h-full w-full overflow-hidden">
+    <div className={`h-full w-full overflow-hidden ${gameOver ? 'pointer-events-none' : ''}`}>
 
       {/* Loading State - Optimizado para móvil */}
       {loading && (
@@ -218,6 +223,21 @@ export default function Game() {
               />
             }
 
+            {showDrawModal &&
+              <DrawConfirmModal
+                isOpen={showDrawModal}
+                onAccept={() => {
+                  socket.emit('draw-game', { gameId: gameId });
+                  setShowDrawModal(false);
+                }}
+                onReject={() => {
+
+                  setShowDrawModal(false);
+                }}
+              />
+            }
+
+
             {/* Turn Indicator */}
             <div className="flex-shrink-0 py-1 z-[51]">
               <TurnIndicator />
@@ -236,6 +256,12 @@ export default function Game() {
             <div className="flex-shrink-0 py-1 z-[52] flex justify-end pr-4">
               <div className="scale-[0.4] xs:scale-[0.95] origin-right">
                 <SkipTurn />
+              </div>
+            </div>
+
+            <div className="flex-shrink-0 py-1 z-[52] flex justify-end pr-4">
+              <div className="scale-[0.4] xs:scale-[0.95] origin-right">
+                <RequestDraw />
               </div>
             </div>
 
@@ -264,10 +290,24 @@ export default function Game() {
                   }}
                 />
               }
+              {showDrawModal &&
+                <DrawConfirmModal
+                  isOpen={showDrawModal}
+                  onAccept={() => {
+                    socket.emit('draw-game', { gameId: gameId });
+                    setShowDrawModal(false);
+                  }}
+                  onReject={() => {
+                    setShowDrawModal(false);
+                  }}
+                />
+              }
             </div>
+
             <div>
               <TurnIndicator />
             </div>
+
             <div className="scale-[0.7] xs:scale-[0.8] sm:scale-[0.5] md:scale-[0.6] lg:scale-[0.65] 
                             -mt-4 xs:-mt-6 sm:-mt-12 md:-mt-14 lg:-mt-[13rem] min-w-fit">
               <Board amIP1={amIP1} />
@@ -277,6 +317,9 @@ export default function Game() {
             </div>
             <div className="-mt-[2rem] xs:-mt-[2.5rem] sm:-mt-[4rem] md:-mt-[5rem] lg:-mt-[6rem] relative z-50">
               <Hand />
+            </div>
+            <div className="md:-mt-[15rem]  z-[52]">
+              <RequestDraw />
             </div>
           </div>
         </>

@@ -4,6 +4,7 @@ export enum Result {
   PLAYER1WIN = "player1win",
   PLAYER2WIN = "player2win",
   DRAW = "draw",
+  NONE = "none",
 }
 
 type GameStore = {
@@ -27,7 +28,7 @@ export const useGameStore = create<GameStore>((set) => ({
   setAmIP1: (value) => set({ amIP1: value }),
   gameOver: false,
   setGameOver: (value) => set({ gameOver: value }),
-  gameResult: Result.DRAW,
+  gameResult: Result.NONE,
   setGameResult: (value) => set({ gameResult: value }),
   playerOneName: "",
   setPlayerOneName: (value) => set({ playerOneName: value }),
@@ -39,7 +40,7 @@ export const useGameStore = create<GameStore>((set) => ({
     set({
       gameOver: false,
       amIP1: false,
-      gameResult: Result.DRAW,
+      gameResult: Result.NONE,
       playerOneName: "",
       playerTwoName: "",
       playerDisconnected: false,

@@ -19,7 +19,7 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
     state.selectedCards,
     state.resetSelectedCards,
   ]);
-  const [isMyTurn, isMyFirstTurn, isBattle, setIsBattle, setIsMyFirstTurn, isMyFirstTurnBattle, setIsMyFirstTurnBattle, showBattleModal, setShowBattleModal] = useTurnStore((state) => [state.isMyTurn, state.isMyFirstTurn, state.isBattle, state.setIsBattle, state.setIsMyFirstTurn, state.isMyFirstTurnBattle, state.setIsMyFirstTurnBattle, state.showBattleModal, state.setShowBattleModal]);
+  const [isMyTurn, isMyFirstTurn, isBattle, setIsBattle, setIsMyFirstTurn, isMyFirstTurnBattle, setIsMyFirstTurnBattle, showBattleModal, setShowBattleModal, setShowDrawModal] = useTurnStore((state) => [state.isMyTurn, state.isMyFirstTurn, state.isBattle, state.setIsBattle, state.setIsMyFirstTurn, state.isMyFirstTurnBattle, state.setIsMyFirstTurnBattle, state.showBattleModal, state.setShowBattleModal, state.setShowDrawModal]);
 
   const [placeCard, drawCard] = useNeoHandStore((state) => [state.placeCard, state.drawCard]);
 
@@ -87,6 +87,8 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
     setIsMyFirstTurnBattle(false);
   });
 
+
+
   async function sendCapturedFairies() {
     try {
       const response = await fetch(`${API_URL}/add-score`, {
@@ -115,6 +117,7 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
   function handleCellClick(position: Tile, rowIndex: number, colIndex: number) {
     console.log(tiles)
     console.log("Is battle:", isBattle);
+    console.log("Im player 1:", amIP1);
     console.log("Is first turn battle:", isMyFirstTurnBattle);
     if (!selectedCard || !canAddCardToPosition(selectedCard, position, rowIndex)) return;
     // Lógica para colocar la carta. Se asume que mapPawns transforma la celda y actualiza el estado.
@@ -186,10 +189,19 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
       resetVariableX();
     };
 
+    const handleDrawRequest = (data: { amIP1: boolean }) => {
+      setShowDrawModal(false)
+      if (data.amIP1 != null && amIP1 != null && data.amIP1 !== amIP1) {
+        setShowDrawModal(true)
+      }
+    };
+
     socket.on('update-tiles', handleUpdateTiles);
+    socket.on("request-draw-player", handleDrawRequest);
 
     return () => {
       socket.off('update-tiles', handleUpdateTiles);
+      socket.off("request-draw-player", handleDrawRequest);
     };
   }, []);
 
@@ -567,7 +579,7 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
             </div>
 
             <div className="player-cell-3d game-cell captured-fairies-cell player-captured-fairies-cell flex items-center justify-center hover-container"
-            style={{ height: '25vw', width: '20vw' }}>
+              style={{ height: '25vw', width: '20vw' }}>
               <div className="fairy-particles"></div>
               <div className="fairy-capture-icon"></div>
               {tiles[2][1].type === 'capturedFairies' ? (

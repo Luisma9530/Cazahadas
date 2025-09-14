@@ -74,6 +74,7 @@ const useNeoHandStore = create<HandStore>((set) => ({
       deck: [...deckCards],
       opponentCards: [] as CardUnity[],
       opponentDeck: [...deckCards],
+      discardPile: [] as CardUnity[],
     });
   },
 }));

@@ -86,35 +86,35 @@ export default function Card({ card, placed = false, amIP1 }: CardProps) {
             <div className="absolute top-0 left-0 right-0 h-1/3 bg-gradient-to-b from-white/20 to-transparent"></div>
 
             {/* Decoración superior */}
-            <div className="absolute top-1 left-0 right-0 flex justify-center"> {/* Reducido el padding */}
+            <div className="absolute top-1 left-0 right-0 flex justify-center">
               <div className="flex space-x-1">
-                <div className={`w-1.5 h-1.5 rounded-full ${config.decorationColor.replace('text-', 'bg-')} animate-pulse`}></div> {/* Puntos más pequeños */}
+                <div className={`w-1.5 h-1.5 rounded-full ${config.decorationColor.replace('text-', 'bg-')} animate-pulse`}></div>
                 <div className={`w-1.5 h-1.5 rounded-full ${config.decorationColor.replace('text-', 'bg-')} animate-pulse`} style={{ animationDelay: '0.1s' }}></div>
                 <div className={`w-1.5 h-1.5 rounded-full ${config.decorationColor.replace('text-', 'bg-')} animate-pulse`} style={{ animationDelay: '0.2s' }}></div>
               </div>
             </div>
 
-            <div className="flex flex-col items-center justify-center h-full p-2 relative z-10"> {/* Reducido padding */}
+            <div className="flex flex-col items-center justify-center h-full p-2 relative z-10">
               {/* Ícono principal */}
-              <div className={`mb-2 p-2 rounded-full ${config.iconBg} backdrop-blur-sm border border-white/30`}> {/* Reducido tamaño */}
-                <div className={`w-6 h-6 ${config.accentColor} flex items-center justify-center text-lg font-bold`}> {/* Ícono más pequeño */}
+              <div className={`mb-2 p-2 rounded-full ${config.iconBg} backdrop-blur-sm border border-white/30`}>
+                <div className={`w-6 h-6 ${config.accentColor} flex items-center justify-center text-lg font-bold`}>
                   ⭐
                 </div>
               </div>
 
               {/* Texto de la carta */}
-              <div className={`text-sm font-semibold ${config.accentColor} text-center px-1`}> {/* Reducido tamaño de fuente */}
+              <div className={`text-sm font-semibold ${config.accentColor} text-center px-1`}>
                 {renderCardText(card.text)}
               </div>
             </div>
 
             {/* Decoración inferior */}
-            <div className="absolute bottom-1 left-0 right-0 flex justify-center"> {/* Reducido espacio */}
-              <div className={`w-12 h-0.5 bg-gradient-to-r from-transparent via-${config.decorationColor.replace('text-', '').replace('-300', '-400')} to-transparent rounded-full`}></div> {/* Línea más pequeña */}
+            <div className="absolute bottom-1 left-0 right-0 flex justify-center">
+              <div className={`w-12 h-0.5 bg-gradient-to-r from-transparent via-${config.decorationColor.replace('text-', '').replace('-300', '-400')} to-transparent rounded-full`}></div>
             </div>
 
             {/* Borde interior */}
-            <div className="absolute inset-0.5 rounded-lg border border-white/20 pointer-events-none"></div> {/* Borde más fino */}
+            <div className="absolute inset-0.5 rounded-lg border border-white/20 pointer-events-none"></div>
           </div>
         );
 
@@ -126,23 +126,23 @@ export default function Card({ card, placed = false, amIP1 }: CardProps) {
 
             {/* Patrón mágico de fondo - Reducido */}
             <div className="absolute inset-0 opacity-10">
-              <div className="absolute top-2 left-2 w-3 h-3 bg-white rounded-full animate-pulse"></div> {/* Elementos más pequeños */}
+              <div className="absolute top-2 left-2 w-3 h-3 bg-white rounded-full animate-pulse"></div> 
               <div className="absolute top-4 right-3 w-2 h-2 bg-white rounded-full animate-pulse" style={{ animationDelay: '0.5s' }}></div>
               <div className="absolute bottom-3 left-3 w-2 h-2 bg-white rounded-full animate-pulse" style={{ animationDelay: '1s' }}></div>
               <div className="absolute bottom-2 right-2 w-1.5 h-1.5 bg-white rounded-full animate-pulse" style={{ animationDelay: '1.5s' }}></div>
             </div>
 
-            <div className="flex flex-col items-center justify-center h-full p-2 relative z-10"> {/* Reducido padding */}
+            <div className="flex flex-col items-center justify-center h-full p-2 relative z-10">
               {/* Ícono principal con efecto mágico */}
-              <div className={`mb-2 p-2 rounded-full ${config.iconBg} backdrop-blur-sm border border-white/30 relative`}> {/* Reducido tamaño */}
-                <div className={`w-6 h-6 ${config.accentColor} flex items-center justify-center text-lg font-bold`}> {/* Ícono más pequeño */}
+              <div className={`mb-2 p-2 rounded-full ${config.iconBg} backdrop-blur-sm border border-white/30 relative`}> 
+                <div className={`w-6 h-6 ${config.accentColor} flex items-center justify-center text-lg font-bold`}> 
                   ⚡
                 </div>
-                <div className="absolute -inset-0.5 bg-gradient-to-r from-emerald-400 to-cyan-400 rounded-full opacity-20 animate-pulse"></div> {/* Efecto más sutil */}
+                <div className="absolute -inset-0.5 bg-gradient-to-r from-emerald-400 to-cyan-400 rounded-full opacity-20 animate-pulse"></div>
               </div>
 
               {/* Texto de la carta */}
-              <div className={`text-sm font-semibold ${config.accentColor} text-center px-1`}> {/* Reducido tamaño de fuente */}
+              <div className={`text-sm font-semibold ${config.accentColor} text-center px-1`}>
                 {renderCardText(card.text)}
               </div>
             </div>
@@ -151,7 +151,7 @@ export default function Card({ card, placed = false, amIP1 }: CardProps) {
             <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent transform -skew-x-12 translate-x-full animate-pulse"></div>
 
             {/* Borde interior */}
-            <div className="absolute inset-0.5 rounded-lg border border-white/20 pointer-events-none"></div> {/* Borde más fino */}
+            <div className="absolute inset-0.5 rounded-lg border border-white/20 pointer-events-none"></div>
           </div>
         );
 
@@ -165,16 +165,16 @@ export default function Card({ card, placed = false, amIP1 }: CardProps) {
             <div className="absolute inset-1 border border-white/20 rounded-lg"></div>
             <div className="absolute inset-2 border border-white/10 rounded-lg"></div>
 
-            <div className="flex flex-col items-center justify-center h-full p-2 relative z-10"> {/* Reducido padding */}
+            <div className="flex flex-col items-center justify-center h-full p-2 relative z-10">
               {/* Ícono principal */}
-              <div className={`mb-2 p-2 rounded-full ${config.iconBg} backdrop-blur-sm border border-white/30`}> {/* Reducido tamaño */}
-                <div className={`w-6 h-6 ${config.accentColor} flex items-center justify-center text-lg font-bold`}> {/* Ícono más pequeño */}
+              <div className={`mb-2 p-2 rounded-full ${config.iconBg} backdrop-blur-sm border border-white/30`}>
+                <div className={`w-6 h-6 ${config.accentColor} flex items-center justify-center text-lg font-bold`}>
                   🛡️
                 </div>
               </div>
 
               {/* Texto de la carta */}
-              <div className={`text-sm font-semibold ${config.accentColor} text-center px-1`}> {/* Reducido tamaño de fuente */}
+              <div className={`text-sm font-semibold ${config.accentColor} text-center px-1`}>
                 {renderCardText(card.text)}
               </div>
             </div>
@@ -186,13 +186,13 @@ export default function Card({ card, placed = false, amIP1 }: CardProps) {
             <div className={`absolute bottom-1 right-1 w-4 h-4 border-r-2 border-b-2 border-${config.decorationColor.replace('text-', '').replace('-300', '-300')}/50`}></div>
 
             {/* Borde interior */}
-            <div className="absolute inset-0.5 rounded-lg border border-white/20 pointer-events-none"></div> {/* Borde más fino */}
+            <div className="absolute inset-0.5 rounded-lg border border-white/20 pointer-events-none"></div> 
           </div>
         );
 
       default:
         return (
-          <div className="flex items-center justify-center rounded-b-md font-bold w-full bg-black border-t-2 border-t-yellow-400 text-yellow-400 text-lg px-2 py-1"> {/* Reducido tamaño de fuente y padding */}
+          <div className="flex items-center justify-center rounded-b-md font-bold w-full bg-black border-t-2 border-t-yellow-400 text-yellow-400 text-lg px-2 py-1">
             {(card as CardInfo).name}
           </div>
         );

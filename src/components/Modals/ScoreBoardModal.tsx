@@ -156,7 +156,7 @@ const ScoreboardModal: React.FC<ScoreboardModalProps> = ({
             {/* Headers de la tabla */}
             <div className="grid grid-cols-12 gap-2 mb-4 px-4 py-2 bg-green-900/30 border border-green-500 rounded font-mono text-green-300 text-sm font-bold">
               <div className="col-span-2 text-center font-extrabold">RNK</div>
-              <div className="col-span-6 font-extrabold">NOMBRE DEL UGADOR</div>
+              <div className="col-span-6 font-extrabold">NOMBRE DEL JUGADOR</div>
               <div className="col-span-4 text-center font-extrabold">HADAS CAPTURADAS</div>
             </div>
 

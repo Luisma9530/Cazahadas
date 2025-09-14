@@ -11,7 +11,7 @@ export default function SkipTurn() {
     state.board,
   ])
 
-  const [isMyTurn, playerSkippedTurn, isBattle, isMyFirstTurnBattle, showBattleModal] = useTurnStore((state) => [state.isMyTurn, state.playerSkippedTurn, state.isBattle, state.isMyFirstTurnBattle, state.showBattleModal])
+  const [isMyTurn, playerSkippedTurn, isBattle, isMyFirstTurnBattle, showBattleModal, showDrawModal] = useTurnStore((state) => [state.isMyTurn, state.playerSkippedTurn, state.isBattle, state.isMyFirstTurnBattle, state.showBattleModal, state.showDrawModal])
 
   const [resetSelectedCard] = useCardStore((state) => [
     state.resetSelectedCards,
@@ -29,7 +29,7 @@ export default function SkipTurn() {
   return (
     <div className="flex w-11/12 items-center justify-end p-2 h-20 relative z-[100] pointer-events-none">
       <AnimatePresence>
-        {isMyTurn && !gameOver && !showBattleModal && (
+        {isMyTurn && !gameOver && !showBattleModal && !showDrawModal && (
           <motion.button
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -39,8 +39,8 @@ export default function SkipTurn() {
                        pointer-events-auto relative z-[101]`}
             onClick={handleSkipTurn}
             type="button"
-          > 
-            {(playerSkippedTurn || isMyFirstTurnBattle) ? ((isBattle) ? 'End battle' : 'End game') : 'Skip turn'} 
+          >
+            {(playerSkippedTurn || isMyFirstTurnBattle) ? ((isBattle) ? 'End battle' : 'End game') : 'Skip turn'}
           </motion.button>
         )}
       </AnimatePresence>
