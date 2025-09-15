@@ -496,7 +496,7 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
             >
               <span className="text-sm font-bold">
                 {tiles[1][3].type === 'variableX'
-                  ? tiles[1][3].value
+                  ? "X= " + tiles[1][3].value
                   : "X"}
               </span>
             </div>

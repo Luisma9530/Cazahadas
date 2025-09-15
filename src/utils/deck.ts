@@ -79,7 +79,7 @@ const magicCard10: CardInfo = {
   name: "endfor+=1",
   type: CardType.MAGIC,
   operation: (x: number) => {
-    for (let i = 1; x + 1; i--) {
+    for (let i = 1; i >= x + 1; i--) {
       x += 1;
     }
     return x;
@@ -91,7 +91,7 @@ const magicCard11: CardInfo = {
   name: "endfor-=1",
   type: CardType.MAGIC,
   operation: (x: number) => {
-    for (let i = 1; x + 1; i++) {
+    for (let i = 1; i <= x + 1; i++) {
       x -= 1;
     }
     return x;
@@ -194,12 +194,12 @@ const shieldCard8: CardInfo = {
 };
 
 export const deckCards = [
-  catchCard1, 
-  catchCard2, 
-  magicCard1, 
-  magicCard2, 
+  catchCard1,
+  catchCard2,
+  magicCard1,
+  magicCard2,
   magicCard3,
-  magicCard4, 
+  magicCard4,
   magicCard5,
   magicCard6,
   magicCard7,
