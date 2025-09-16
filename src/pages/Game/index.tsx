@@ -253,14 +253,11 @@ export default function Game() {
             </div>
 
             {/* Skip Turn */}
-            <div className="flex-shrink-0 py-1 z-[52] flex justify-end pr-4">
-              <div className="scale-[0.4] xs:scale-[0.95] origin-right">
+            <div className="flex-shrink-0 z-[52] flex flex-col justify-end items-end pr-4 -space-y-2">
+              <div className="scale-[0.4] xs:scale-[0.8] origin-right">
                 <SkipTurn />
               </div>
-            </div>
-
-            <div className="flex-shrink-0 py-1 z-[52] flex justify-end pr-4">
-              <div className="scale-[0.4] xs:scale-[0.95] origin-right">
+              <div className="scale-[0.4] xs:scale-[0.8] origin-right">
                 <RequestDraw />
               </div>
             </div>
@@ -315,8 +312,10 @@ export default function Game() {
             <div className="-mt-[6rem] xs:-mt-[7rem] sm:-mt-[10rem] md:-mt-[12rem] lg:-mt- z-[52]">
               <SkipTurn />
             </div>
-            <div className="-mt-[2rem] xs:-mt-[2.5rem] sm:-mt-[4rem] md:-mt-[5rem] lg:-mt-[6rem] relative z-50">
-              <Hand />
+            <div className="-mt-[2rem] xs:-mt-[2.5rem] sm:-mt-[4rem] md:-mt-[5rem] lg:-mt-[6rem] relative z-[49]">
+              <div className="scale-[0.7] xs:scale-[0.95] origin-center">
+                <Hand />
+              </div>
             </div>
             <div className="md:-mt-[15rem]  z-[52]">
               <RequestDraw />

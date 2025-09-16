@@ -646,7 +646,8 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
 
           {/* Fila 0: Zona del Rival - Desktop */}
           <div className="grid grid-cols-4 gap-1 sm:gap-2 auto-rows-[60px] sm:auto-rows-[100px] auto-cols-[48px] sm:auto-cols-[80px]">
-            <div className="rival-cell-3d defense-cell-castle game-cell flex items-center justify-center hover-container">
+            <div className="rival-cell-3d defense-cell-castle game-cell flex items-center justify-center hover-container"
+            style={{ height: '7vw', width: '13vw' }}>
               <div className="defense-shield-icon"></div>
               {tiles[0][0].type === 'deck' ? (
                 tiles[0][0].cards.length > 0 ? (
@@ -681,7 +682,8 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
               )}
             </div>
 
-            <div className="rival-cell-3d game-cell captured-fairies-cell rival-captured-fairies-cell flex items-center justify-center hover-container">
+            <div className="rival-cell-3d game-cell captured-fairies-cell rival-captured-fairies-cell flex items-center justify-center hover-container"
+            style={{ height: '7vw', width: '13.5vw' }}>
               <div className="fairy-particles"></div>
               <div className="fairy-capture-icon"></div>
               {tiles[0][1].type === 'capturedFairies' ? (
@@ -718,6 +720,7 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
                   : 'bg-gray-200'}`
               )}
               onClick={() => handleCellClick(tiles[1][0], 1, 0)}
+              style={{ height: '9.5vw', width: '10.7vw' }}
             >
               {tiles[1][0].type === 'fairy' && tiles[1][0].card ? (
                 <div className="w-[57px] sm:w-[95px] h-[75px] sm:h-[125px]">
@@ -736,6 +739,7 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
                   : 'bg-gray-200'}`
               )}
               onClick={() => handleCellClick(tiles[1][1], 1, 1)}
+              style={{ height: '9.5vw', width: '10.7vw' }}
             >
               {tiles[1][1].type === 'fairy' && tiles[1][1].card ? (
                 <div className="w-[72px] sm:w-[120px] h-[96px] sm:h-[160px]">
@@ -754,6 +758,7 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
                   : 'bg-gray-200'}`
               )}
               onClick={() => handleCellClick(tiles[1][2], 1, 2)}
+              style={{ height: '9.5vw', width: '10.7vw' }}
             >
               {tiles[1][2].type === 'fairy' && tiles[1][2].card ? (
                 <div className="w-[72px] sm:w-[120px] h-[96px] sm:h-[160px]">
@@ -767,6 +772,7 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
             <div
               className="middle-cell-3d game-cell bg-yellow-300 flex items-center justify-center border cursor-pointer"
               onClick={() => handleCellClick(tiles[1][3], 1, 3)}
+              style={{ height: '9.5vw', width: '10.7vw' }}
             >
               <span className="text-lg sm:text-xl font-bold">
                 {tiles[1][3].type === 'variableX'
@@ -780,6 +786,7 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
                 "player-cell-3d game-cell player-magic-cell bg-blue-500 flex items-center justify-center border cursor-pointer hover-container"
               )}
               onClick={() => handleCellClick(tiles[1][4], 1, 4)}
+              style={{ height: '9.5vw', width: '10.7vw' }}
             >
               <div className="player-light-particles"></div>
               <div className="player-magical-energy"></div>
@@ -827,6 +834,7 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
                 "player-cell-3d defense-cell-castle game-cell flex items-center justify-center cursor-pointer hover-container"
               )}
               onClick={() => handleCellClick(tiles[2][0], 2, 0)}
+              style={{ height: '7.5vw', width: '13.5vw' }}
             >
               <div className="defense-shield-icon"></div>
               {tiles[2][0].type === 'deck' ? (
@@ -862,7 +870,8 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
               )}
             </div>
 
-            <div className="player-cell-3d game-cell captured-fairies-cell player-captured-fairies-cell flex items-center justify-center hover-container">
+            <div className="player-cell-3d game-cell captured-fairies-cell player-captured-fairies-cell flex items-center justify-center hover-container"
+            style={{ height: '7.5vw', width: '13.5vw' }}>
               <div className="fairy-particles"></div>
               <div className="fairy-capture-icon"></div>
               {tiles[2][1].type === 'capturedFairies' ? (
@@ -893,6 +902,7 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
                 "player-cell-3d game-cell discard-cell-cauldron player-discard-cell flex items-center justify-center border cursor-pointer hover-container"
               )}
               onClick={() => handleCellClick(tiles[2][2], 2, 2)}
+              style={{ height: '7vw', width: '13.5vw' }}
             >
               <div className="discard-magical-smoke"></div>
               <div className="discard-magic-icon"></div>

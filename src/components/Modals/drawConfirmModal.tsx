@@ -30,7 +30,7 @@ const DrawConfirmModal: React.FC<DrawConfirmModalProps> = ({
     if (!isOpen) return null;
 
     return (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+        <div className="fixed mt-[320px] top-0 left-0 w-full h-full flex items-start justify-center z-50">
             <div className="relative max-w-lg w-full">
                 {/* Rodillo Superior */}
                 <div className="absolute -top-3 left-6 right-6 h-4 bg-gradient-to-r from-blue-800 via-indigo-700 to-blue-800 rounded-full shadow-lg z-20 border-2 border-blue-900">

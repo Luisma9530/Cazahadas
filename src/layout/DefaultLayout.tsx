@@ -93,58 +93,69 @@ export default function DefaultLayout() {
         height: "100vh",
       }}
     >
-      {/* Header con botones - Responsive */}
-      <div className="absolute top-0 left-0 right-0 z-50 p-4">
-        <div className="flex justify-end items-center gap-2 sm:gap-3">
+      {/* Header con botones - Versión compacta */}
+      <div className="absolute top-0 left-0 right-0 z-50 p-2">
+        <div className="flex justify-between items-center">
           
-          {/* Botón de Inicio/Cierre de Sesión */}
-          {!logedUser ? (
-            <button
-              onClick={() => setShowAuth(true)}
-              className="bg-gradient-to-r from-purple-400 to-pink-500 text-white 
-                         p-2 sm:p-3 rounded-full shadow-lg hover:scale-110 transition-transform
-                         min-w-[44px] min-h-[44px] sm:min-w-[48px] sm:min-h-[48px]
-                         flex items-center justify-center"
-              title="Iniciar sesión"
+          {/* Título en el header - más pequeño */}
+          {(!showRules && !showAuth && !showScoreboard) && (
+            <h1
+              className="font-light z-40 text-xl sm:text-2xl md:text-3xl hover:cursor-pointer 
+                         font-title text-white drop-shadow-lg"
+              onClick={handleTitleClick}
             >
-              <User className="w-4 h-4 sm:w-6 sm:h-6" />
-            </button>
-          ) : (
-            <button
-              onClick={() => closeSesion()}
-              className="bg-gradient-to-r from-purple-400 to-pink-500 text-white 
-                         px-3 py-2 sm:px-4 sm:py-3 rounded-full shadow-lg hover:scale-110 transition-transform
-                         text-xs sm:text-sm font-medium whitespace-nowrap"
-              title="Cerrar sesión"
-            >
-              <span className="hidden sm:inline">Cerrar sesión</span>
-              <span className="sm:hidden">Salir</span>
-            </button>
+              Cazahadas
+            </h1>
           )}
+          
+          {/* Botones agrupados a la derecha */}
+          <div className="flex items-center gap-2">
+            {/* Botón de Inicio/Cierre de Sesión */}
+            {!logedUser ? (
+              <button
+                onClick={() => setShowAuth(true)}
+                className="bg-gradient-to-r from-purple-400 to-pink-500 text-white 
+                           p-2 rounded-full shadow-lg hover:scale-110 transition-transform
+                           w-10 h-10 flex items-center justify-center"
+                title="Iniciar sesión"
+              >
+                <User className="w-4 h-4" />
+              </button>
+            ) : (
+              <button
+                onClick={() => closeSesion()}
+                className="bg-gradient-to-r from-purple-400 to-pink-500 text-white 
+                           px-3 py-2 rounded-full shadow-lg hover:scale-110 transition-transform
+                           text-xs font-medium whitespace-nowrap"
+                title="Cerrar sesión"
+              >
+                <span className="hidden sm:inline">Cerrar sesión</span>
+                <span className="sm:hidden">Salir</span>
+              </button>
+            )}
 
-          {/* Botón de Scoreboard */}
-          <button
-            onClick={() => handleScoreboardClick()}
-            className="bg-gradient-to-r from-green-400 to-blue-500 text-white 
-                       p-2 sm:p-3 rounded-full shadow-lg hover:scale-110 transition-transform
-                       min-w-[44px] min-h-[44px] sm:min-w-[48px] sm:min-h-[48px]
-                       flex items-center justify-center"
-            title="Ver puntuaciones"
-          >
-            <Trophy className="w-4 h-4 sm:w-6 sm:h-6" />
-          </button>
+            {/* Botón de Scoreboard */}
+            <button
+              onClick={() => handleScoreboardClick()}
+              className="bg-gradient-to-r from-green-400 to-blue-500 text-white 
+                         p-2 rounded-full shadow-lg hover:scale-110 transition-transform
+                         w-10 h-10 flex items-center justify-center"
+              title="Ver puntuaciones"
+            >
+              <Trophy className="w-4 h-4" />
+            </button>
 
-          {/* Botón de Reglas */}
-          <button
-            onClick={() => setShowRules(true)}
-            className="bg-gradient-to-r from-pink-400 to-purple-500 text-white 
-                       p-2 sm:p-3 rounded-full shadow-lg hover:scale-110 transition-transform
-                       min-w-[44px] min-h-[44px] sm:min-w-[48px] sm:min-h-[48px]
-                       flex items-center justify-center"
-            title="Ver reglas del juego"
-          >
-            <Sparkles className="w-4 h-4 sm:w-6 sm:h-6" />
-          </button>
+            {/* Botón de Reglas */}
+            <button
+              onClick={() => setShowRules(true)}
+              className="bg-gradient-to-r from-pink-400 to-purple-500 text-white 
+                         p-2 rounded-full shadow-lg hover:scale-110 transition-transform
+                         w-10 h-10 flex items-center justify-center"
+              title="Ver reglas del juego"
+            >
+              <Sparkles className="w-4 h-4" />
+            </button>
+          </div>
         </div>
       </div>
 
@@ -173,17 +184,8 @@ export default function DefaultLayout() {
         />
       }
 
-      {/* Contenido principal */}
-      <div className="flex flex-col justify-center items-center h-full w-full px-4 pt-16 sm:pt-20">
-        {(!showRules && !showAuth && !showScoreboard) && (
-          <h1
-            className="font-light z-40 text-3xl sm:text-4xl md:text-5xl hover:cursor-pointer 
-                       font-title text-white drop-shadow-lg text-center mb-4 sm:mb-8"
-            onClick={handleTitleClick}
-          >
-            Cazahadas
-          </h1>
-        )}
+      {/* Contenido principal - con menos padding superior */}
+      <div className="flex flex-col justify-center items-center h-full w-full px-4 pt-14">
         <Outlet />
       </div>
     </div>
