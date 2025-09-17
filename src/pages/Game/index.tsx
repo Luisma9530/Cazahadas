@@ -21,7 +21,7 @@ import useBackgroundStore from "../../store/BackgroundStore";
 import homeBackground from '../../assets/images/homeBackground.png';
 import { CardUnity } from "../../@types/Card";
 import BattleConfirmModal from "../../components/Modals/BattleStartModal.tsx";
-import DrawConfirmModal from "../../components/Modals/drawConfirmModal.tsx";
+import DrawConfirmModal from "../../components/Modals/DrawConfirmModal.tsx";
 import RequestDraw from "../../components/drawGame.tsx";
 
 export default function Game() {
@@ -263,7 +263,7 @@ export default function Game() {
             </div>
 
             {/* Hand - Escalado proporcional manteniendo diseño original */}
-            <div className="flex-shrink-0 pb-2 z-50">
+            <div className="flex-shrink-0 pb-2 z-[50]">
               <div className="scale-[0.45] xs:scale-[0.8] origin-top">
                 <Hand />
               </div>
@@ -272,7 +272,7 @@ export default function Game() {
 
           {/* Layout original para desktop (sm y mayor) */}
           <div className="hidden sm:block">
-            <div className="-mt-[2rem] xs:-mt-[2.5rem] sm:-mt-[4rem] md:-mt-[5rem] lg:-mt-[6rem] relative z-[51]">
+            <div className="-mt-[2rem] xs:-mt-[2.5rem] sm:-mt-[4rem] md:-mt-[5rem] lg:-mt-[6rem] relative z-[53]">
               {showBattleModal &&
                 <BattleConfirmModal
                   isOpen={showBattleModal}
@@ -312,7 +312,7 @@ export default function Game() {
             <div className="-mt-[6rem] xs:-mt-[7rem] sm:-mt-[10rem] md:-mt-[12rem] lg:-mt- z-[52]">
               <SkipTurn />
             </div>
-            <div className="-mt-[2rem] xs:-mt-[2.5rem] sm:-mt-[4rem] md:-mt-[5rem] lg:-mt-[6rem] relative z-[49]">
+            <div className="-mt-[2rem] xs:-mt-[2.5rem] sm:-mt-[4rem] md:-mt-[5rem] lg:-mt-[6rem] relative z-[50]">
               <div className="scale-[0.7] xs:scale-[0.95] origin-center">
                 <Hand />
               </div>
@@ -337,10 +337,26 @@ export default function Game() {
       }
 
       {/* Modales - Sin cambios en funcionalidad */}
-      {gameStartModal && !gameOver && <GameStartModal />}
-      {turnModal && !gameOver && <TurnModal />}
-      {battleModal && !gameOver && <BattleModal />}
-      {gameOver && <EndGameModal amIP1={amIP1} winner={gameResult} />}
+      {gameStartModal && !gameOver && (
+        <div className="relative z-[60]">
+          <GameStartModal />
+        </div>
+      )}
+      {turnModal && !gameOver && (
+        <div className="relative z-[60]">
+          <TurnModal />
+        </div>
+      )}
+      {battleModal && !gameOver && (
+        <div className="relative z-[60]">
+          <BattleModal />
+        </div>
+      )}
+      {gameOver && (
+        <div className="relative z-[60]">
+          <EndGameModal amIP1={amIP1} winner={gameResult} />
+        </div>
+      )}
     </div >
   )
 }

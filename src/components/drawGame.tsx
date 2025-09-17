@@ -6,7 +6,7 @@ import { useParams } from "react-router-dom"
 
 export default function RequestDraw() {
 
-  const [showDrawModal] = useTurnStore((state) => [state.showDrawModal])
+  const [showDrawModal, showBattleModal] = useTurnStore((state) => [state.showDrawModal, state.showBattleModal])
 
   const [gameOver, amIP1] = useGameStore((state) => [state.gameOver, state.amIP1])
 
@@ -17,9 +17,9 @@ export default function RequestDraw() {
   }
 
   return (
-    <div className="flex w-11/12 items-center justify-end p-2 h-20 relative z-[100] pointer-events-none">
+    <div className="flex w-11/12 items-center justify-end p-2 h-20 relative z-[52] pointer-events-none">
       <AnimatePresence>
-        {!gameOver && !showDrawModal && (
+        {!gameOver && !showBattleModal && !showDrawModal && (
           <motion.button
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}

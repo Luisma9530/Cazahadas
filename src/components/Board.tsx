@@ -36,7 +36,13 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
       if (rowIndex == 2) {
         switch (card.type) {
           case CardType.SHIELD:
-            return (position.type === 'deck' && isBattle) || position.type === 'discard';
+            var defensePlaced = false;
+            if ((tiles[0][0].type === 'deck' && tiles[0][0].cards.length > 0) ||
+              (tiles[2][0].type === 'deck' && tiles[2][0].cards.length > 0)
+            ) {
+              defensePlaced = true;
+            }
+            return (position.type === 'deck' && isBattle && !defensePlaced && !haveIStartedBattle()) || position.type === 'discard';
           case CardType.MAGIC:
             return position.type === 'discard';
           default:
@@ -56,38 +62,16 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
     } else { return false; } // Si no hay cartas seleccionadas, no se puede colocar nada
   }
 
-  socket.on("start-battle-player", (data: { amIP1: boolean }) => {
-    setIsBattle(true);
-    setIsMyFirstTurnBattle(true);
-    console.log("Battle started");
-    console.log("amIP1:", data.amIP1, " | I am:", amIP1);
-    if (data.amIP1 !== amIP1) {
-      setShowBattleModal(true)
-      console.log("Battle modal shown");
-    }
-  });
-
-  socket.on("captured-fairy", (data: { player: boolean }) => {
-    if (amIP1 == data.player) {
-      if (logedUser) {
-        sendCapturedFairies()
-      }
-      if (tiles[2][1].type == "capturedFairies" && tiles[2][1].cards.length >= 2) {
-        console.log('Fin del juego: Capturadas dos hadas');
-        socket.emit('all-fairy-captured', {
-          reason: 'captured-two-fairies',
-          winner: amIP1,
-          gameId: gameId,
-        });
+  function haveIStartedBattle() {
+    // Recorremos las casillas de hadas para ver si alguna está marcada por mí
+    for (let colIndex = 0; colIndex < tiles[1].length - 1; colIndex++) {
+      const tile = tiles[1][colIndex];
+      if (tile.type === 'fairy' && tile.marked && tile.placedByPlayerOne === amIP1) {
+        return true;
       }
     }
-  });
-
-  socket.on("end-first-turn-battle", () => {
-    setIsMyFirstTurnBattle(false);
-  });
-
-
+    return false;
+  }
 
   async function sendCapturedFairies() {
     try {
@@ -196,12 +180,49 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
       }
     };
 
+    const handleBattleStart = (data: { amIP1: boolean }) => {
+      setIsBattle(true);
+      setIsMyFirstTurnBattle(true);
+      console.log("Battle started");
+      console.log("amIP1:", data.amIP1, " | I am:", amIP1);
+      if (data.amIP1 !== amIP1) {
+        setShowBattleModal(true)
+        console.log("Battle modal shown");
+      }
+    };
+
+    const handleCapturedFairy = (data: { player: boolean }) => {
+      if (amIP1 == data.player) {
+        if (logedUser) {
+          sendCapturedFairies()
+        }
+        if (tiles[2][1].type == "capturedFairies" && tiles[2][1].cards.length >= 2) {
+          console.log('Fin del juego: Capturadas dos hadas');
+          socket.emit('all-fairy-captured', {
+            reason: 'captured-two-fairies',
+            winner: amIP1,
+            gameId: gameId,
+          });
+        }
+      }
+    };
+
+    const handleEndFirstTurnBattle = () => {
+      setIsMyFirstTurnBattle(false);
+    };
+
     socket.on('update-tiles', handleUpdateTiles);
     socket.on("request-draw-player", handleDrawRequest);
+    socket.on("start-battle-player", handleBattleStart);
+    socket.on("captured-fairy", handleCapturedFairy);
+    socket.on("end-first-turn-battle", handleEndFirstTurnBattle);
 
     return () => {
       socket.off('update-tiles', handleUpdateTiles);
       socket.off("request-draw-player", handleDrawRequest);
+      socket.off("start-battle-player", handleBattleStart);
+      socket.off("captured-fairy", handleCapturedFairy);
+      socket.off("end-first-turn-battle", handleEndFirstTurnBattle);
     };
   }, []);
 
@@ -647,7 +668,7 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
           {/* Fila 0: Zona del Rival - Desktop */}
           <div className="grid grid-cols-4 gap-1 sm:gap-2 auto-rows-[60px] sm:auto-rows-[100px] auto-cols-[48px] sm:auto-cols-[80px]">
             <div className="rival-cell-3d defense-cell-castle game-cell flex items-center justify-center hover-container"
-            style={{ height: '7vw', width: '13vw' }}>
+              style={{ height: '7vw', width: '13vw' }}>
               <div className="defense-shield-icon"></div>
               {tiles[0][0].type === 'deck' ? (
                 tiles[0][0].cards.length > 0 ? (
@@ -683,7 +704,7 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
             </div>
 
             <div className="rival-cell-3d game-cell captured-fairies-cell rival-captured-fairies-cell flex items-center justify-center hover-container"
-            style={{ height: '7vw', width: '13.5vw' }}>
+              style={{ height: '7vw', width: '13.5vw' }}>
               <div className="fairy-particles"></div>
               <div className="fairy-capture-icon"></div>
               {tiles[0][1].type === 'capturedFairies' ? (
@@ -871,7 +892,7 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
             </div>
 
             <div className="player-cell-3d game-cell captured-fairies-cell player-captured-fairies-cell flex items-center justify-center hover-container"
-            style={{ height: '7.5vw', width: '13.5vw' }}>
+              style={{ height: '7.5vw', width: '13.5vw' }}>
               <div className="fairy-particles"></div>
               <div className="fairy-capture-icon"></div>
               {tiles[2][1].type === 'capturedFairies' ? (
