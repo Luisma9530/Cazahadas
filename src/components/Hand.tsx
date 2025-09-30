@@ -105,8 +105,8 @@ export default function Hand() {
                 onHoverEnd={() => setHoveredCard(null)}
                 onClick={() => handleCardClick(card)}
                 whileHover={{ 
-                  y: y - 20, // Hover más sutil
-                  scale: 1.05,
+                  y: y - 10, // Hover más sutil
+                  scale: 1.4,
                   transition: { duration: 0.2 }
                 }}
               >

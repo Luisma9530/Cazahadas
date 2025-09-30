@@ -306,18 +306,18 @@ export default function Game() {
             </div>
 
             <div className="scale-[0.7] xs:scale-[0.8] sm:scale-[0.5] md:scale-[0.6] lg:scale-[0.65] 
-                            -mt-4 xs:-mt-6 sm:-mt-12 md:-mt-14 lg:-mt-[13rem] min-w-fit">
+                            -mt-4 xs:-mt-6 sm:-mt-12 md:-mt-14 lg:-mt-[13rem] min-w-fit z-[52]">
               <Board amIP1={amIP1} />
             </div>
-            <div className="-mt-[6rem] xs:-mt-[7rem] sm:-mt-[10rem] md:-mt-[12rem] lg:-mt- z-[52]">
+            <div className="scale-[0.7] xs:scale-[0.7] origin-right -mt-[6rem] xs:-mt-[7rem] sm:-mt-[10rem] md:-mt-[12rem] lg:-mt- z-[52]">
               <SkipTurn />
             </div>
             <div className="-mt-[2rem] xs:-mt-[2.5rem] sm:-mt-[4rem] md:-mt-[5rem] lg:-mt-[6rem] relative z-[50]">
-              <div className="scale-[0.7] xs:scale-[0.95] origin-center">
+              <div className="scale-[1] xs:scale-[1] origin-center">
                 <Hand />
               </div>
             </div>
-            <div className="md:-mt-[15rem]  z-[52]">
+            <div className="scale-[0.7] xs:scale-[0.7] md:-mt-[15rem] origin-right z-[52]">
               <RequestDraw />
             </div>
           </div>

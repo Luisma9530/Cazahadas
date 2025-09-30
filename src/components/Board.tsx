@@ -683,8 +683,8 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
                           <Card placed={true} card={card} amIP1={amIP1} />
                         </div>
                         {/* Hover preview individual para cada carta */}
-                        <div className="absolute z-[9999] hidden sm:group-hover:block top-[-10px] left-[54px] sm:left-[90px]">
-                          <div className="w-[72px] sm:w-[120px] h-[90px] sm:h-[150px] border bg-white shadow-lg rounded p-1">
+                        <div className="absolute z-[9999] hidden sm:group-hover:block top-[-10px] left-[54px] sm:left-[90px]"> 
+                          <div className="w-[172px] sm:w-[288px] h-[216px] sm:h-[360px] border bg-white shadow-lg rounded p-1">
                             <Card placed={true} card={card} amIP1={amIP1} />
                           </div>
                         </div>
@@ -827,8 +827,8 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
                           <Card placed={true} card={card} amIP1={amIP1} />
                         </div>
                         {/* Hover preview individual para cada carta */}
-                        <div className="absolute z-[9999] hidden sm:group-hover:block top-[-10px] left-[60px] sm:left-[100px]">
-                          <div className="w-[72px] sm:w-[120px] h-[90px] sm:h-[150px] border bg-white shadow-lg rounded p-1">
+                        <div className="absolute z-[9999] hidden sm:group-hover:block top-[-10px] left-[60px] sm:left-[0px]">
+                          <div className="w-[172px] sm:w-[288px] h-[216px] sm:h-[360px] border bg-white shadow-lg rounded p-1">
                             <Card placed={true} card={card} amIP1={amIP1} />
                           </div>
                         </div>
@@ -871,8 +871,8 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
                           <Card placed={true} card={card} amIP1={amIP1} />
                         </div>
                         {/* Hover preview individual para cada carta */}
-                        <div className="absolute z-[9999] hidden sm:group-hover:block top-[-10px] left-[54px] sm:left-[90px]">
-                          <div className="w-[72px] sm:w-[120px] h-[90px] sm:h-[150px] border bg-white shadow-lg rounded p-1">
+                        <div className="absolute z-[9999] hidden sm:group-hover:block top-[-200px] left-[54px] sm:left-[90px]">
+                          <div className="w-[172px] sm:w-[288px] h-[216px] sm:h-[360px] border bg-white shadow-lg rounded p-1">
                             <Card placed={true} card={card} amIP1={amIP1} />
                           </div>
                         </div>
