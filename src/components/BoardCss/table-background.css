@@ -67,7 +67,6 @@
     50% 80%;
   
   /* Perspectiva ajustada - menos inclinación y más arriba */
-  transform: perspective(800px) rotateX(60deg) translateY(-50px);
   transform-origin: center center;
   
   /* Efectos de profundidad y realismo */

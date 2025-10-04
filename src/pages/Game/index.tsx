@@ -270,9 +270,25 @@ export default function Game() {
             </div>
           </div>
 
-          {/* Layout original para desktop (sm y mayor) */}
-          <div className="hidden sm:block">
-            <div className="-mt-[2rem] xs:-mt-[2.5rem] sm:-mt-[4rem] md:-mt-[5rem] lg:-mt-[6rem] relative z-[53]">
+          {/* Layout mejorado para desktop */}
+          <div className="hidden sm:block relative w-full h-screen overflow-hidden">
+
+            {/* Modales - Centro absoluto de la pantalla */}
+            <div className="absolute -top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 z-[60] w-full max-w-md">
+              {showDrawModal &&
+                <DrawConfirmModal
+                  isOpen={showDrawModal}
+                  onAccept={() => {
+                    socket.emit('draw-game', { gameId: gameId });
+                    setShowDrawModal(false);
+                  }}
+                  onReject={() => {
+                    setShowDrawModal(false);
+                  }}
+                />
+              }
+            </div>
+            <div className="absolute top-72 left-1/2 -translate-x-1/2 -translate-y-1/2 z-[60] w-full max-w-md">
               {showBattleModal &&
                 <BattleConfirmModal
                   isOpen={showBattleModal}
@@ -287,39 +303,43 @@ export default function Game() {
                   }}
                 />
               }
-              {showDrawModal &&
-                <DrawConfirmModal
-                  isOpen={showDrawModal}
-                  onAccept={() => {
-                    socket.emit('draw-game', { gameId: gameId });
-                    setShowDrawModal(false);
-                  }}
-                  onReject={() => {
-                    setShowDrawModal(false);
-                  }}
-                />
-              }
             </div>
 
-            <div>
+            {/* Indicador de turno - Esquina superior derecha, por delante del tablero */}
+            <div className="absolute top-4 md:top-8 right-4 md:right-8 lg:right-12 z-[54]">
               <TurnIndicator />
             </div>
 
-            <div className="scale-[0.7] xs:scale-[0.8] sm:scale-[0.5] md:scale-[0.6] lg:scale-[0.65] 
-                            -mt-4 xs:-mt-6 sm:-mt-12 md:-mt-14 lg:-mt-[13rem] min-w-fit z-[52]">
-              <Board amIP1={amIP1} />
-            </div>
-            <div className="scale-[0.7] xs:scale-[0.7] origin-right -mt-[6rem] xs:-mt-[7rem] sm:-mt-[10rem] md:-mt-[12rem] lg:-mt- z-[52]">
-              <SkipTurn />
-            </div>
-            <div className="-mt-[2rem] xs:-mt-[2.5rem] sm:-mt-[4rem] md:-mt-[5rem] lg:-mt-[6rem] relative z-[50]">
-              <div className="scale-[1] xs:scale-[1] origin-center">
-                <Hand />
-              </div>
-            </div>
-            <div className="scale-[0.7] xs:scale-[0.7] md:-mt-[15rem] origin-right z-[52]">
+            {/* Botón Request Draw - Debajo del TurnIndicator */}
+            <div className="absolute top-20 md:top-1/3
+        right-4 md:-right-24 lg:-right-16 z-[54]
+        scale-[0.55] md:scale-[0.50] lg:scale-[0.7]">
               <RequestDraw />
             </div>
+
+            {/* Botón Skip Turn - Debajo de RequestDraw */}
+            <div className="absolute top-32 md:top-1/2 
+        right-4 md:-right-20 lg:-right-12 z-[54]
+        scale-[0.55] md:scale-[0.50] lg:scale-[0.7]">
+              <SkipTurn />
+            </div>
+
+            {/* Tablero - Centro pero más arriba, ancho aumentado sin estirar contenido */}
+            <div className="absolute top-[30%] left-1/2 -translate-x-1/2 -translate-y-1/2 z-[52]
+        w-[130%] md:w-[140%] lg:w-[145%] xl:w-[115%]">
+              <div className="scale-[0.5] md:scale-[0.6] lg:scale-[0.65] xl:scale-[0.7] 
+          origin-center flex justify-center">
+                <Board amIP1={amIP1} />
+              </div>
+            </div>
+
+            {/* Mano de cartas - Debajo del tablero, por delante */}
+            <div className="absolute top-[30%] translate-y-[calc(50%+2rem)] md:translate-y-[calc(50%+4rem)]
+        left-1/2 -translate-x-1/2 z-[53]
+        w-full max-w-6xl px-4">
+              <Hand />
+            </div>
+
           </div>
         </>
       )

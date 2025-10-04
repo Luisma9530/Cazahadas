@@ -2,7 +2,6 @@
 
 /* Perspectiva para la fila superior (rival) - ajustada */
 .rival-cell-3d {
-  transform: perspective(600px) rotateX(15deg);
   transform-origin: bottom;
   transform-style: preserve-3d;
   transition: transform 0.3s ease;
@@ -14,7 +13,6 @@
 
 /* Perspectiva para la fila media (zona de juego) - menos inclinación */
 .middle-cell-3d {
-  transform: perspective(1200px) rotateX(20deg);
   transform-origin: bottom center;
   transform-style: preserve-3d;
   transition: transform 0.3s ease;
@@ -26,7 +24,6 @@
 
 /* Perspectiva para la fila inferior (jugador) - moderada */
 .player-cell-3d {
-  transform: perspective(800px) rotateX(25deg);
   transform-origin: bottom center;
   transform-style: preserve-3d;
   transition: transform 0.3s ease;

@@ -127,13 +127,48 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
         if (
           !tile.marked &&
           tile.captured) {
+          let fairySpecificCard: CardInfo;
+
+          switch (colIndex) {
+            case 0: // Hada en posición 0 (Hada Encarada)
+              fairySpecificCard = {
+                // Propiedades de la carta específica para hada 0
+                name: "Hada Encarada",
+                type: CardType.CATCH,
+                text: "Hada Encarada",
+                image: "/cartasPNG/Hada_encarada.png"
+                
+              };
+              break;
+
+            case 1: // Hada en posición 1 (Hada Malhablada)
+              fairySpecificCard = {
+                name: "Hada Malhablada",
+                type: CardType.CATCH,
+                text: "Hada Malhablada",
+                image: "/cartasPNG/Hada_malhablada.png"
+              };
+              break;
+
+            case 2: // Hada en posición 2 (Hada Resabiada)
+              fairySpecificCard = {
+                name: "Hada Resabiada",
+                type: CardType.CATCH,
+                text: "Hada Resabiada",
+                image: "/cartasPNG/Hada_resabiada.png"
+              };
+              break;
+
+            default:
+              fairySpecificCard = tile.card!; // Fallback a la carta original
+          }
           if (tile.placedByPlayerOne === amIP1) {
             if (newTiles[2][1].type === 'capturedFairies' && tile.card) {
-              cardsBottom.push(tile.card);
+              cardsBottom.push(fairySpecificCard);
             }
           } else {
             if (newTiles[0][1].type === 'capturedFairies' && tile.card) {
-              cardsTop.push(tile.card);
+              cardsTop.push(fairySpecificCard);
             }
           }
         }
@@ -197,7 +232,6 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
           sendCapturedFairies()
         }
         if (tiles[2][1].type == "capturedFairies" && tiles[2][1].cards.length >= 2) {
-          console.log('Fin del juego: Capturadas dos hadas');
           socket.emit('all-fairy-captured', {
             reason: 'captured-two-fairies',
             winner: amIP1,
@@ -683,7 +717,7 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
                           <Card placed={true} card={card} amIP1={amIP1} />
                         </div>
                         {/* Hover preview individual para cada carta */}
-                        <div className="absolute z-[9999] hidden sm:group-hover:block top-[-10px] left-[54px] sm:left-[90px]"> 
+                        <div className="absolute z-[9999] hidden sm:group-hover:block top-[-10px] left-[54px] sm:left-[90px]">
                           <div className="w-[172px] sm:w-[288px] h-[216px] sm:h-[360px] border bg-white shadow-lg rounded p-1">
                             <Card placed={true} card={card} amIP1={amIP1} />
                           </div>
@@ -735,21 +769,29 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
           <div className="grid grid-cols-5 gap-2 sm:gap-3 auto-rows-[84px] sm:auto-rows-[140px] auto-cols-[66px] sm:auto-cols-[110px] justify-center mb-2 sm:mb-4 -mt-4 sm:-mt-7">
             <div
               className={getCellHighlightClasses(1, 0, selectedCard,
-                `middle-cell-3d game-cell flex items-center justify-center border cursor-pointer
-                ${tiles[1][0].type === 'fairy' && tiles[1][0].captured
-                  ? 'bg-gray-500'
-                  : 'bg-gray-200'}`
+                `middle-cell-3d game-cell relative flex items-center justify-center border cursor-pointer overflow-hidden
+                ${tiles[1][0].type === 'fairy' && tiles[1][0].captured ? 'grayscale' : ''}`
               )}
               onClick={() => handleCellClick(tiles[1][0], 1, 0)}
               style={{ height: '9.5vw', width: '10.7vw' }}
             >
-              {tiles[1][0].type === 'fairy' && tiles[1][0].card ? (
-                <div className="w-[57px] sm:w-[95px] h-[75px] sm:h-[125px]">
-                  <Card placed={true} card={tiles[1][0].card} amIP1={amIP1} />
-                </div>
-              ) : (
-                <span className="text-xs sm:text-base font-semibold">Fairy 1</span>
+              {/* Imagen de fondo */}
+              {tiles[1][0].type === 'fairy' && !tiles[1][0].captured && (
+                <img
+                  src="/cartasPNG/HadaEncarada.png"
+                  alt="Fairy background"
+                  className="absolute inset-0 w-full h-full object-cover z-0"
+                />
               )}
+              <div className="relative z-10">
+                {tiles[1][0].type === 'fairy' && tiles[1][0].card ? (
+                  <div className="w-[57px] sm:w-[95px] h-[75px] sm:h-[125px]">
+                    <Card placed={true} card={tiles[1][0].card} amIP1={amIP1} />
+                  </div>
+                ) : (
+                  <span />
+                )}
+              </div>
             </div>
 
             <div
@@ -762,12 +804,20 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
               onClick={() => handleCellClick(tiles[1][1], 1, 1)}
               style={{ height: '9.5vw', width: '10.7vw' }}
             >
+              {/* Imagen de fondo */}
+              {tiles[1][1].type === 'fairy' && !tiles[1][1].captured && (
+                <img
+                  src="/cartasPNG/HadaMalhablada.png"
+                  alt="Fairy background"
+                  className="absolute inset-0 w-full h-full object-cover z-0"
+                />
+              )}
               {tiles[1][1].type === 'fairy' && tiles[1][1].card ? (
                 <div className="w-[72px] sm:w-[120px] h-[96px] sm:h-[160px]">
                   <Card placed={true} card={tiles[1][1].card} amIP1={amIP1} />
                 </div>
               ) : (
-                <span className="text-xs sm:text-base font-semibold">Fairy 2</span>
+                <span />
               )}
             </div>
 
@@ -781,6 +831,14 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
               onClick={() => handleCellClick(tiles[1][2], 1, 2)}
               style={{ height: '9.5vw', width: '10.7vw' }}
             >
+              {/* Imagen de fondo */}
+              {tiles[1][2].type === 'fairy' && !tiles[1][2].captured && (
+                <img
+                  src="/cartasPNG/HadaResabiada.png"
+                  alt="Fairy background"
+                  className="absolute inset-0 w-full h-full object-cover z-0"
+                />
+              )}
               {tiles[1][2].type === 'fairy' && tiles[1][2].card ? (
                 <div className="w-[72px] sm:w-[120px] h-[96px] sm:h-[160px]">
                   <Card placed={true} card={tiles[1][2].card} amIP1={amIP1} />
