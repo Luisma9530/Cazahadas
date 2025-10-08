@@ -23,7 +23,7 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
 
   const [placeCard, drawCard] = useNeoHandStore((state) => [state.placeCard, state.drawCard]);
 
-  const [logedUser, password] = useAuthStore((state) => [state.logedUser, state.password]);
+  const [logedUser, token] = useAuthStore((state) => [state.logedUser, state.token]);
 
   const { id: gameId } = useParams<{ id: string }>();
   const API_URL = import.meta.env.VITE_API_URL;
@@ -79,12 +79,7 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
         method: "POST",
         headers: {
           "Authorization": `Bearer ${token}`,
-          "Content-Type": "application/json",
         },
-        body: JSON.stringify({
-          logedUser,
-          password,
-        }),
       });
 
       if (!response.ok) {
