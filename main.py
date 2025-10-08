@@ -175,7 +175,7 @@ class ScoreOut(BaseModel):
 
 
 @app.get("/get-scores", response_model=List[ScoreOut])
-def get_scores(username: str = Depends(verify_token)):
+def get_scores():
     """Obtiene las puntuaciones (requiere autenticación)"""
     try:
         mongo_uri = f"mongodb+srv://{os.getenv('MONGO_RW_USERNAME')}:{os.getenv('MONGO_RW_PASSWORD')}@cluster0.hufeuvx.mongodb.net/Cazahadas?retryWrites=true&w=majority"
