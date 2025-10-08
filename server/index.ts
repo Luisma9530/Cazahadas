@@ -179,6 +179,11 @@ io.on("connection", (socket) => {
       }
       return tile;
     });
+
+    io.to(currentGames[data.gameId].playerIds).emit("captured-fairy", {
+      player: player
+    });
+
     io.to(currentGames[data.gameId].playerIds).emit("update-tiles", {
       tiles: data.tiles
     });

@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useRef, useEffect } from "react";
 import socket from "../socket";
 import { Tile } from "../@types/Tile";
 import useBoardStore from "../store/BoardStore";
@@ -30,6 +30,9 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
 
   // Validación para colocar carta en zona de juego
   function canAddCardToPosition(selectedCards: CardUnity[], position: Tile, rowIndex: number): boolean {
+    if (!isMyTurn) {
+      return false
+    }
     if (selectedCards.length === 1) {
       const card = selectedCards[0];
       if (!card || !isMyTurn || showBattleModal) return false;
@@ -73,7 +76,16 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
     return false;
   }
 
+  let isAddingScore = false;
+
   async function sendCapturedFairies() {
+    if (isAddingScore) {
+      console.log("⏳ Ya hay una petición en curso, ignorando...");
+      return;
+    }
+
+    isAddingScore = true;
+
     try {
       const response = await fetch(`${API_URL}/add-score`, {
         method: "POST",
@@ -81,6 +93,7 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
           "Authorization": `Bearer ${token}`,
         },
       });
+      console.log("Add-score response:", response);
 
       if (!response.ok) {
         console.error("❌ Error al guardar puntos en la base de datos:", await response.json());
@@ -89,6 +102,10 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
       }
     } catch (error) {
       console.error("❌ Error de red al enviar puntos:", error);
+    } finally {
+      setTimeout(() => {
+        isAddingScore = false;
+      }, 1000);
     }
   }
 
@@ -186,6 +203,20 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
     return newTiles
   }
 
+  // 1. Declarar los refs al inicio del componente (antes del useEffect)
+  const amIP1Ref = useRef(amIP1);
+  const logedUserRef = useRef(logedUser);
+  const tilesRef = useRef(tiles);
+  const gameIdRef = useRef(gameId);
+
+  // 2. useEffect para mantener los refs actualizados
+  useEffect(() => {
+    amIP1Ref.current = amIP1;
+    logedUserRef.current = logedUser;
+    tilesRef.current = tiles;
+    gameIdRef.current = gameId;
+  }, [amIP1, logedUser, tiles, gameId]);
+
   useEffect(() => {
     // Ejecutar drawCard una vez al cargar el componente por primera vez
     drawCard(false);
@@ -193,11 +224,8 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
 
     const handleUpdateTiles = (data: { tiles: Tile[][] }) => {
       var updatedTiles = data.tiles.map((row) => row.map((tile) => ({ ...tile })));
-
-      updatedTiles = checkMarkedFairiesForCapture(data.tiles, amIP1);
-
+      updatedTiles = checkMarkedFairiesForCapture(data.tiles, amIP1Ref.current);
       setTiles(updatedTiles);
-
       setIsBattle(false);
       setIsMyFirstTurnBattle(false);
       clearDeckAndMagic();
@@ -206,7 +234,7 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
 
     const handleDrawRequest = (data: { amIP1: boolean }) => {
       setShowDrawModal(false)
-      if (data.amIP1 != null && amIP1 != null && data.amIP1 !== amIP1) {
+      if (data.amIP1 != null && amIP1Ref.current != null && data.amIP1 !== amIP1Ref.current) {
         setShowDrawModal(true)
       }
     };
@@ -215,23 +243,28 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
       setIsBattle(true);
       setIsMyFirstTurnBattle(true);
       console.log("Battle started");
-      console.log("amIP1:", data.amIP1, " | I am:", amIP1);
-      if (data.amIP1 !== amIP1) {
+      console.log("amIP1:", data.amIP1, " | I am:", amIP1Ref.current);
+      if (data.amIP1 !== amIP1Ref.current) {
         setShowBattleModal(true)
         console.log("Battle modal shown");
       }
     };
 
     const handleCapturedFairy = (data: { player: boolean }) => {
-      if (amIP1 == data.player) {
-        if (logedUser) {
+      console.log("Fairy captured by player:", data.player);
+      console.log("🔍 Condición amIP1 == data.player:", amIP1Ref.current, "==", data.player, "=>", amIP1Ref.current == data.player);
+
+      if (amIP1Ref.current == data.player) {
+        console.log("✅ Condición cumplida");
+        if (logedUserRef.current) {
+          console.log("📤 Usuario logueado, llamando sendCapturedFairies...");
           sendCapturedFairies()
         }
-        if (tiles[2][1].type == "capturedFairies" && tiles[2][1].cards.length >= 2) {
+        if (tilesRef.current[2][1].type == "capturedFairies" && tilesRef.current[2][1].cards.length >= 2) {
           socket.emit('all-fairy-captured', {
             reason: 'captured-two-fairies',
-            winner: amIP1,
-            gameId: gameId,
+            winner: amIP1Ref.current,
+            gameId: gameIdRef.current,
           });
         }
       }
@@ -241,13 +274,27 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
       setIsMyFirstTurnBattle(false);
     };
 
+    // ⚠️ IMPORTANTE: Remover TODOS los listeners anteriores antes de registrar
+    console.log("🧹 Limpiando todos los listeners anteriores");
+    socket.off('update-tiles');
+    socket.off('request-draw-player');
+    socket.off('start-battle-player');
+    socket.off('captured-fairy');
+    socket.off('end-first-turn-battle');
+
+    console.log("🔢 Listeners para 'captured-fairy' después de limpiar:", socket.listeners('captured-fairy').length);
+
+    // Registrar los nuevos listeners
     socket.on('update-tiles', handleUpdateTiles);
     socket.on("request-draw-player", handleDrawRequest);
     socket.on("start-battle-player", handleBattleStart);
     socket.on("captured-fairy", handleCapturedFairy);
     socket.on("end-first-turn-battle", handleEndFirstTurnBattle);
 
+    console.log("🔢 Listeners para 'captured-fairy' después de registrar:", socket.listeners('captured-fairy').length);
+
     return () => {
+      console.log("🧹 Cleanup ejecutándose...");
       socket.off('update-tiles', handleUpdateTiles);
       socket.off("request-draw-player", handleDrawRequest);
       socket.off("start-battle-player", handleBattleStart);
