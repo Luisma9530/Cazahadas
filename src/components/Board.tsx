@@ -78,6 +78,7 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
       const response = await fetch(`${API_URL}/add-score`, {
         method: "POST",
         headers: {
+          "Authorization": `Bearer ${token}`,
           "Content-Type": "application/json",
         },
         body: JSON.stringify({

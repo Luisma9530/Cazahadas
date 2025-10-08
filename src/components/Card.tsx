@@ -53,7 +53,6 @@ export default function Card({ card, placed = false, amIP1 }: CardProps) {
               console.error('Error al cargar imagen:', card.image);
               e.currentTarget.style.display = 'none';
             }}
-            onLoad={() => console.log('Imagen cargada correctamente:', card.image)}
           />
         </div>
       );

@@ -15,7 +15,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [notification, setNotification] = useState<{ type: 'success' | 'error', message: string } | null>(null);
-  const [setLogedUser, setPassword] = useAuthStore((state) => [state.setLogedUser, state.setPassword]);
+  const [setLogedUser, setToken] = useAuthStore((state) => [state.setLogedUser, state.setToken]);
   const API_URL = import.meta.env.VITE_API_URL;
 
   const [loginData, setLoginData] = useState({
@@ -82,7 +82,8 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
       if (response.ok) {
         alert("✅ Login exitoso");
         setLogedUser(data.username);
-        setPassword(loginData.password);
+        setToken(data.access_token);
+        console.log("Token recibido:", data.access_token);
         onClose();
       } else {
         alert("❌ Error de login: " + data.detail);
