@@ -16,11 +16,11 @@ export default function Home() {
 
   useEffect(() => {
     socket.on('game-busy', () => {
-      setErrorMessage('Game is busy')
+      setErrorMessage('Esta sala ya está completa')
     })
 
     socket.on('game-not-found', () => {
-      setErrorMessage('Game not found')
+      setErrorMessage('Sala no encontrada')
     })
 
     socket.on('game-found', (data: {
@@ -166,7 +166,7 @@ export default function Home() {
                           border-2 border-gray-400 rounded-lg
                           focus:outline-none focus:ring-2 focus:ring-gray-500 
                           focus:border-gray-500"
-                placeholder="Enter Game ID"
+                placeholder="Introduce el ID de la sala"
               />
 
               <div className="flex flex-col sm:flex-row gap-[2vh] sm:gap-[2vw] w-full">
@@ -183,7 +183,7 @@ export default function Home() {
                   <span className="text-[3.5vw] sm:text-[2.5vw] lg:text-[1.5vw] xl:text-[1.2vw]
                                  min-[1600px]:text-lg 
                                  font-medium">
-                    Join
+                    Unirse
                   </span>
                 </button>
 
@@ -202,7 +202,7 @@ export default function Home() {
                   <span className="text-[3.5vw] sm:text-[2.5vw] lg:text-[1.5vw] xl:text-[1.2vw]
                                  min-[1600px]:text-lg 
                                  font-medium">
-                    Cancel
+                    Cancelar
                   </span>
                 </button>
               </div>
