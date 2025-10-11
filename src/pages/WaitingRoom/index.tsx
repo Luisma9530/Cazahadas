@@ -56,7 +56,7 @@ export function WaitingRoom() {
                        transition-all duration-200"
           >
             <span className="text-lg sm:text-2xl font-medium text-black group-hover:text-white">
-              Join Game
+              Unirse a partida
             </span>
           </button>
         </div>

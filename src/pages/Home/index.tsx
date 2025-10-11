@@ -108,7 +108,7 @@ export default function Home() {
               <span className="text-[4vw] sm:text-[3vw] lg:text-[1.8vw] xl:text-[1.5vw] 
                              font-medium text-black group-hover:text-white
                              min-[1600px]:text-2xl">
-                Join Game
+                Unirse a partida
               </span>
             </button>
           </div>
@@ -133,7 +133,7 @@ export default function Home() {
               <span className="text-[4vw] sm:text-[3vw] lg:text-[1.8vw] xl:text-[1.5vw] 
                              font-medium text-black group-hover:text-white
                              min-[1600px]:text-2xl">
-                Start Game
+                Crear Partida
               </span>
             </button>
           </div>
@@ -154,7 +154,7 @@ export default function Home() {
               <h2 className="text-[5vw] sm:text-[4vw] lg:text-[2.5vw] xl:text-[2vw]
                            min-[1600px]:text-3xl
                            font-medium text-black text-center">
-                Join Game
+                Unirse a partida
               </h2>
 
               <input
