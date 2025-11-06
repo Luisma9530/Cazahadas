@@ -4,11 +4,9 @@ import socket from "../socket";
 import useBoardStore from "../store/BoardStore";
 import { useGameStore } from "../store/GameStore";
 import { useModalStore } from "../store/ModalStore";
-import { usePointStore } from "../store/PointsStore";
 import useTurnStore from "../store/TurnStore";
 import useNeoHandStore from "../store/NeoHandStore";
-import homeBackground from '../assets/images/homeBackground.png';
-import waitingRoomBackground from '../assets/images/waitingRoomBackground.png';
+import homeBackground from '../assets/images/fondo.png';
 import useBackgroundStore from "../store/BackgroundStore";
 import GameRulesModal from "../components/Modals/GameRulesModal";
 import ScoreboardModal from "../components/Modals/ScoreBoardModal";
@@ -21,7 +19,6 @@ export default function DefaultLayout() {
   const navigate = useNavigate()
   const [resetBoardStore] = useBoardStore((state) => [state.resetStore])
   const [resetGameStore] = useGameStore((state) => [state.resetStore])
-  const [resetPointsStore] = usePointStore((state) => [state.resetStore])
   const [resetTurnStore] = useTurnStore((state) => [state.resetStore])
   const [resetModalStore] = useModalStore((state) => [state.resetStore])
   const [resetNeoHandStore] = useNeoHandStore((state) => [state.resetStore])
@@ -29,7 +26,7 @@ export default function DefaultLayout() {
   const [showRules, setShowRules] = useState(false);
   const [showScoreboard, setShowScoreboard] = useState(false);
   const [showAuth, setShowAuth] = useState(false);
-  const [logedUser, setLogedUser, setPassword] = useAuthStore((state) => [state.logedUser, state.setLogedUser, state.setPassword]);
+  const [logedUser, setLogedUser, setPassword] = useAuthStore((state) => [state.logedUser, state.setLogedUser, state.setToken]);
   const [scores, setScores] = useState([]);
   const API_URL = import.meta.env.VITE_API_URL;
 
@@ -43,7 +40,7 @@ export default function DefaultLayout() {
     } else if (location.pathname.startsWith("/game")) {
       return `url(${homeBackground})`;
     } else if (location.pathname.startsWith("/waiting-room")) {
-      return `url(${waitingRoomBackground})`;
+      return `url(${homeBackground})`;
     }
     return "none";
   };
@@ -61,7 +58,6 @@ export default function DefaultLayout() {
   const resetAllStores = () => {
     resetBoardStore()
     resetGameStore()
-    resetPointsStore()
     resetTurnStore()
     resetModalStore()
     resetNeoHandStore()

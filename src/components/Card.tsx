@@ -6,25 +6,6 @@ type CardProps = {
   amIP1?: boolean
 }
 
-function renderCardText(text: string) {
-  const parts = text.split(/(\[\[.*?\]\])/);
-  return parts.map((part, index) => {
-    if (part.startsWith("[[") && part.endsWith("]]")) {
-      const specialText = part.slice(2, -2);
-      return (
-        <span key={index} className="text-sm font-bold whitespace-pre-line">
-          {specialText}
-        </span>
-      );
-    }
-    return (
-      <span key={index} className="whitespace-pre-line">
-        {part}
-      </span>
-    );
-  });
-}
-
 export default function Card({ card, placed = false, amIP1 }: CardProps) {
   if (!card) return null
 
@@ -45,8 +26,8 @@ export default function Card({ card, placed = false, amIP1 }: CardProps) {
     if (card.image) {
       return (
         <div className="relative h-full w-full rounded-lg overflow-hidden bg-gray-200">
-          <img 
-            src={card.image} 
+          <img
+            src={card.image}
             alt={card.name || 'Card'}
             className="w-full h-full object-fill"
             onError={(e) => {

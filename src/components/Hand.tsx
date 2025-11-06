@@ -30,12 +30,12 @@ export default function Hand() {
 
   const handleCardClick = (card: CardUnity) => {
     toggleCardSelection(card)
-    
+
     flickAudio.pause()
     flickAudio.currentTime = 0
     flickAudio.volume = 0.4
     flickAudio.play()
-    
+
     // Emitir las cartas seleccionadas actualizadas
     // Necesitamos obtener el estado actualizado después del toggle
     const updatedSelectedCards = useCardStore.getState().selectedCards
@@ -55,7 +55,7 @@ export default function Hand() {
   return (
     <motion.ul
       className="flex items-end justify-center w-full pt-2 pb-3 px-8 relative"
-      style={{ height: '160px' }} // Altura reducida significativamente
+      style={{ height: '20vh' }} // Cambiado de 160px a vh
       animate={{ transition: { staggerChildren: 0.5 } }}
     >
       <AnimatePresence>
@@ -66,13 +66,11 @@ export default function Hand() {
             const angleStep = totalCards > 1 ? maxAngle / (totalCards - 1) : 0;
             const angle = totalCards > 1 ? -maxAngle / 2 + (index * angleStep) : 0;
 
-            // Radio reducido para menor espacio
-            const radius = 140; // Reducido de 250 a 140
+            const radius = window.innerHeight * 0.18; // 18% del alto del viewport
 
-            // Calcular posición basada en el ángulo para formar un verdadero abanico
             const radian = (angle * Math.PI) / 180;
             const x = Math.sin(radian) * radius;
-            const y = -Math.cos(radian) * radius + radius; // Crear curva de abanico real
+            const y = -Math.cos(radian) * radius + radius;
 
             const isSelected = isCardSelected(card)
             const isHovered = hoveredCard?.id === card.id
@@ -83,29 +81,28 @@ export default function Hand() {
                 initial={{ opacity: 0, x: -200, y: 0 }}
                 animate={{
                   x: x,
-                  y: y + (isSelected ? -20 : 0), // Reducido el movimiento de selección
+                  y: y + (isSelected ? -20 : 0),
                   opacity: 1,
                   rotate: angle,
                   transition: { duration: 0.0 }
                 }}
                 exit={{ opacity: 0, transition: { duration: 1 } }}
-                className={`border-2 border-solid shadow-lg rounded-lg cursor-pointer absolute ${
-                  isSelected
-                    ? 'border-green-400 -translate-y-5 transform z-10' // Reducido el translate
+                className={`border-2 border-solid shadow-lg rounded-lg cursor-pointer absolute ${isSelected
+                    ? 'border-green-400 -translate-y-5 transform z-10'
                     : 'border-black hover:scale-105 hover:duration-100 hover:border-blue-500'
-                  } h-44 w-36` // Cartas más pequeñas: de h-60 w-52 a h-44 w-36
+                  } sm:h-[12vw] aspect-[36/44]`
                 }
                 style={{
                   transformOrigin: 'bottom center',
                   zIndex: (isSelected || isHovered) ? 10 : index,
                   bottom: 0,
-                  transition: 'transform 0.3s ease-in-out' // Transición suave
+                  transition: 'transform 0.3s ease-in-out'
                 }}
                 onHoverStart={() => handleHoverStart(card)}
                 onHoverEnd={() => setHoveredCard(null)}
                 onClick={() => handleCardClick(card)}
-                whileHover={{ 
-                  y: y - 10, // Hover más sutil
+                whileHover={{
+                  y: y - 10,
                   scale: 1.4,
                   transition: { duration: 0.2 }
                 }}

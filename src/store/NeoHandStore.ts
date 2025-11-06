@@ -6,8 +6,6 @@ let index = 0;
 
 type HandStore = {
   deck: CardInfo[];
-  opponentDeck: CardInfo[];
-  opponentCards: CardUnity[];
   playerCards: CardUnity[];
   discardPile: CardUnity[];
   placeCard: (card: CardUnity) => void;
@@ -19,8 +17,6 @@ type HandStore = {
 const useNeoHandStore = create<HandStore>((set) => ({
   deck: [...deckCards],
   playerCards: [] as CardUnity[],
-  opponentDeck: [...deckCards],
-  opponentCards: [] as CardUnity[],
   placeCard: (card) => {
     set((state) => ({
       playerCards: state.playerCards.filter((c) => c.id !== card.id),
@@ -72,8 +68,6 @@ const useNeoHandStore = create<HandStore>((set) => ({
     return set({
       playerCards: [] as CardUnity[],
       deck: [...deckCards],
-      opponentCards: [] as CardUnity[],
-      opponentDeck: [...deckCards],
       discardPile: [] as CardUnity[],
     });
   },

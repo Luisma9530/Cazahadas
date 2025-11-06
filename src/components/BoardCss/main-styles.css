@@ -19,3 +19,6 @@
 
 /* Sistema de hover y z-index */
 @import './hover-previews.css';
+
+/* Estilos adicionales pueden ser añadidos aquí */
+@import './medieval-number.css'

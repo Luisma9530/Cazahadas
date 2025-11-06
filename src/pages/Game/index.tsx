@@ -1,11 +1,9 @@
 import { useEffect, useState } from "react";
 import Board from "../../components/Board";
-import Hand from "../../components/Hand";
 import socket from "../../socket";
 import { Tile } from "../../@types/Tile";
 import useBoardStore from "../../store/BoardStore";
 import { Result, useGameStore } from "../../store/GameStore";
-import { usePointStore } from "../../store/PointsStore";
 import SkipTurn from "../../components/SkipTurn";
 import TurnIndicator from "../../components/TurnIndicator.tsx";
 import { useModalStore } from "../../store/ModalStore";
@@ -17,12 +15,11 @@ import { EndGameModal } from "../../components/Modals/EndGameModal";
 import { useParams } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCopy } from "@fortawesome/free-regular-svg-icons";
-import useBackgroundStore from "../../store/BackgroundStore";
-import homeBackground from '../../assets/images/homeBackground.png';
 import { CardUnity } from "../../@types/Card";
 import BattleConfirmModal from "../../components/Modals/BattleStartModal.tsx";
 import DrawConfirmModal from "../../components/Modals/DrawConfirmModal.tsx";
 import RequestDraw from "../../components/drawGame.tsx";
+import GameWrapper from "../../utils/GameWrapper.tsx";
 
 export default function Game() {
   const [loading, setLoading] = useState(true)
@@ -32,8 +29,6 @@ export default function Game() {
   const [isMyTurn, toggleTurn, setPlayerSkippedTurn, setIsBattle, isBattle, setIsMyFirstTurnBattle, showBattleModal, setShowBattleModal, showDrawModal, setShowDrawModal] = useTurnStore((state) => [state.isMyTurn, state.toggleTurn, state.setPlayerSkippedTurn, state.setIsBattle, state.isBattle, state.setIsMyFirstTurnBattle, state.showBattleModal, state.setShowBattleModal, state.showDrawModal, state.setShowDrawModal]);
   const [setBoard, board] = useBoardStore((state) => [state.setBoard, state.board])
   const [amIP1, setAmIP1, gameOver, setGameOver, setPlayerOneName, setPlayerTwoName, setPlayerDisconnected, setGameResult, gameResult] = useGameStore((state) => [state.amIP1, state.setAmIP1, state.gameOver, state.setGameOver, state.setPlayerOneName, state.setPlayerTwoName, state.setPlayerDisconnected, state.setGameResult, state.gameResult])
-  const [setPoints] = usePointStore((state) => [state.setPoints])
-  const { setBackground } = useBackgroundStore();
 
   const { id: gameId } = useParams<{ id: string }>()
 
@@ -65,7 +60,6 @@ export default function Game() {
       if (amIP1) {
         toggleTurn()
       }
-      setBackground(homeBackground)
       setPlayerOneName(data[0])
       setPlayerTwoName(data[1])
     })
@@ -78,7 +72,6 @@ export default function Game() {
       } else { // Si no es una batalla o no se terminó, se actualiza el estado de si el jugador saltó su turno
         setPlayerSkippedTurn(data.playerSkippedTurn)
       }
-      setPoints(data.tiles)
       toggleTurnModal()
       if (!isMyTurn) {
         const mirroredTiles = mirrorBoard(data.tiles);
@@ -193,7 +186,7 @@ export default function Game() {
               {gameId}
             </h1>
             <button
-              className="cursor-pointer text-white hover:text-gray-300 transition-colors p-2"
+              className="cursor-pointer text-white hover:text-gray-300 transition-colors p-2 z-[55]"
               onClick={() => handleGameIdClick(gameId)}
             >
               <FontAwesomeIcon icon={faCopy} size={"lg"} />
@@ -202,93 +195,13 @@ export default function Game() {
         </div>
       )}
 
-      {/* Game Board - Diseño original para desktop, optimizado para móvil */}
-      {shouldShowBoard && (
-        <>
-          {/* Layout para móvil (sm y menor) */}
-          <div className="block sm:hidden h-full flex flex-col">
-            {/* Battle Modal */}
-            {showBattleModal &&
-              <BattleConfirmModal
-                isOpen={showBattleModal}
-                onAccept={() => {
-                  console.log("Battle confirmed");
-                  setShowBattleModal(false);
-                }}
-                onReject={() => {
-                  console.log("Battle rejected");
-                  socket.emit("end-battle", { gameId: gameId, tiles: board });
-                  setShowBattleModal(false);
-                }}
-              />
-            }
-
-            {showDrawModal &&
-              <DrawConfirmModal
-                isOpen={showDrawModal}
-                onAccept={() => {
-                  socket.emit('draw-game', { gameId: gameId });
-                  setShowDrawModal(false);
-                }}
-                onReject={() => {
-
-                  setShowDrawModal(false);
-                }}
-              />
-            }
-
-
-            {/* Turn Indicator */}
-            <div className="flex-shrink-0 py-1 z-[51]">
-              <TurnIndicator />
-            </div>
-
-            {/* Board Container optimizado para móvil */}
-            <div className="flex-1 flex items-center justify-center min-h-0">
-              <div className="w-full h-full flex items-center justify-center">
-                <div className="scale-[0.7] xs:scale-[0.95] origin-center">
-                  <Board amIP1={amIP1} />
-                </div>
-              </div>
-            </div>
-
-            {/* Skip Turn */}
-            <div className="flex-shrink-0 z-[52] flex flex-col justify-end items-end pr-4 -space-y-2">
-              <div className="scale-[0.4] xs:scale-[0.8] origin-right">
-                <SkipTurn />
-              </div>
-              <div className="scale-[0.4] xs:scale-[0.8] origin-right">
-                <RequestDraw />
-              </div>
-            </div>
-
-            {/* Hand - Escalado proporcional manteniendo diseño original */}
-            <div className="flex-shrink-0 pb-2 z-[50]">
-              <div className="scale-[0.45] xs:scale-[0.8] origin-top">
-                <Hand />
-              </div>
-            </div>
-          </div>
-
-          {/* Layout mejorado para desktop */}
-          <div className="hidden sm:block relative w-full h-screen overflow-hidden">
-
-            {/* Modales - Centro absoluto de la pantalla */}
-            <div className="absolute -top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 z-[60] w-full max-w-md">
-              {showDrawModal &&
-                <DrawConfirmModal
-                  isOpen={showDrawModal}
-                  onAccept={() => {
-                    socket.emit('draw-game', { gameId: gameId });
-                    setShowDrawModal(false);
-                  }}
-                  onReject={() => {
-                    setShowDrawModal(false);
-                  }}
-                />
-              }
-            </div>
-            <div className="absolute top-72 left-1/2 -translate-x-1/2 -translate-y-1/2 z-[60] w-full max-w-md">
+      <GameWrapper>
+        {/* Game Board - Diseño original para desktop, optimizado para móvil */}
+        {shouldShowBoard && (
+          <>
+            {/* Layout para móvil (sm y menor) */}
+            <div className="block sm:hidden h-full flex flex-col">
+              {/* Battle Modal */}
               {showBattleModal &&
                 <BattleConfirmModal
                   isOpen={showBattleModal}
@@ -303,47 +216,111 @@ export default function Game() {
                   }}
                 />
               }
-            </div>
 
-            {/* Indicador de turno - Esquina superior derecha, por delante del tablero */}
-            <div className="absolute top-4 md:top-8 right-4 md:right-8 lg:right-12 z-[54]">
-              <TurnIndicator />
-            </div>
+              {showDrawModal &&
+                <DrawConfirmModal
+                  isOpen={showDrawModal}
+                  onAccept={() => {
+                    socket.emit('draw-game', { gameId: gameId });
+                    setShowDrawModal(false);
+                  }}
+                  onReject={() => {
 
-            {/* Botón Request Draw - Debajo del TurnIndicator */}
-            <div className="absolute top-20 md:top-1/3
-        right-4 md:-right-24 lg:-right-16 z-[54]
-        scale-[0.55] md:scale-[0.50] lg:scale-[0.7]">
-              <RequestDraw />
-            </div>
+                    setShowDrawModal(false);
+                  }}
+                />
+              }
 
-            {/* Botón Skip Turn - Debajo de RequestDraw */}
-            <div className="absolute top-32 md:top-1/2 
-        right-4 md:-right-20 lg:-right-12 z-[54]
-        scale-[0.55] md:scale-[0.50] lg:scale-[0.7]">
-              <SkipTurn />
-            </div>
 
-            {/* Tablero - Centro pero más arriba, ancho aumentado sin estirar contenido */}
-            <div className="absolute top-[30%] left-1/2 -translate-x-1/2 -translate-y-1/2 z-[52]
-        w-[130%] md:w-[140%] lg:w-[145%] xl:w-[115%]">
-              <div className="scale-[0.5] md:scale-[0.6] lg:scale-[0.65] xl:scale-[0.7] 
-          origin-center flex justify-center">
-                <Board amIP1={amIP1} />
+              {/* Turn Indicator */}
+              <div className="flex-shrink-0 py-1 z-[51]">
+                <TurnIndicator />
               </div>
+
+              {/* Board Container optimizado para móvil */}
+              {/* Tablero centrado en el área escalada */}
+              <div className="absolute inset-0 flex items-center justify-center">
+                <div className="w-[80%] max-w-[1600px] aspect-[16/9] relative">
+                  <Board amIP1={amIP1} />
+                </div>
+              </div>
+
+
+
+
+              {/* Skip Turn */}
+              <div className="absolute top-[35%] right-[2%] scale-[0.7] z-[54]">
+                <RequestDraw />
+              </div>
+              <div className="absolute top-[50%] right-[2%] scale-[0.7] z-[54]">
+                <SkipTurn />
+              </div>
+
             </div>
 
-            {/* Mano de cartas - Debajo del tablero, por delante */}
-            <div className="absolute top-[30%] translate-y-[calc(50%+2rem)] md:translate-y-[calc(50%+4rem)]
-        left-1/2 -translate-x-1/2 z-[53]
-        w-full max-w-6xl px-4">
-              <Hand />
-            </div>
+            {/* Layout mejorado para desktop */}
+            <div className="fixed inset-0 flex items-center justify-center overflow-hidden relative">
 
-          </div>
-        </>
-      )
-      }
+
+              {/* Modales - Centro absoluto de la pantalla */}
+              <div className="absolute -top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 z-[60] w-full max-w-md">
+                {showDrawModal &&
+                  <DrawConfirmModal
+                    isOpen={showDrawModal}
+                    onAccept={() => {
+                      socket.emit('draw-game', { gameId: gameId });
+                      setShowDrawModal(false);
+                    }}
+                    onReject={() => {
+                      setShowDrawModal(false);
+                    }}
+                  />
+                }
+              </div>
+              <div className="absolute top-72 left-1/2 -translate-x-1/2 -translate-y-1/2 z-[60] w-full max-w-md">
+                {showBattleModal &&
+                  <BattleConfirmModal
+                    isOpen={showBattleModal}
+                    onAccept={() => {
+                      console.log("Battle confirmed");
+                      setShowBattleModal(false);
+                    }}
+                    onReject={() => {
+                      console.log("Battle rejected");
+                      socket.emit("end-battle", { gameId: gameId, tiles: board });
+                      setShowBattleModal(false);
+                    }}
+                  />
+                }
+              </div>
+
+              {/* Indicador de turno - Esquina superior derecha, por delante del tablero */}
+              <div className="absolute top-4 md:top-8 right-4 md:right-8 lg:right-12 z-[54]">
+                <TurnIndicator />
+              </div>
+
+              <div
+                className="absolute inset-0 flex items-center justify-center"
+                style={{ transform: "scale(var(--board-scale))", transformOrigin: "center center" }}
+              >
+                <Board amIP1={amIP1} />
+                {/* Botones fijados a la pantalla igual que el TurnIndicator */}
+                <div className="fixed top-[35vh] right-0 scale-[0.8] z-[54]">
+                  <RequestDraw />
+                </div>
+
+                <div className="fixed top-[50vh] right-0 scale-[0.8] z-[54]">
+                  <SkipTurn />
+                </div>
+
+
+              </div>
+
+            </div>
+          </>
+        )
+        }
+      </GameWrapper >
 
       {/* Game Busy - Centrado */}
       {
@@ -357,26 +334,34 @@ export default function Game() {
       }
 
       {/* Modales - Sin cambios en funcionalidad */}
-      {gameStartModal && !gameOver && (
-        <div className="relative z-[60]">
-          <GameStartModal />
-        </div>
-      )}
-      {turnModal && !gameOver && (
-        <div className="relative z-[60]">
-          <TurnModal />
-        </div>
-      )}
-      {battleModal && !gameOver && (
-        <div className="relative z-[60]">
-          <BattleModal />
-        </div>
-      )}
-      {gameOver && (
-        <div className="relative z-[60]">
-          <EndGameModal amIP1={amIP1} winner={gameResult} />
-        </div>
-      )}
+      {
+        gameStartModal && !gameOver && (
+          <div className="relative z-[60]">
+            <GameStartModal />
+          </div>
+        )
+      }
+      {
+        turnModal && !gameOver && (
+          <div className="relative z-[60]">
+            <TurnModal />
+          </div>
+        )
+      }
+      {
+        battleModal && !gameOver && (
+          <div className="relative z-[60]">
+            <BattleModal />
+          </div>
+        )
+      }
+      {
+        gameOver && (
+          <div className="relative z-[60]">
+            <EndGameModal amIP1={amIP1} winner={gameResult} />
+          </div>
+        )
+      }
     </div >
   )
 }

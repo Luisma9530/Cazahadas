@@ -1,6 +1,7 @@
 import { useRef, useEffect } from "react";
 import socket from "../socket";
 import { Tile } from "../@types/Tile";
+import Hand from "../components/Hand";
 import useBoardStore from "../store/BoardStore";
 import useNeoHandStore from "../store/NeoHandStore";
 import useTurnStore from "../store/TurnStore";
@@ -398,7 +399,7 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
     const isValid = isCellValid(row, col, selectedCards);
 
     if (isValid) {
-      return `${baseClasses} relative before:content-['✨'] before:absolute before:-top-2 before:-right-2 before:text-2xl before:animate-bounce 
+      return `${baseClasses} relative  before:absolute before:-top-2 before:-right-2 before:text-2xl before:animate-bounce 
             after:content-[''] after:absolute after:inset-0 after:bg-gradient-to-r after:from-yellow-300 after:via-orange-300 after:to-yellow-300 
             after:opacity-30 after:animate-pulse after:rounded 
             ring-6 ring-orange-400 shadow-[0_0_30px_rgba(255,165,0,0.8)] transform scale-110 transition-all duration-300 z-20 
@@ -452,629 +453,272 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
     return validCells;
   };
 
-  // Renderizamos el tablero con la estructura 3x4.
   return (
-    <div className="relative w-full min-h-screen flex items-center justify-center p-2 sm:p-4">
+    <div className="fixed inset-0 flex items-center justify-center pointer-events-none">
+      {/* Contenedor del tablero */}
+      <div
+        className="relative pointer-events-auto"
+        style={{
+          width: "1280px",
+          height: "720px",
+          transform: "scale(var(--board-scale))",
+          transformOrigin: "center center",
+        }}
+      >
 
-      {/* Mesa de fondo */}
-      <div className="absolute inset-0 table-background"></div>
-
-      {/* Tablero de juego - Layout diferente para móvil vs desktop */}
-      <div className="relative z-10 w-full max-w-sm sm:max-w-2xl lg:max-w-4xl mx-auto">
-
-        {/* DISEÑO MÓVIL - Flex vertical compacto */}
-        <div className="flex flex-col gap-1 p-2 sm:hidden">
-
-          {/* Fila 0: Zona del Rival - Móvil */}
-          <div className="grid grid-cols-4 gap-1">
-            <div className="rival-cell-3d defense-cell-castle game-cell flex items-center justify-center hover-container"
-              style={{ height: '25vw', width: '20vw' }}>
-              <div className="defense-shield-icon"></div>
-              {tiles[0][0].type === 'deck' ? (
-                tiles[0][0].cards.length > 0 ? (
-                  <div className="relative h-full w-full">
-                    {tiles[0][0].cards.slice(-3).map((card, i) => (
-                      <div
-                        key={i}
-                        className="absolute top-0 left-0"
-                        style={{ top: `${i * 2}px`, zIndex: i }}
-                      >
-                        <div className="w-full h-full overflow-hidden">
-                          <Card placed={true} card={card} amIP1={amIP1} />
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                ) : (
-                  <div className="text-[6px] font-bold text-center text-stone-100 leading-tight">
-                    DEFENSA<br />DEL HADA
-                  </div>
-                )
-              ) : (
-                <div className="text-[6px] font-bold text-center text-stone-100 leading-tight">
-                  DEFENSA<br />DEL HADA
-                </div>
-              )}
-            </div>
-
-            <div className="rival-cell-3d game-cell captured-fairies-cell rival-captured-fairies-cell flex items-center justify-center hover-container"
-              style={{ height: '25vw', width: '20vw' }}>
-              <div className="fairy-particles"></div>
-              <div className="fairy-capture-icon"></div>
-              {tiles[0][1].type === 'capturedFairies' ? (
-                tiles[0][1].cards.length > 0 ? (
-                  <div className="relative h-full w-full">
-                    {tiles[0][1].cards.slice(-3).map((card, i) => (
-                      <div
-                        key={i}
-                        className="absolute top-0 left-0"
-                        style={{ top: `${i * 2}px`, zIndex: i }}
-                      >
-                        <div className="w-full h-full overflow-hidden">
-                          <Card placed={true} card={card} amIP1={amIP1} />
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                ) : (
-                  <div className="captured-fairies-text text-[6px] leading-tight text-center">Captured<br />Fairies</div>
-                )
-              ) : (
-                <span className="text-[6px] leading-tight text-center">Captured<br />Fairies</span>
-              )}
-            </div>
-
-            <div className="h-12"></div>
-            <div className="h-12"></div>
-          </div>
-
-          {/* Fila 1: Zona de juego central - Móvil */}
-          <div className="grid grid-cols-5 gap-12 justify-center my-4">
-            <div
-              className={getCellHighlightClasses(1, 0, selectedCard,
-                `middle-cell-3d game-cell relative flex items-center justify-center border cursor-pointer overflow-hidden
-                ${tiles[1][0].type === 'fairy' && tiles[1][0].captured
-                  ? 'bg-gray-500'
-                  : 'bg-gray-200'}`
-              )}
-              onClick={() => handleCellClick(tiles[1][0], 1, 0)}
-              style={{ height: '25vw', width: '20vw' }}
-            >
-              {/* Imagen de fondo */}
-              {tiles[1][0].type === 'fairy' && !tiles[1][0].captured && (
-                <img
-                  src="/cartasPNG/HadaEncarada.png"
-                  alt="Fairy background"
-                  className="absolute inset-0 w-full h-full object-cover z-0"
-                />
-              )}
-              <div className="relative z-10">
-                {tiles[1][0].type === 'fairy' && tiles[1][0].card ? (
-                  <div className="w-full h-full p-0.5">
-                    <Card placed={true} card={tiles[1][0].card} amIP1={amIP1} />
-                  </div>
-                ) : (
-                  <span />
-                )}
+        {/* HADAS CAPTURADAS - RIVAL (Esquina superior izquierda) */}
+        <div className="absolute top-[-10%] left-[-20%] w-[120px] h-[150px] sm:w-[150px] sm:h-[186px]">
+          <div className="rival-cell-3d game-cell captured-fairies-cell flex items-center justify-center hover-container w-full h-full">
+            <div className="fairy-particles"></div>
+            <div className="fairy-capture-icon"></div>
+            {tiles[0][1].type === 'capturedFairies' && (
+              <div className="medieval-number text-5xl sm:text-6xl">
+                {tiles[0][1].cards.length}
               </div>
-            </div>
-
-            <div
-              className={getCellHighlightClasses(1, 1, selectedCard,
-                `middle-cell-3d game-cell relative flex items-center justify-center border cursor-pointer overflow-hidden
-                ${tiles[1][1].type === 'fairy' && tiles[1][1].captured
-                  ? 'bg-gray-500'
-                  : 'bg-gray-200'}`
-              )}
-              onClick={() => handleCellClick(tiles[1][1], 1, 1)}
-              style={{ height: '25vw', width: '20vw' }}
-            >
-              {/* Imagen de fondo */}
-              {tiles[1][1].type === 'fairy' && !tiles[1][1].captured && (
-                <img
-                  src="/cartasPNG/HadaMalhablada.png"
-                  alt="Fairy background"
-                  className="absolute inset-0 w-full h-full object-cover z-0"
-                />
-              )}
-              <div className="relative z-10">
-                {tiles[1][1].type === 'fairy' && tiles[1][1].card ? (
-                  <div className="w-full h-full p-0.5">
-                    <Card placed={true} card={tiles[1][1].card} amIP1={amIP1} />
-                  </div>
-                ) : (
-                  <span />
-                )}
-              </div>
-            </div>
-
-            <div
-              className={getCellHighlightClasses(1, 2, selectedCard,
-                `middle-cell-3d game-cell relative flex items-center justify-center border cursor-pointer overflow-hidden
-                ${tiles[1][2].type === 'fairy' && tiles[1][2].captured
-                  ? 'bg-gray-500'
-                  : 'bg-gray-200'}`
-              )}
-              onClick={() => handleCellClick(tiles[1][2], 1, 2)}
-              style={{ height: '25vw', width: '20vw' }}
-            >
-              {/* Imagen de fondo */}
-              {tiles[1][2].type === 'fairy' && !tiles[1][2].captured && (
-                <img
-                  src="/cartasPNG/HadaResabiada.png"
-                  alt="Fairy background"
-                  className="absolute inset-0 w-full h-full object-cover z-0"
-                />
-              )}
-              <div className="relative z-10">
-                {tiles[1][2].type === 'fairy' && tiles[1][2].card ? (
-                  <div className="w-full h-full p-0.5">
-                    <Card placed={true} card={tiles[1][2].card} amIP1={amIP1} />
-                  </div>
-                ) : (
-                  <span />
-                )}
-              </div>
-            </div>
-
-            <div
-              className="middle-cell-3d game-cell bg-yellow-300 flex items-center justify-center border cursor-pointer"
-              onClick={() => handleCellClick(tiles[1][3], 1, 3)}
-              style={{ height: '25vw', width: '20vw' }}
-            >
-              <span className="text-sm font-bold">
-                {tiles[1][3].type === 'variableX'
-                  ? "X= " + tiles[1][3].value
-                  : "X"}
-              </span>
-            </div>
-
-            <div
-              className={getCellHighlightClasses(1, 4, selectedCard,
-                "player-cell-3d game-cell player-magic-cell bg-blue-500 flex items-center justify-center border cursor-pointer hover-container"
-              )}
-              onClick={() => handleCellClick(tiles[1][4], 1, 4)}
-              style={{ height: '25vw', width: '20vw' }}
-            >
-              <div className="player-light-particles"></div>
-              <div className="player-magical-energy"></div>
-              <div className="player-magic-runes"></div>
-              <div className="player-grimoire-symbol"></div>
-              <div className="player-magic-power-icon"></div>
-              {tiles[1][4].type === 'magic' ? (
-                tiles[1][4].cards.length > 0 ? (
-                  <div className="relative h-full w-full">
-                    {tiles[1][4].cards.slice(-3).map((card, i) => (
-                      <div
-                        key={i}
-                        className="absolute top-0 left-0"
-                        style={{ top: `${i * 2}px`, zIndex: i }}
-                      >
-                        <div className="w-full h-full overflow-hidden">
-                          <Card placed={true} card={card} amIP1={amIP1} />
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                ) : (
-                  <div className="player-magic-text text-[6px] text-center leading-tight">
-                    Sacred<br />Magics
-                  </div>
-                )
-              ) : (
-                <div className="player-magic-text text-[6px] text-center leading-tight">
-                  Sacred<br />Magics
-                </div>
-              )}
-            </div>
-          </div>
-
-          {/* Fila 2: Zona del Jugador - Móvil */}
-          <div className="grid grid-cols-4 gap-5">
-            <div
-              className={getCellHighlightClasses(2, 0, selectedCard,
-                "player-cell-3d defense-cell-castle game-cell flex items-center justify-center cursor-pointer hover-container"
-              )}
-              onClick={() => handleCellClick(tiles[2][0], 2, 0)}
-              style={{ height: '25vw', width: '20vw' }}
-            >
-              <div className="defense-shield-icon"></div>
-              {tiles[2][0].type === 'deck' ? (
-                tiles[2][0].cards.length > 0 ? (
-                  <div className="relative h-full w-full">
-                    {tiles[2][0].cards.slice(-3).map((card, i) => (
-                      <div
-                        key={i}
-                        className="absolute top-0 left-0"
-                        style={{ top: `${i * 2}px`, zIndex: i }}
-                      >
-                        <div className="w-full h-full overflow-hidden">
-                          <Card placed={true} card={card} amIP1={amIP1} />
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                ) : (
-                  <div className="text-[6px] font-bold text-center text-stone-100 leading-tight">
-                    DEFENSA<br />DEL JUGADOR
-                  </div>
-                )
-              ) : (
-                <div className="text-[6px] font-bold text-center text-stone-100 leading-tight">
-                  DEFENSA<br />DEL JUGADOR
-                </div>
-              )}
-            </div>
-
-            <div className="player-cell-3d game-cell captured-fairies-cell player-captured-fairies-cell flex items-center justify-center hover-container"
-              style={{ height: '25vw', width: '20vw' }}>
-              <div className="fairy-particles"></div>
-              <div className="fairy-capture-icon"></div>
-              {tiles[2][1].type === 'capturedFairies' ? (
-                tiles[2][1].cards.length > 0 ? (
-                  <div className="relative h-full w-full">
-                    {tiles[2][1].cards.slice(-3).map((card, i) => (
-                      <div
-                        key={i}
-                        className="absolute top-0 left-0"
-                        style={{ top: `${i * 2}px`, zIndex: i }}
-                      >
-                        <div className="w-full h-full overflow-hidden">
-                          <Card placed={true} card={card} amIP1={amIP1} />
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                ) : (
-                  <div className="captured-fairies-text text-[6px] text-center leading-tight">Captured<br />Fairies</div>
-                )
-              ) : (
-                <div className="captured-fairies-text text-[6px] text-center leading-tight">Captured<br />Fairies</div>
-              )}
-            </div>
-
-            <div
-              className={getCellHighlightClasses(2, 2, selectedCard,
-                "player-cell-3d game-cell discard-cell-cauldron player-discard-cell flex items-center justify-center border cursor-pointer hover-container"
-              )}
-              onClick={() => handleCellClick(tiles[2][2], 2, 2)}
-              style={{ height: '25vw', width: '20vw' }}
-            >
-              <div className="discard-magical-smoke"></div>
-              <div className="discard-magic-icon"></div>
-              {tiles[2][2].type === 'discard' ? (
-                tiles[2][2].cards.length > 0 ? (
-                  <div className="relative h-full w-full">
-                    {tiles[2][2].cards.slice(-3).map((card, i) => (
-                      <div
-                        key={i}
-                        className="absolute top-0 left-0 discard-card-animation"
-                        style={{ top: `${i * 2}px`, zIndex: i }}
-                      >
-                        <div className="w-full h-full overflow-hidden">
-                          <Card placed={true} card={card} amIP1={amIP1} />
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                ) : (
-                  <span className="discard-text text-[6px] text-center">Mi Caldero</span>
-                )
-              ) : (
-                <span className="discard-text text-[6px] text-center">Mi Caldero</span>
-              )}
-            </div>
-
-            <div className="h-12"></div>
+            )}
           </div>
         </div>
 
-        {/* DISEÑO DESKTOP - Grid con tamaños fijos */}
-        <div className="hidden sm:block relative w-full">
-          <div className="absolute -top-64 left-0 right-0 flex justify-center">
-            <div className="grid grid-rows-3 gap-4 sm:gap-6 p-4 sm:p-8">
-
-              {/* Fila 0: Zona del Rival - Desktop */}
-              <div className="grid grid-cols-4 gap-6 sm:gap-10">
-                <div className="rival-cell-3d defense-cell-castle game-cell flex items-center justify-center hover-container h-[60px] sm:h-[100px] w-[104px] sm:w-[174px]">
-                  <div className="defense-shield-icon"></div>
-                  {tiles[0][0].type === 'deck' ? (
-                    tiles[0][0].cards.length > 0 ? (
-                      <div className="relative h-[60px] sm:h-[100px] w-[48px] sm:w-[80px]">
-                        {tiles[0][0].cards.slice(-3).map((card, i) => (
-                          <div
-                            key={i}
-                            className="absolute top-0 left-0 group"
-                            style={{ top: `${i * 4}px sm:${i * 8}px`, zIndex: i }}
-                          >
-                            <div className="w-[48px] sm:w-[80px] h-[51px] sm:h-[85px] overflow-hidden">
-                              <Card placed={true} card={card} amIP1={amIP1} />
-                            </div>
-                            {/* Hover preview individual para cada carta */}
-                            <div className="absolute z-[9999] hidden sm:group-hover:block top-[-10px] left-[54px] sm:left-[90px]">
-                              <div className="w-[172px] sm:w-[288px] h-[216px] sm:h-[360px] border bg-white shadow-lg rounded p-1">
-                                <Card placed={true} card={card} amIP1={amIP1} />
-                              </div>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    ) : (
-                      <div className="text-[8px] sm:text-xs font-bold text-center text-stone-100">
-                        DEFENSA<br />DEL HADA
-                      </div>
-                    )
-                  ) : (
-                    <div className="text-[8px] sm:text-xs font-bold text-center text-stone-100">
-                      DEFENSA<br />DEL HADA
+        {/* DEFENSA RIVAL (Izquierda, arriba del centro) */}
+        <div className="absolute top-[10%] left-[8%] w-[100px] h-[150px] sm:w-[146px] sm:h-[217px]">
+          <div className="rival-cell-3d defense-cell-castle game-cell flex items-center justify-center hover-container w-full h-full">
+            <div className="defense-shield-icon"></div>
+            {tiles[0][0].type === 'deck' && tiles[0][0].cards.length > 0 && (
+              <div className="relative w-full h-full">
+                {tiles[0][0].cards.slice(-3).map((card, i) => (
+                  <div
+                    key={i}
+                    className="absolute top-0 left-0 group"
+                    style={{ top: `${i * 4}px`, left: `${i * 2}px`, zIndex: i }}
+                  >
+                    <div className="w-20 h-28 sm:w-28 sm:h-40 overflow-hidden">
+                      <Card placed card={card} amIP1={amIP1} />
                     </div>
-                  )}
-                </div>
-
-                <div className="rival-cell-3d game-cell captured-fairies-cell rival-captured-fairies-cell flex items-center justify-center hover-container h-[60px] sm:h-[100px] w-[108px] sm:w-[180px]">
-                  <div className="fairy-particles"></div>
-                  <div className="fairy-capture-icon"></div>
-                  {tiles[0][1].type === 'capturedFairies' ? (
-                    tiles[0][1].cards.length > 0 ? (
-                      <div className="relative h-[60px] sm:h-[100px] w-[48px] sm:w-[80px]">
-                        {tiles[0][1].cards.slice(-3).map((card, i) => (
-                          <div
-                            key={i}
-                            className="absolute top-0 left-0 group"
-                            style={{ top: `${i * 4}px sm:${i * 8}px`, zIndex: i }}
-                          >
-                            <div className="w-[48px] sm:w-[80px] h-[51px] sm:h-[85px] overflow-hidden">
-                              <Card placed={true} card={card} amIP1={amIP1} />
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    ) : (
-                      <div className="captured-fairies-text text-[8px] sm:text-xs">Captured<br />Fairies</div>
-                    )
-                  ) : (
-                    <span className="text-[8px] sm:text-xs">Captured Fairies</span>
-                  )}
-                </div>
-              </div>
-
-              {/* Fila 1: Zona de juego - Desktop */}
-              <div className="grid grid-cols-5 gap-6 sm:gap-10 justify-center mb-2 sm:mb-4 -mt-4 sm:-mt-7">
-                <div
-                  className={getCellHighlightClasses(1, 0, selectedCard,
-                    `middle-cell-3d game-cell relative flex items-center justify-center border cursor-pointer overflow-hidden h-[84px] sm:h-[140px] w-[86px] sm:w-[143px]
-                    ${tiles[1][0].type === 'fairy' && tiles[1][0].captured ? 'grayscale' : ''}`
-                  )}
-                  onClick={() => handleCellClick(tiles[1][0], 1, 0)}
-                >
-                  {/* Imagen de fondo */}
-                  {tiles[1][0].type === 'fairy' && !tiles[1][0].captured && (
-                    <img
-                      src="/cartasPNG/HadaEncarada.png"
-                      alt="Fairy background"
-                      className="absolute inset-0 w-full h-full object-cover z-0"
-                    />
-                  )}
-                  <div className="relative z-10">
-                    {tiles[1][0].type === 'fairy' && tiles[1][0].card ? (
-                      <div className="w-[57px] sm:w-[95px] h-[75px] sm:h-[125px]">
-                        <Card placed={true} card={tiles[1][0].card} amIP1={amIP1} />
-                      </div>
-                    ) : (
-                      <span />
-                    )}
                   </div>
-                </div>
-
-                <div
-                  className={getCellHighlightClasses(1, 1, selectedCard,
-                    `middle-cell-3d game-cell flex items-center justify-center border cursor-pointer h-[84px] sm:h-[140px] w-[86px] sm:w-[143px]
-                    ${tiles[1][1].type === 'fairy' && tiles[1][1].captured
-                      ? 'bg-gray-500'
-                      : 'bg-gray-200'}`
-                  )}
-                  onClick={() => handleCellClick(tiles[1][1], 1, 1)}
-                >
-                  {/* Imagen de fondo */}
-                  {tiles[1][1].type === 'fairy' && !tiles[1][1].captured && (
-                    <img
-                      src="/cartasPNG/HadaMalhablada.png"
-                      alt="Fairy background"
-                      className="absolute inset-0 w-full h-full object-cover z-0"
-                    />
-                  )}
-                  {tiles[1][1].type === 'fairy' && tiles[1][1].card ? (
-                    <div className="w-[72px] sm:w-[120px] h-[96px] sm:h-[160px]">
-                      <Card placed={true} card={tiles[1][1].card} amIP1={amIP1} />
-                    </div>
-                  ) : (
-                    <span />
-                  )}
-                </div>
-
-                <div
-                  className={getCellHighlightClasses(1, 2, selectedCard,
-                    `middle-cell-3d game-cell flex items-center justify-center border cursor-pointer h-[84px] sm:h-[140px] w-[86px] sm:w-[143px]
-                    ${tiles[1][2].type === 'fairy' && tiles[1][2].captured
-                      ? 'bg-gray-500'
-                      : 'bg-gray-200'}`
-                  )}
-                  onClick={() => handleCellClick(tiles[1][2], 1, 2)}
-                >
-                  {/* Imagen de fondo */}
-                  {tiles[1][2].type === 'fairy' && !tiles[1][2].captured && (
-                    <img
-                      src="/cartasPNG/HadaResabiada.png"
-                      alt="Fairy background"
-                      className="absolute inset-0 w-full h-full object-cover z-0"
-                    />
-                  )}
-                  {tiles[1][2].type === 'fairy' && tiles[1][2].card ? (
-                    <div className="w-[72px] sm:w-[120px] h-[96px] sm:h-[160px]">
-                      <Card placed={true} card={tiles[1][2].card} amIP1={amIP1} />
-                    </div>
-                  ) : (
-                    <span className="text-xs sm:text-base font-semibold">Fairy 3</span>
-                  )}
-                </div>
-
-                <div
-                  className="middle-cell-3d game-cell bg-yellow-300 flex items-center justify-center border cursor-pointer h-[84px] sm:h-[140px] w-[86px] sm:w-[143px]"
-                  onClick={() => handleCellClick(tiles[1][3], 1, 3)}
-                >
-                  <span className="text-lg sm:text-xl font-bold">
-                    {tiles[1][3].type === 'variableX'
-                      ? "X= " + tiles[1][3].value
-                      : "X"}
-                  </span>
-                </div>
-
-                <div
-                  className={getCellHighlightClasses(1, 4, selectedCard,
-                    "player-cell-3d game-cell player-magic-cell bg-blue-500 flex items-center justify-center border cursor-pointer hover-container h-[84px] sm:h-[140px] w-[86px] sm:w-[143px]"
-                  )}
-                  onClick={() => handleCellClick(tiles[1][4], 1, 4)}
-                >
-                  <div className="player-light-particles"></div>
-                  <div className="player-magical-energy"></div>
-                  <div className="player-magic-runes"></div>
-                  <div className="player-grimoire-symbol"></div>
-                  <div className="player-magic-power-icon"></div>
-                  {tiles[1][4].type === 'magic' ? (
-                    tiles[1][4].cards.length > 0 ? (
-                      <div className="relative h-[78px] sm:h-[130px] w-[60px] sm:w-[100px]">
-                        {tiles[1][4].cards.slice(-3).map((card, i) => (
-                          <div
-                            key={i}
-                            className="absolute top-0 left-0 group hover-trigger"
-                            style={{ top: `${i * 7}px sm:${i * 12}px`, zIndex: i }}
-                          >
-                            <div className="w-[60px] sm:w-[100px] h-[63px] sm:h-[105px] overflow-hidden">
-                              <Card placed={true} card={card} amIP1={amIP1} />
-                            </div>
-                            {/* Hover preview individual para cada carta */}
-                            <div className="absolute z-[9999] hidden sm:group-hover:block top-[-10px] left-[60px] sm:left-[0px]">
-                              <div className="w-[172px] sm:w-[288px] h-[216px] sm:h-[360px] border bg-white shadow-lg rounded p-1">
-                                <Card placed={true} card={card} amIP1={amIP1} />
-                              </div>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    ) : (
-                      <div className="player-magic-text text-[8px] sm:text-xs">
-                        Sacred<br />Magics
-                      </div>
-                    )
-                  ) : (
-                    <div className="player-magic-text text-[8px] sm:text-xs">
-                      Sacred<br />Magics
-                    </div>
-                  )}
-                </div>
+                ))}
               </div>
+            )}
+          </div>
+        </div>
 
-              {/* Fila 2: Zona del Jugador - Desktop */}
-              <div className="grid grid-cols-4 gap-6 sm:gap-10 -mt-3 sm:-mt-5">
-                <div
-                  className={getCellHighlightClasses(2, 0, selectedCard,
-                    "player-cell-3d defense-cell-castle game-cell flex items-center justify-center cursor-pointer hover-container h-[60px] sm:h-[100px] w-[108px] sm:w-[180px]"
-                  )}
-                  onClick={() => handleCellClick(tiles[2][0], 2, 0)}
-                >
-                  <div className="defense-shield-icon"></div>
-                  {tiles[2][0].type === 'deck' ? (
-                    tiles[2][0].cards.length > 0 ? (
-                      <div className="relative h-[60px] sm:h-[100px] w-[48px] sm:w-[80px]">
-                        {tiles[2][0].cards.slice(-3).map((card, i) => (
-                          <div
-                            key={i}
-                            className="absolute top-0 left-0 group hover-trigger"
-                            style={{ top: `${i * 7}px sm:${i * 12}px`, zIndex: i }}
-                          >
-                            <div className="w-[48px] sm:w-[80px] h-[51px] sm:h-[85px] overflow-hidden">
-                              <Card placed={true} card={card} amIP1={amIP1} />
-                            </div>
-                            {/* Hover preview individual para cada carta */}
-                            <div className="absolute z-[9999] hidden sm:group-hover:block top-[-200px] left-[54px] sm:left-[90px]">
-                              <div className="w-[172px] sm:w-[288px] h-[216px] sm:h-[360px] border bg-white shadow-lg rounded p-1">
-                                <Card placed={true} card={card} amIP1={amIP1} />
-                              </div>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    ) : (
-                      <div className="text-[8px] sm:text-xs font-bold text-center text-stone-100">
-                        DEFENSA<br />DEL JUGADOR
-                      </div>
-                    )
-                  ) : (
-                    <div className="text-[8px] sm:text-xs font-bold text-center text-stone-100">
-                      DEFENSA<br />DEL JUGADOR
-                    </div>
-                  )}
+        {/* HADAS - RIVAL (Centro superior) */}
+        <div className="absolute top-[30%] left-1/2 transform -translate-x-1/2 flex gap-2 sm:gap-4">
+          {/* Hada 1 - Encarada */}
+          <div
+            className={getCellHighlightClasses(
+              1,
+              0,
+              selectedCard,
+              `middle-cell-3d game-cell relative flex items-center justify-center border cursor-pointer overflow-hidden w-[84px] h-[86px] sm:w-[215px] sm:h-[210px]
+              ${tiles[1][0].type === 'fairy' && tiles[1][0].captured ? 'grayscale' : ''}`
+            )}
+            onClick={() => handleCellClick(tiles[1][0], 1, 0)}
+          >
+            {tiles[1][0].type === 'fairy' && !tiles[1][0].captured && (
+              <img
+                src="/cartasPNG/HadaEncarada.png"
+                alt="Fairy background"
+                className="absolute inset-0 w-full h-full object-cover z-0"
+              />
+            )}
+            <div className="relative z-10">
+              {tiles[1][0].type === 'fairy' && tiles[1][0].card && (
+                <div className="w-16 h-24 sm:w-24 sm:h-36">
+                  <Card placed card={tiles[1][0].card} amIP1={amIP1} />
                 </div>
-
-                <div className="player-cell-3d game-cell captured-fairies-cell player-captured-fairies-cell flex items-center justify-center hover-container h-[60px] sm:h-[100px] w-[108px] sm:w-[180px]">
-                  <div className="fairy-particles"></div>
-                  <div className="fairy-capture-icon"></div>
-                  {tiles[2][1].type === 'capturedFairies' ? (
-                    tiles[2][1].cards.length > 0 ? (
-                      <div className="relative h-[78px] sm:h-[130px] w-[60px] sm:w-[100px]">
-                        {tiles[2][1].cards.slice(-3).map((card, i) => (
-                          <div
-                            key={i}
-                            className="absolute top-0 left-0 group"
-                            style={{ top: `${i * 4}px sm:${i * 8}px`, zIndex: i }}
-                          >
-                            <div className="w-[48px] sm:w-[80px] h-[51px] sm:h-[85px] overflow-hidden">
-                              <Card placed={true} card={card} amIP1={amIP1} />
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    ) : (
-                      <div className="captured-fairies-text text-[8px] sm:text-xs">Captured<br />Fairies</div>
-                    )
-                  ) : (
-                    <div className="captured-fairies-text text-[8px] sm:text-xs">Captured<br />Fairies</div>
-                  )}
-                </div>
-
-                <div
-                  className={getCellHighlightClasses(2, 2, selectedCard,
-                    "player-cell-3d game-cell discard-cell-cauldron player-discard-cell flex items-center justify-center border cursor-pointer hover-container h-[60px] sm:h-[100px] w-[108px] sm:w-[180px]"
-                  )}
-                  onClick={() => handleCellClick(tiles[2][2], 2, 2)}
-                >
-                  <div className="discard-magical-smoke"></div>
-                  <div className="discard-magic-icon"></div>
-                  {tiles[2][2].type === 'discard' ? (
-                    tiles[2][2].cards.length > 0 ? (
-                      <div className="relative h-[78px] sm:h-[130px] w-[60px] sm:w-[100px]">
-                        {tiles[2][2].cards.slice(-3).map((card, i) => (
-                          <div
-                            key={i}
-                            className="absolute top-0 left-0 group hover-trigger discard-card-animation"
-                            style={{ top: `${i * 7}px sm:${i * 12}px`, zIndex: i }}
-                          >
-                            <div className="w-[60px] sm:w-[100px] h-[63px] sm:h-[105px] overflow-hidden">
-                              <Card placed={true} card={card} amIP1={amIP1} />
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    ) : (
-                      <span className="discard-text text-[8px] sm:text-xs">Mi Caldero</span>
-                    )
-                  ) : (
-                    <span className="discard-text text-[8px] sm:text-xs">Mi Caldero</span>
-                  )}
-                </div>
-              </div>
+              )}
             </div>
           </div>
+
+          {/* Hada 2 - Malhablada */}
+          <div
+            className={getCellHighlightClasses(
+              1,
+              1,
+              selectedCard,
+              `middle-cell-3d game-cell relative flex items-center justify-center border cursor-pointer overflow-hidden w-[80px] h-[120px] sm:w-[215px] sm:h-[210px]
+              ${tiles[1][1].type === 'fairy' && tiles[1][1].captured ? 'bg-gray-500' : 'bg-gray-200'}`
+            )}
+            onClick={() => handleCellClick(tiles[1][1], 1, 1)}
+          >
+            {tiles[1][1].type === 'fairy' && !tiles[1][1].captured && (
+              <img
+                src="/cartasPNG/HadaMalhablada.png"
+                alt="Fairy background"
+                className="absolute inset-0 w-full h-full object-cover z-0"
+              />
+            )}
+            <div className="relative z-10">
+              {tiles[1][1].type === 'fairy' && tiles[1][1].card && (
+                <div className="w-16 h-24 sm:w-24 sm:h-36">
+                  <Card placed card={tiles[1][1].card} amIP1={amIP1} />
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Hada 3 - Resabiada */}
+          <div
+            className={getCellHighlightClasses(
+              1,
+              2,
+              selectedCard,
+              `middle-cell-3d game-cell relative flex items-center justify-center border cursor-pointer overflow-hidden w-[80px] h-[120px] sm:w-[215px] sm:h-[210px]
+              ${tiles[1][2].type === 'fairy' && tiles[1][2].captured ? 'bg-gray-500' : 'bg-gray-200'}`
+            )}
+            onClick={() => handleCellClick(tiles[1][2], 1, 2)}
+          >
+            {tiles[1][2].type === 'fairy' && !tiles[1][2].captured && (
+              <img
+                src="/cartasPNG/HadaResabiada.png"
+                alt="Fairy background"
+                className="absolute inset-0 w-full h-full object-cover z-0"
+              />
+            )}
+            <div className="relative z-10">
+              {tiles[1][2].type === 'fairy' && tiles[1][2].card && (
+                <div className="w-16 h-24 sm:w-24 sm:h-36">
+                  <Card placed card={tiles[1][2].card} amIP1={amIP1} />
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* VARIABLE X (Derecha del centro de las hadas) */}
+        <div className="absolute top-[30%] right-[5%] w-[80px] h-[120px] sm:w-[215px] sm:h-[210px]">
+          <div
+            className="middle-cell-3d game-cell bg-yellow-300 flex items-center justify-center border cursor-pointer w-full h-full"
+            onClick={() => handleCellClick(tiles[1][3], 1, 3)}
+          >
+            <span className="text-2xl sm:text-3xl font-bold">
+              {tiles[1][3].type === 'variableX' ? `X= ${tiles[1][3].value}` : "X"}
+            </span>
+          </div>
+        </div>
+
+        {/* MAGIA (Más a la derecha) */}
+        <div className="absolute top-[30%] right-[-13%] w-[80px] h-[120px] sm:w-[215px] sm:h-[210px]">
+          <div
+            className={getCellHighlightClasses(
+              1,
+              4,
+              selectedCard,
+              "player-cell-3d game-cell player-magic-cell bg-blue-500 flex items-center justify-center border cursor-pointer hover-container w-full h-full"
+            )}
+            onClick={() => handleCellClick(tiles[1][4], 1, 4)}
+          >
+            <div className="player-light-particles"></div>
+            <div className="player-magical-energy"></div>
+            <div className="player-magic-runes"></div>
+            <div className="player-grimoire-symbol"></div>
+            <div className="player-magic-power-icon"></div>
+            {tiles[1][4].type === 'magic' && tiles[1][4].cards.length > 0 ? (
+              <div className="relative w-full h-full">
+                {tiles[1][4].cards.slice(-3).map((card, i) => (
+                  <div
+                    key={i}
+                    className="absolute top-0 left-0"
+                    style={{ top: `${i * 4}px`, left: `${i * 2}px`, zIndex: i }}
+                  >
+                    <div className="w-16 h-24 sm:w-24 sm:h-36 overflow-hidden">
+                      <Card placed card={card} amIP1={amIP1} />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="player-magic-text text-xs sm:text-sm text-center leading-tight">
+                Sacred<br />Magics
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* DEFENSA JUGADOR (Izquierda, abajo del centro) */}
+        <div className="absolute top-[55%] left-[8%] w-[100px] h-[150px] sm:w-[146px] sm:h-[217px]">
+          <div
+            className={getCellHighlightClasses(
+              2,
+              0,
+              selectedCard,
+              "player-cell-3d defense-cell-castle game-cell flex items-center justify-center cursor-pointer hover-container w-full h-full"
+            )}
+            onClick={() => handleCellClick(tiles[2][0], 2, 0)}
+          >
+            <div className="defense-shield-icon"></div>
+            {tiles[2][0].type === 'deck' && tiles[2][0].cards.length > 0 ? (
+              <div className="relative w-full h-full">
+                {tiles[2][0].cards.slice(-3).map((card, i) => (
+                  <div
+                    key={i}
+                    className="absolute top-0 left-0 group"
+                    style={{ top: `${i * 4}px`, left: `${i * 2}px`, zIndex: i }}
+                  >
+                    <div className="w-20 h-28 sm:w-28 sm:h-40 overflow-hidden">
+                      <Card placed card={card} amIP1={amIP1} />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="text-xs font-bold text-center text-stone-100 leading-tight">
+                DEFENSA<br />DEL JUGADOR
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* HADAS CAPTURADAS - JUGADOR (Esquina inferior izquierda) */}
+        <div className="absolute top-[75%] left-[-20%] w-[120px] h-[150px] sm:w-[150px] sm:h-[186px]">
+          <div className="player-cell-3d game-cell captured-fairies-cell flex items-center justify-center hover-container w-full h-full">
+            <div className="fairy-particles"></div>
+            <div className="fairy-capture-icon"></div>
+            {tiles[2][1].type === 'capturedFairies' && (
+              <div className="medieval-number text-5xl sm:text-6xl">
+                {tiles[2][1].cards.length}
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* CALDERO - DESCARTES (Esquina inferior derecha) */}
+        <div className="absolute bottom-[5%] right-[0%] w-[140px] h-[130px] sm:w-[192px] sm:h-[178px]">
+          <div
+            className={getCellHighlightClasses(
+              2,
+              2,
+              selectedCard,
+              "player-cell-3d discard-cell-cauldron flex items-center justify-center cursor-pointer hover-container w-full h-full"
+            )}
+            onClick={() => handleCellClick(tiles[2][2], 2, 2)}
+          >
+            <div className="discard-magical-smoke"></div>
+            <div className="discard-magic-icon"></div>
+            {tiles[2][2].type === 'discard' && tiles[2][2].cards.length > 0 ? (
+              <div className="relative w-full h-full">
+                {tiles[2][2].cards.slice(-3).map((card, i) => (
+                  <div
+                    key={i}
+                    className="absolute top-0 left-0 discard-card-animation"
+                    style={{ top: `${i * 2}px`, left: `${i * 2}px`, zIndex: i }}
+                  >
+                    <div className="w-full h-full overflow-hidden">
+                      <Card placed card={card} amIP1={amIP1} />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <span className="discard-text text-sm sm:text-base text-center">
+                Mi Caldero
+              </span>
+            )}
+          </div>
+        </div>
+        {/* Mano de cartas - Abajo fijo */}
+        <div className="fixed bottom-20 left-1/2 transform -translate-x-1/2 z-50">
+          <Hand />
         </div>
       </div>
     </div>

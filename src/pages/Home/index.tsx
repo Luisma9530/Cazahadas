@@ -1,7 +1,7 @@
 import { useNavigate } from 'react-router-dom'
 import socket from '../../socket'
 import { useEffect, useState } from 'react'
-import waitingRoomBackground from '../../assets/images/waitingRoomBackground.png';
+import homeBackground from '../../assets/images/fondo.png';
 import useBackgroundStore from "../../store/BackgroundStore";
 import { useAuthStore } from '../../store/LoginStore';
 
@@ -57,7 +57,7 @@ export default function Home() {
     }
     const randomGameId = generateUUID()
     navigate(`/game/${randomGameId}`)
-    setBackground(waitingRoomBackground)
+    setBackground(homeBackground)
     socket.connect()
     socket.emit('start-game-info', {
       playerName,
@@ -70,10 +70,6 @@ export default function Home() {
     socket.emit('attempt-to-join-game', {
       gameId
     })
-  }
-
-  const handleChangePlayerNameInput = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setPlayerName(e.target.value)
   }
 
   const handleChangeGameIdInput = (e: React.ChangeEvent<HTMLInputElement>) => {
