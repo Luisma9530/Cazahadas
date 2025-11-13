@@ -662,9 +662,7 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
                 ))}
               </div>
             ) : (
-              <div className="text-xs font-bold text-center text-stone-100 leading-tight">
-                DEFENSA<br />DEL JUGADOR
-              </div>
+              <div/>
             )}
           </div>
         </div>
@@ -717,7 +715,8 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
           </div>
         </div>
         {/* Mano de cartas - Abajo fijo */}
-        <div className="fixed bottom-20 left-1/2 transform -translate-x-1/2 z-50">
+        <div className="fixed bottom-[17%] left-1/2 transform -translate-x-1/2 z-50"
+        style={{ transform: 'translateX(-40%) scale(1)' }}>
           <Hand />
         </div>
       </div>

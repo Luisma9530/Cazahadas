@@ -18,8 +18,7 @@ export default function Hand() {
   const [playerCards] = useNeoHandStore((state) => [
     state.playerCards
   ])
-  const [selectedCards, toggleCardSelection, isCardSelected] = useCardStore((state) => [
-    state.selectedCards,
+  const [toggleCardSelection, isCardSelected] = useCardStore((state) => [
     state.toggleCardSelection,
     state.isCardSelected
   ])
@@ -55,7 +54,7 @@ export default function Hand() {
   return (
     <motion.ul
       className="flex items-end justify-center w-full pt-2 pb-3 px-8 relative"
-      style={{ height: '20vh' }} // Cambiado de 160px a vh
+      style={{ height: '20vh' }}
       animate={{ transition: { staggerChildren: 0.5 } }}
     >
       <AnimatePresence>
@@ -90,7 +89,7 @@ export default function Hand() {
                 className={`border-2 border-solid shadow-lg rounded-lg cursor-pointer absolute ${isSelected
                     ? 'border-green-400 -translate-y-5 transform z-10'
                     : 'border-black hover:scale-105 hover:duration-100 hover:border-blue-500'
-                  } sm:h-[12vw] aspect-[36/44]`
+                  } sm:h-[30vh] aspect-[36/44]`
                 }
                 style={{
                   transformOrigin: 'bottom center',

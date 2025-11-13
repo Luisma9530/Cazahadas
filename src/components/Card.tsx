@@ -1,4 +1,4 @@
-import { CardInfo, CardType } from '../@types/Card'
+import { CardInfo } from '../@types/Card'
 
 type CardProps = {
   card: CardInfo | null
