@@ -199,65 +199,6 @@ export default function Game() {
         {/* Game Board - Diseño original para desktop, optimizado para móvil */}
         {shouldShowBoard && (
           <>
-            {/* Layout para móvil (sm y menor) */}
-            <div className="block sm:hidden h-full flex flex-col">
-              {/* Battle Modal */}
-              {showBattleModal &&
-                <BattleConfirmModal
-                  isOpen={showBattleModal}
-                  onAccept={() => {
-                    console.log("Battle confirmed");
-                    setShowBattleModal(false);
-                  }}
-                  onReject={() => {
-                    console.log("Battle rejected");
-                    socket.emit("end-battle", { gameId: gameId, tiles: board });
-                    setShowBattleModal(false);
-                  }}
-                />
-              }
-
-              {showDrawModal &&
-                <DrawConfirmModal
-                  isOpen={showDrawModal}
-                  onAccept={() => {
-                    socket.emit('draw-game', { gameId: gameId });
-                    setShowDrawModal(false);
-                  }}
-                  onReject={() => {
-
-                    setShowDrawModal(false);
-                  }}
-                />
-              }
-
-
-              {/* Turn Indicator */}
-              <div className="flex-shrink-0 py-1 z-[51]">
-                <TurnIndicator />
-              </div>
-
-              {/* Board Container optimizado para móvil */}
-              {/* Tablero centrado en el área escalada */}
-              <div className="absolute inset-0 flex items-center justify-center">
-                <div className="w-[80%] max-w-[1600px] aspect-[16/9] relative">
-                  <Board amIP1={amIP1} />
-                </div>
-              </div>
-
-
-
-
-              {/* Skip Turn */}
-              <div className="absolute top-[35%] right-[2%] scale-[0.7] z-[54]">
-                <RequestDraw />
-              </div>
-              <div className="absolute top-[50%] right-[2%] scale-[0.7] z-[54]">
-                <SkipTurn />
-              </div>
-
-            </div>
-
             {/* Layout mejorado para desktop */}
             <div className="fixed inset-0 flex items-center justify-center overflow-hidden relative">
 
