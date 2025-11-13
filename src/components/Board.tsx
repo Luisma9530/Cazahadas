@@ -509,7 +509,7 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
               1,
               0,
               selectedCard,
-              `middle-cell-3d game-cell relative flex items-center justify-center border cursor-pointer overflow-hidden w-[84px] h-[86px] sm:w-[215px] sm:h-[210px]
+              `middle-cell-3d game-cell relative flex items-center justify-center border cursor-pointer overflow-hidden w-[215px] h-[210px]
               ${tiles[1][0].type === 'fairy' && tiles[1][0].captured ? 'grayscale' : ''}`
             )}
             onClick={() => handleCellClick(tiles[1][0], 1, 0)}
@@ -536,7 +536,7 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
               1,
               1,
               selectedCard,
-              `middle-cell-3d game-cell relative flex items-center justify-center border cursor-pointer overflow-hidden w-[80px] h-[120px] sm:w-[215px] sm:h-[210px]
+              `middle-cell-3d game-cell relative flex items-center justify-center border cursor-pointer overflow-hidden w-[215px] h-[210px]
               ${tiles[1][1].type === 'fairy' && tiles[1][1].captured ? 'bg-gray-500' : 'bg-gray-200'}`
             )}
             onClick={() => handleCellClick(tiles[1][1], 1, 1)}
@@ -563,7 +563,7 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
               1,
               2,
               selectedCard,
-              `middle-cell-3d game-cell relative flex items-center justify-center border cursor-pointer overflow-hidden w-[80px] h-[120px] sm:w-[215px] sm:h-[210px]
+              `middle-cell-3d game-cell relative flex items-center justify-center border cursor-pointer overflow-hidden w-[215px] h-[210px]
               ${tiles[1][2].type === 'fairy' && tiles[1][2].captured ? 'bg-gray-500' : 'bg-gray-200'}`
             )}
             onClick={() => handleCellClick(tiles[1][2], 1, 2)}
@@ -586,7 +586,7 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
         </div>
 
         {/* VARIABLE X (Derecha del centro de las hadas) */}
-        <div className="absolute top-[30%] right-[5%] w-[80px] h-[120px] sm:w-[215px] sm:h-[210px]">
+        <div className="absolute top-[30%] right-[5%] w-[215px] h-[210px]">
           <div
             className="middle-cell-3d game-cell bg-yellow-300 flex items-center justify-center border cursor-pointer w-full h-full"
             onClick={() => handleCellClick(tiles[1][3], 1, 3)}
@@ -598,7 +598,7 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
         </div>
 
         {/* MAGIA (Más a la derecha) */}
-        <div className="absolute top-[30%] right-[-13%] w-[80px] h-[120px] sm:w-[215px] sm:h-[210px]">
+        <div className="absolute top-[30%] right-[-13%] w-[215px] h-[210px]">
           <div
             className={getCellHighlightClasses(
               1,
