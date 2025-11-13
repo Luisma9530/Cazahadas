@@ -199,10 +199,7 @@ export default function Game() {
         {/* Game Board - Diseño original para desktop, optimizado para móvil */}
         {shouldShowBoard && (
           <>
-            {/* Layout mejorado para desktop */}
             <div className="fixed inset-0 flex items-center justify-center overflow-hidden relative">
-
-
               {/* Modales - Centro absoluto de la pantalla */}
               <div className="absolute -top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 z-[60] w-full max-w-md">
                 {showDrawModal &&
@@ -245,16 +242,15 @@ export default function Game() {
                 style={{ transform: "scale(var(--board-scale))", transformOrigin: "center center" }}
               >
                 <Board amIP1={amIP1} />
-                {/* Botones fijados a la pantalla igual que el TurnIndicator */}
-                <div className="fixed top-[35vh] right-0 scale-[0.8] z-[54]">
-                  <RequestDraw />
-                </div>
+              </div>
 
-                <div className="fixed top-[50vh] right-0 scale-[0.8] z-[54]">
-                  <SkipTurn />
-                </div>
+              {/* Botones FUERA del contenedor con scale */}
+              <div className="fixed top-[35vh] right-0 scale-[0.8] z-[54]">
+                <RequestDraw />
+              </div>
 
-
+              <div className="fixed top-[50vh] right-0 scale-[0.8] z-[54]">
+                <SkipTurn />
               </div>
 
             </div>
