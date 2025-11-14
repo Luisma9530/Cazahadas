@@ -195,43 +195,43 @@ export default function Game() {
         </div>
       )}
 
+      {/* Modales - Centro absoluto de la pantalla */}
+      <div className="absolute z-[60] w-full max-w-md">
+        {showDrawModal &&
+          <DrawConfirmModal
+            isOpen={showDrawModal}
+            onAccept={() => {
+              socket.emit('draw-game', { gameId: gameId });
+              setShowDrawModal(false);
+            }}
+            onReject={() => {
+              setShowDrawModal(false);
+            }}
+          />
+        }
+      </div>
+      <div className="absolute z-[60] w-full max-w-md">
+        {showBattleModal &&
+          <BattleConfirmModal
+            isOpen={showBattleModal}
+            onAccept={() => {
+              console.log("Battle confirmed");
+              setShowBattleModal(false);
+            }}
+            onReject={() => {
+              console.log("Battle rejected");
+              socket.emit("end-battle", { gameId: gameId, tiles: board });
+              setShowBattleModal(false);
+            }}
+          />
+        }
+      </div>
+
       <GameWrapper>
         {/* Game Board - Diseño original para desktop, optimizado para móvil */}
         {shouldShowBoard && (
           <>
             <div className="fixed inset-0 flex items-center justify-center overflow-hidden relative">
-              {/* Modales - Centro absoluto de la pantalla */}
-              <div className="absolute -top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 z-[60] w-full max-w-md">
-                {showDrawModal &&
-                  <DrawConfirmModal
-                    isOpen={showDrawModal}
-                    onAccept={() => {
-                      socket.emit('draw-game', { gameId: gameId });
-                      setShowDrawModal(false);
-                    }}
-                    onReject={() => {
-                      setShowDrawModal(false);
-                    }}
-                  />
-                }
-              </div>
-              <div className="absolute top-72 left-1/2 -translate-x-1/2 -translate-y-1/2 z-[60] w-full max-w-md">
-                {showBattleModal &&
-                  <BattleConfirmModal
-                    isOpen={showBattleModal}
-                    onAccept={() => {
-                      console.log("Battle confirmed");
-                      setShowBattleModal(false);
-                    }}
-                    onReject={() => {
-                      console.log("Battle rejected");
-                      socket.emit("end-battle", { gameId: gameId, tiles: board });
-                      setShowBattleModal(false);
-                    }}
-                  />
-                }
-              </div>
-
               {/* Indicador de turno - Esquina superior derecha, por delante del tablero */}
               <div className="absolute top-4 md:top-8 right-4 md:right-8 lg:right-12 z-[54]">
                 <TurnIndicator />

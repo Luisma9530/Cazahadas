@@ -472,9 +472,10 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
             <div className="fairy-particles"></div>
             <div className="fairy-capture-icon"></div>
             {tiles[0][1].type === 'capturedFairies' && (
-              <div className="medieval-number text-5xl sm:text-6xl">
+              <span className="text-6xl sm:text-7xl font-bold text-green-400 drop-shadow-[0_2px_8px_rgba(0,0,0,0.8)]"
+                style={{ fontFamily: "'MedievalSharp', 'cursive'" }}>
                 {tiles[0][1].cards.length}
-              </div>
+              </span>
             )}
           </div>
         </div>
@@ -502,21 +503,21 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
         </div>
 
         {/* HADAS - RIVAL (Centro superior) */}
-        <div className="absolute top-[30%] left-1/2 transform -translate-x-1/2 flex gap-2 sm:gap-4">
+        <div className="absolute top-[20%] left-1/2 transform -translate-x-1/2 flex gap-2 sm:gap-4">
           {/* Hada 1 - Encarada */}
           <div
             className={getCellHighlightClasses(
               1,
               0,
               selectedCard,
-              `middle-cell-3d game-cell relative flex items-center justify-center border cursor-pointer overflow-hidden w-[215px] h-[210px]
-              ${tiles[1][0].type === 'fairy' && tiles[1][0].captured ? 'grayscale' : ''}`
+              `middle-cell-3d game-cell relative flex items-center justify-center border cursor-pointer overflow-hidden w-[240px] h-[341px]
+              ${tiles[1][0].type === 'fairy' && tiles[1][0].captured ? 'bg-gray-500' : 'bg-gray-200'}`
             )}
             onClick={() => handleCellClick(tiles[1][0], 1, 0)}
           >
             {tiles[1][0].type === 'fairy' && !tiles[1][0].captured && (
               <img
-                src="/cartasPNG/HadaEncarada.png"
+                src="/cartasPNG/Hada_encarada.png"
                 alt="Fairy background"
                 className="absolute inset-0 w-full h-full object-cover z-0"
               />
@@ -536,14 +537,14 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
               1,
               1,
               selectedCard,
-              `middle-cell-3d game-cell relative flex items-center justify-center border cursor-pointer overflow-hidden w-[215px] h-[210px]
+              `middle-cell-3d game-cell relative flex items-center justify-center border cursor-pointer overflow-hidden w-[240px] h-[341px]
               ${tiles[1][1].type === 'fairy' && tiles[1][1].captured ? 'bg-gray-500' : 'bg-gray-200'}`
             )}
             onClick={() => handleCellClick(tiles[1][1], 1, 1)}
           >
             {tiles[1][1].type === 'fairy' && !tiles[1][1].captured && (
               <img
-                src="/cartasPNG/HadaMalhablada.png"
+                src="/cartasPNG/Hada_malhablada.png"
                 alt="Fairy background"
                 className="absolute inset-0 w-full h-full object-cover z-0"
               />
@@ -563,14 +564,14 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
               1,
               2,
               selectedCard,
-              `middle-cell-3d game-cell relative flex items-center justify-center border cursor-pointer overflow-hidden w-[215px] h-[210px]
+              `middle-cell-3d game-cell relative flex items-center justify-center border cursor-pointer overflow-hidden w-[240px] h-[341px]
               ${tiles[1][2].type === 'fairy' && tiles[1][2].captured ? 'bg-gray-500' : 'bg-gray-200'}`
             )}
             onClick={() => handleCellClick(tiles[1][2], 1, 2)}
           >
             {tiles[1][2].type === 'fairy' && !tiles[1][2].captured && (
               <img
-                src="/cartasPNG/HadaResabiada.png"
+                src="/cartasPNG/Hada_resabiada.png"
                 alt="Fairy background"
                 className="absolute inset-0 w-full h-full object-cover z-0"
               />
@@ -588,31 +589,27 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
         {/* VARIABLE X (Derecha del centro de las hadas) */}
         <div className="absolute top-[30%] right-[5%] w-[215px] h-[210px]">
           <div
-            className="middle-cell-3d game-cell bg-yellow-300 flex items-center justify-center border cursor-pointer w-full h-full"
+            className="middle-cell-3d game-cell bg-transparent flex items-center justify-center border-0 cursor-pointer w-full h-full"
             onClick={() => handleCellClick(tiles[1][3], 1, 3)}
           >
-            <span className="text-2xl sm:text-3xl font-bold">
+            <span className="text-6xl sm:text-7xl font-bold text-green-400 drop-shadow-[0_2px_8px_rgba(0,0,0,0.8)]"
+              style={{ fontFamily: "'MedievalSharp', 'cursive'" }}>
               {tiles[1][3].type === 'variableX' ? `X= ${tiles[1][3].value}` : "X"}
             </span>
           </div>
         </div>
 
         {/* MAGIA (Más a la derecha) */}
-        <div className="absolute top-[30%] right-[-13%] w-[215px] h-[210px]">
+        <div className="absolute top-[29%] right-[-10%] w-[147px] h-[218px]">
           <div
             className={getCellHighlightClasses(
               1,
               4,
               selectedCard,
-              "player-cell-3d game-cell player-magic-cell bg-blue-500 flex items-center justify-center border cursor-pointer hover-container w-full h-full"
+              "player-cell-3d game-cell player-magic-cell magic-cell-background bg-blue-500 flex items-center justify-center border cursor-pointer hover-container w-full h-full"
             )}
             onClick={() => handleCellClick(tiles[1][4], 1, 4)}
           >
-            <div className="player-light-particles"></div>
-            <div className="player-magical-energy"></div>
-            <div className="player-magic-runes"></div>
-            <div className="player-grimoire-symbol"></div>
-            <div className="player-magic-power-icon"></div>
             {tiles[1][4].type === 'magic' && tiles[1][4].cards.length > 0 ? (
               <div className="relative w-full h-full">
                 {tiles[1][4].cards.slice(-3).map((card, i) => (
@@ -628,9 +625,7 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
                 ))}
               </div>
             ) : (
-              <div className="player-magic-text text-xs sm:text-sm text-center leading-tight">
-                Sacred<br />Magics
-              </div>
+              <div />
             )}
           </div>
         </div>
@@ -662,7 +657,7 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
                 ))}
               </div>
             ) : (
-              <div/>
+              <div />
             )}
           </div>
         </div>
@@ -673,9 +668,10 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
             <div className="fairy-particles"></div>
             <div className="fairy-capture-icon"></div>
             {tiles[2][1].type === 'capturedFairies' && (
-              <div className="medieval-number text-5xl sm:text-6xl">
+              <span className="text-6xl sm:text-7xl font-bold text-green-400 drop-shadow-[0_2px_8px_rgba(0,0,0,0.8)]"
+                style={{ fontFamily: "'MedievalSharp', 'cursive'" }}>
                 {tiles[2][1].cards.length}
-              </div>
+              </span>
             )}
           </div>
         </div>
@@ -708,15 +704,13 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
                 ))}
               </div>
             ) : (
-              <span className="discard-text text-sm sm:text-base text-center">
-                Mi Caldero
-              </span>
+              <div />
             )}
           </div>
         </div>
         {/* Mano de cartas - Abajo fijo */}
         <div className="fixed bottom-[17%] left-1/2 transform -translate-x-1/2 z-50"
-        style={{ transform: 'translateX(-40%) scale(1)' }}>
+          style={{ transform: 'translateX(-40%) scale(1)' }}>
           <Hand />
         </div>
       </div>
