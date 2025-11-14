@@ -587,7 +587,7 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
         </div>
 
         {/* VARIABLE X (Derecha del centro de las hadas) */}
-        <div className="absolute top-[30%] right-[5%] w-[215px] h-[210px]">
+        <div className="absolute top-[30%] right-[3%] w-[215px] h-[210px]">
           <div
             className="middle-cell-3d game-cell bg-transparent flex items-center justify-center border-0 cursor-pointer w-full h-full"
             onClick={() => handleCellClick(tiles[1][3], 1, 3)}

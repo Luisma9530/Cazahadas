@@ -194,9 +194,8 @@ export default function Game() {
           </div>
         </div>
       )}
-
-      {/* Modales - Centro absoluto de la pantalla */}
-      <div className="absolute z-[60] w-full max-w-md">
+      
+      {<div className="absolute z-[60] w-full max-w-md">
         {showDrawModal &&
           <DrawConfirmModal
             isOpen={showDrawModal}
@@ -210,22 +209,25 @@ export default function Game() {
           />
         }
       </div>
-      <div className="absolute z-[60] w-full max-w-md">
-        {showBattleModal &&
-          <BattleConfirmModal
-            isOpen={showBattleModal}
-            onAccept={() => {
-              console.log("Battle confirmed");
-              setShowBattleModal(false);
-            }}
-            onReject={() => {
-              console.log("Battle rejected");
-              socket.emit("end-battle", { gameId: gameId, tiles: board });
-              setShowBattleModal(false);
-            }}
-          />
-        }
-      </div>
+      }
+      {
+        <div className="absolute z-[60] w-full max-w-md">
+          {showBattleModal &&
+            <BattleConfirmModal
+              isOpen={showBattleModal}
+              onAccept={() => {
+                console.log("Battle confirmed");
+                setShowBattleModal(false);
+              }}
+              onReject={() => {
+                console.log("Battle rejected");
+                socket.emit("end-battle", { gameId: gameId, tiles: board });
+                setShowBattleModal(false);
+              }}
+            />
+          }
+        </div>
+      }
 
       <GameWrapper>
         {/* Game Board - Diseño original para desktop, optimizado para móvil */}
