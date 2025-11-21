@@ -174,7 +174,7 @@ export default function Game() {
   return (
     <div className={`h-full w-full overflow-hidden ${gameOver ? 'pointer-events-none' : ''}`}>
 
-      {/* Loading State - Optimizado para móvil */}
+      {/* Loading State */}
       {loading && (
         <div className="flex flex-col items-center justify-center h-full gap-4 sm:gap-6 px-4">
           <p className="text-center text-white text-base sm:text-lg md:text-xl">
@@ -194,7 +194,7 @@ export default function Game() {
           </div>
         </div>
       )}
-      
+
       {<div className="absolute z-[60] w-full max-w-md">
         {showDrawModal &&
           <DrawConfirmModal
@@ -241,17 +241,20 @@ export default function Game() {
 
               <div
                 className="absolute inset-0 flex items-center justify-center"
-                style={{ transform: "scale(var(--board-scale))", transformOrigin: "center center" }}
+                style={{
+                  transform: "scale(var(--board-scale))",
+                  transformOrigin: "center center"
+                }}
               >
                 <Board amIP1={amIP1} />
               </div>
 
               {/* Botones FUERA del contenedor con scale */}
-              <div className="fixed top-[35vh] right-0 scale-[0.8] z-[54]">
+              <div className="fixed top-[45vh] right-0 scale-[0.8] z-[54]">
                 <RequestDraw />
               </div>
 
-              <div className="fixed top-[50vh] right-0 scale-[0.8] z-[54]">
+              <div className="fixed top-[60vh] right-0 scale-[0.8] z-[54]">
                 <SkipTurn />
               </div>
 

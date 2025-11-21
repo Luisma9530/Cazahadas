@@ -37,6 +37,9 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
     if (selectedCards.length === 1) {
       const card = selectedCards[0];
       if (!card || !isMyTurn || showBattleModal) return false;
+      if (isMyFirstTurnBattle) {
+        return card.type == CardType.SHIELD && position.type != 'discard'; // Solo se pueden colocar cartas de defensa en el primer turno de batalla
+      }
       if (rowIndex == 2) {
         switch (card.type) {
           case CardType.SHIELD:
@@ -52,8 +55,8 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
           default:
             return false; // Si no conocemos el tipo no dejamos colocar
         }
-      } else if (rowIndex == 1 && CardType.MAGIC === card.type) {
-        return (position.type === 'magic' && isBattle);
+      } else if (position.type === 'magic' && CardType.MAGIC === card.type) {
+        return (isBattle);
       } else {
         if (CardType.CATCH === card.type) {
           return position.type === 'fairy' && !position.marked && !position.captured && !isBattle;
@@ -248,6 +251,8 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
       if (data.amIP1 !== amIP1Ref.current) {
         setShowBattleModal(true)
         console.log("Battle modal shown");
+      } else {
+        setIsMyFirstTurnBattle(false);
       }
     };
 
@@ -415,12 +420,13 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
       CATCH: [[1, 0], [1, 1], [1, 2]], // Casillas de hadas
       MAGIC: [[1, 4]], // Casilla de magia del jugador
       SHIELD: [[2, 0]], // Casilla de defensa del jugador
-      DISCARD: [[2, 2]], // Zona de descarte (siempre válida)
+      DISCARD: [[2, 2]], // Zona de descarte
     };
 
     return rules;
   };
 
+  // Versión alternativa más flexible del método getValidCells
   // Versión alternativa más flexible del método getValidCells
   const getValidCellsFlexible = (selectedCards: CardUnity[]): boolean[][] => {
     const validCells = Array(3).fill(null).map(() => Array(4).fill(false));
@@ -431,10 +437,12 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
 
     const rules = updateValidationRules();
 
-    // La zona de descarte siempre es válida
-    rules.DISCARD.forEach(([row, col]) => {
-      validCells[row][col] = true
-    });
+    // La zona de descarte solo es válida cuando NO estamos en batalla
+    if (!isBattle) {
+      rules.DISCARD.forEach(([row, col]) => {
+        validCells[row][col] = true;
+      });
+    }
 
     // Si hay exactamente una carta, aplicar reglas específicas
     if (selectedCards.length === 1) {
@@ -463,6 +471,7 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
           height: "720px",
           transform: "scale(var(--board-scale))",
           transformOrigin: "center center",
+          left: "-7%"
         }}
       >
 
@@ -677,7 +686,7 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
         </div>
 
         {/* CALDERO - DESCARTES (Esquina inferior derecha) */}
-        <div className="absolute bottom-[5%] right-[0%] w-[140px] h-[130px] sm:w-[192px] sm:h-[178px]">
+        <div className="absolute bottom-[5%] right-[-10%] w-[140px] h-[130px] sm:w-[192px] sm:h-[178px]">
           <div
             className={getCellHighlightClasses(
               2,
