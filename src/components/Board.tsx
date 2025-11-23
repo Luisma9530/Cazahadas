@@ -196,14 +196,6 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
       newTiles[2][1].cards = cardsBottom;
     }
 
-    if (cardsBottom.length >= 2) {
-      socket.emit('all-fairy-captured', {
-        reason: 'captured-two-fairies',
-        winner: amIP1,
-        gameId: gameId,
-      });
-    }
-
     return newTiles
   }
 
@@ -257,13 +249,8 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
     };
 
     const handleCapturedFairy = (data: { player: boolean }) => {
-      console.log("Fairy captured by player:", data.player);
-      console.log("🔍 Condición amIP1 == data.player:", amIP1Ref.current, "==", data.player, "=>", amIP1Ref.current == data.player);
-
       if (amIP1Ref.current == data.player) {
-        console.log("✅ Condición cumplida");
         if (logedUserRef.current) {
-          console.log("📤 Usuario logueado, llamando sendCapturedFairies...");
           sendCapturedFairies()
         }
         if (tilesRef.current[2][1].type == "capturedFairies" && tilesRef.current[2][1].cards.length >= 2) {
@@ -288,8 +275,6 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
     socket.off('captured-fairy');
     socket.off('end-first-turn-battle');
 
-    console.log("🔢 Listeners para 'captured-fairy' después de limpiar:", socket.listeners('captured-fairy').length);
-
     // Registrar los nuevos listeners
     socket.on('update-tiles', handleUpdateTiles);
     socket.on("request-draw-player", handleDrawRequest);
@@ -297,10 +282,7 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
     socket.on("captured-fairy", handleCapturedFairy);
     socket.on("end-first-turn-battle", handleEndFirstTurnBattle);
 
-    console.log("🔢 Listeners para 'captured-fairy' después de registrar:", socket.listeners('captured-fairy').length);
-
     return () => {
-      console.log("🧹 Cleanup ejecutándose...");
       socket.off('update-tiles', handleUpdateTiles);
       socket.off("request-draw-player", handleDrawRequest);
       socket.off("start-battle-player", handleBattleStart);

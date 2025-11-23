@@ -35,6 +35,8 @@ let currentGames = {} as {
     playerIds: string[];
     playerNames: string[];
     playerSkippedTurn: boolean;
+    gameEnded: boolean;
+    currentTurnPlayerId: string;
   };
 };
 
@@ -42,8 +44,14 @@ io.on("connection", (socket) => {
   console.log("A Player with id", socket.id, "connected");
 
   socket.on("skip-turn", (data: { tiles: Tile[][]; gameId: string, isBattle: boolean, isMyFirstTurnBattle: boolean, amIP1: boolean }) => {
+    if (currentGames[data.gameId].currentTurnPlayerId !== socket.id) {
+      console.log("Skip-turn rejected: Not your turn! Socket:", socket.id, "Current turn:", currentGames[data.gameId].currentTurnPlayerId);
+      return;
+    }
+
     var endBattle = false;
     if (currentGames[data.gameId].playerSkippedTurn && !data.isBattle) { // Si el jugador ya había saltado su turno y no es una batalla
+      currentGames[data.gameId].gameEnded = true;
       io.to(currentGames[data.gameId].playerIds).emit("game-end", {
         tiles: data.tiles,
         reason: "player-skipped-turn",
@@ -53,7 +61,7 @@ io.on("connection", (socket) => {
       var captured = false
       endBattle = true
       currentGames[data.gameId].playerSkippedTurn = false; // Marcar que el jugador ha terminado la batalla
-      var player = true
+      var player = data.amIP1
 
       data.tiles[1] = data.tiles[1].map(tile => {
         if (
@@ -61,18 +69,16 @@ io.on("connection", (socket) => {
           tile.card?.type === CardType.CATCH &&
           tile.marked &&
           !tile.captured
-        ) {
+        ) { // Si la carta es un hada de captura, está marcada y no está capturada
 
           var rivalShield = null
           var valueX = 0;
-          if (!tile.placedByPlayerOne) {
-            if (data.tiles[0][0].type === "deck") {
-              rivalShield = data.tiles[0][0].cards?.at(-1);
-            }
-          } else {
-            if (data.tiles[2][0].type === "deck") {
-              rivalShield = data.tiles[2][0].cards?.at(-1);
-            }
+
+          // Buscar el escudo del defensor (solo uno puede existir)
+          if (data.tiles[0][0].type === "deck" && data.tiles[0][0].cards && data.tiles[0][0].cards.length > 0) {
+            rivalShield = data.tiles[0][0].cards.at(-1);
+          } else if (data.tiles[2][0].type === "deck" && data.tiles[2][0].cards && data.tiles[2][0].cards.length > 0) {
+            rivalShield = data.tiles[2][0].cards.at(-1);
           }
           if (data.tiles[1][3].type === "variableX") {
             valueX = data.tiles[1][3].value;
@@ -133,6 +139,11 @@ io.on("connection", (socket) => {
     } else if (!currentGames[data.gameId].playerSkippedTurn) { // Si el jugador no había saltado su turno
       currentGames[data.gameId].playerSkippedTurn = true; // Marcar que el jugador ha saltado su turno
     }
+
+    const currentPlayerIndex = currentGames[data.gameId].playerIds.indexOf(socket.id);
+    const nextPlayerIndex = currentPlayerIndex === 0 ? 1 : 0;
+    currentGames[data.gameId].currentTurnPlayerId = currentGames[data.gameId].playerIds[nextPlayerIndex];
+
     if (!data.isMyFirstTurnBattle) {
       io.to(currentGames[data.gameId].playerIds).emit("new-turn", { // Enviar el nuevo turno a todos los jugadores
         tiles: data.tiles,
@@ -150,10 +161,21 @@ io.on("connection", (socket) => {
   });
 
   socket.on("place-card", (data: { tiles: Tile[][]; gameId: string, isBattle: boolean, selectedCard: CardUnity[] }) => {
+    // VALIDACIÓN: Verificar que es el turno de este jugador
+    if (currentGames[data.gameId].currentTurnPlayerId !== socket.id) {
+      console.log("Place-card rejected: Not your turn! Socket:", socket.id, "Current turn:", currentGames[data.gameId].currentTurnPlayerId);
+      return;
+    }
+
     currentGames[data.gameId].playerSkippedTurn = false;
     if (data.isBattle) {
       io.to(currentGames[data.gameId].playerIds).emit("end-first-turn-battle");
     }
+
+    const currentPlayerIndex = currentGames[data.gameId].playerIds.indexOf(socket.id);
+    const nextPlayerIndex = currentPlayerIndex === 0 ? 1 : 0;
+    currentGames[data.gameId].currentTurnPlayerId = currentGames[data.gameId].playerIds[nextPlayerIndex];
+
     io.to(currentGames[data.gameId].playerIds).emit("new-turn", {
       tiles: data.tiles,
       playerSkippedTurn: currentGames[data.gameId].playerSkippedTurn,
@@ -207,7 +229,7 @@ io.on("connection", (socket) => {
       currentGames[gameId].playerIds.includes(socket.id)
     );
 
-    if (gameIdForDcedPlayer) {
+    if (gameIdForDcedPlayer && !currentGames[gameIdForDcedPlayer].gameEnded) {
       io.to(currentGames[gameIdForDcedPlayer].playerIds).emit("game-end", {
         playerDisconnected: true,
       });
@@ -218,6 +240,8 @@ io.on("connection", (socket) => {
     const game = currentGames[data.gameId];
     if (!game) return;
 
+    game.gameEnded = true;
+
     io.to(game.playerIds).emit("game-end", {
       reason: data.reason,
       winner: data.winner,
@@ -226,6 +250,8 @@ io.on("connection", (socket) => {
   socket.on("draw-game", (data) => {
     const game = currentGames[data.gameId];
     if (!game) return;
+
+    game.gameEnded = true;
 
     io.to(game.playerIds).emit('game-end', {
       reason: 'draw-request'
@@ -242,6 +268,8 @@ io.on("connection", (socket) => {
         playerIds: [socket.id],
         playerNames: [data.playerName],
         playerSkippedTurn: false,
+        gameEnded: false,
+        currentTurnPlayerId: "",
       };
       io.to(socket.id).emit("player-connected", {
         firstPlayer: currentGames[data.gameId].playerNames.length === 1,
@@ -253,6 +281,7 @@ io.on("connection", (socket) => {
     console.log("Player", data.playerName, "is trying to join game", data.gameId);
     if (currentGames[data.gameId]["playerIds"].includes(socket.id)) {
       currentGames[data.gameId].playerNames.push(data.playerName);
+      currentGames[data.gameId].currentTurnPlayerId = currentGames[data.gameId].playerIds[0];
       io.to(socket.id).emit("player-connected", {
         firstPlayer: currentGames[data.gameId].playerNames.length === 1,
       });

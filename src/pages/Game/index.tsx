@@ -84,14 +84,7 @@ export default function Game() {
 
     socket.on('game-end', (data: { tiles: Tile[][], playerDisconnected: boolean, winner: boolean, reason: string }) => {
       setPlayerSkippedTurn(false)
-      if (data?.playerDisconnected && !gameOver) {
-        setPlayerDisconnected(true)
-        if (amIP1) {
-          setGameResult(Result.PLAYER1WIN)
-        } else {
-          setGameResult(Result.PLAYER2WIN)
-        }
-      }
+
       if (data?.reason === 'captured-two-fairies') {
         if (data.winner) {
           setGameResult(Result.PLAYER1WIN)
@@ -99,23 +92,24 @@ export default function Game() {
           setGameResult(Result.PLAYER2WIN)
         }
       }
+
       if (data?.reason === 'player-skipped-turn') {
         var player1Fairies = 0
         var player2Fairies = 0
         data.tiles.forEach(row => {
-          row.forEach(tile => {
-            if (tile.type === 'capturedFairies' && tile.cards) {
-              // Contar cartas por propietario
-              tile.cards.forEach(card => {
-                if (card.placedByPlayerOne) {
-                  player1Fairies++;
-                } else {
-                  player2Fairies++;
-                }
-              });
+          const tile = row[1]; // Columna 1
+          if (tile.type === 'capturedFairies' && tile.cards) {
+            // Contar según el propietario de la casilla
+            const fairyCount = tile.cards.length;
+
+            if (tile.owner === 'playerOne') {
+              player1Fairies += fairyCount;
+            } else if (tile.owner === 'playerTwo') {
+              player2Fairies += fairyCount;
             }
-          });
+          }
         });
+
         if (player1Fairies > player2Fairies) {
           setGameResult(Result.PLAYER1WIN)
         } else if (player1Fairies < player2Fairies) {
@@ -124,9 +118,22 @@ export default function Game() {
           setGameResult(Result.DRAW)
         }
       }
+
       if (data?.reason === 'draw-request') {
         setGameResult(Result.DRAW)
       }
+      console.log("Player Result:", gameResult);
+
+      if (data?.playerDisconnected) {
+        setPlayerDisconnected(true)
+        console.log("El oponente se ha desconectado.");
+
+        // Solo establecer victoria por desconexión si no hay resultado previo
+        if (gameResult === Result.NONE) {
+          setGameResult(Result.PLAYER1WIN)
+        }
+      }
+
       setGameOver(true)
     })
 
