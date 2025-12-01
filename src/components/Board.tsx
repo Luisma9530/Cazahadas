@@ -126,6 +126,7 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
     for (const card of selectedCard) {
       placeCard(card);
     }
+    console.log(newTiles)
     setTiles(newTiles);
     resetSelectedCard();
     socket.emit("place-card", { tiles: newTiles, gameId: gameId, isBattle: isBattle, selectedCard: selectedCard });
@@ -196,6 +197,14 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
       newTiles[2][1].cards = cardsBottom;
     }
 
+    if (cardsBottom.length >= 2) {
+      socket.emit('all-fairy-captured', {
+        reason: 'captured-two-fairies',
+        winner: amIP1,
+        gameId: gameId,
+      });
+    }
+
     return newTiles
   }
 
@@ -212,6 +221,15 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
     tilesRef.current = tiles;
     gameIdRef.current = gameId;
   }, [amIP1, logedUser, tiles, gameId]);
+
+  function mirrorBoard(tiles: Tile[][]): Tile[][] {
+    // Cambia filas: 0 <-> 2, mantiene columnas
+    return [
+      tiles[2].map((col) => ({ ...col })), // fila 0 <- antes fila 2
+      tiles[1].map((col) => ({ ...col })), // fila 1 igual
+      tiles[0].map((col) => ({ ...col })), // fila 2 <- antes fila 0
+    ];
+  }
 
   useEffect(() => {
     // Ejecutar drawCard una vez al cargar el componente por primera vez
@@ -242,7 +260,6 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
       console.log("amIP1:", data.amIP1, " | I am:", amIP1Ref.current);
       if (data.amIP1 !== amIP1Ref.current) {
         setShowBattleModal(true)
-        console.log("Battle modal shown");
       } else {
         setIsMyFirstTurnBattle(false);
       }
@@ -253,6 +270,8 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
         if (logedUserRef.current) {
           sendCapturedFairies()
         }
+        console.log("Fairy captured by me");
+        console.log(tilesRef)
         if (tilesRef.current[2][1].type == "capturedFairies" && tilesRef.current[2][1].cards.length >= 2) {
           socket.emit('all-fairy-captured', {
             reason: 'captured-two-fairies',

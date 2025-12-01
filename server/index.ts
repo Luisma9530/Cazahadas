@@ -45,7 +45,6 @@ io.on("connection", (socket) => {
 
   socket.on("skip-turn", (data: { tiles: Tile[][]; gameId: string, isBattle: boolean, isMyFirstTurnBattle: boolean, amIP1: boolean }) => {
     if (currentGames[data.gameId].currentTurnPlayerId !== socket.id) {
-      console.log("Skip-turn rejected: Not your turn! Socket:", socket.id, "Current turn:", currentGames[data.gameId].currentTurnPlayerId);
       return;
     }
 
@@ -149,6 +148,7 @@ io.on("connection", (socket) => {
         tiles: data.tiles,
         playerSkippedTurn: currentGames[data.gameId].playerSkippedTurn,
         endBattle: endBattle,
+        isMyFirstTurnBattle: data.isMyFirstTurnBattle
       });
     }
     if ((data.isBattle && data.isMyFirstTurnBattle) || endBattle) {

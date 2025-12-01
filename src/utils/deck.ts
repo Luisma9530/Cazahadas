@@ -90,7 +90,8 @@ const magicCard10: CardInfo = {
   name: "endfor+=1",
   type: CardType.MAGIC,
   operation: (x: number) => {
-    for (let i = 1; i >= x + 1; i--) {
+    const end = x + 1;
+    for (let i = 1; i >= end; i--) {
       x += 1;
     }
     return x;
@@ -103,7 +104,8 @@ const magicCard11: CardInfo = {
   name: "endfor-=1",
   type: CardType.MAGIC,
   operation: (x: number) => {
-    for (let i = 1; i <= x + 1; i++) {
+    const end = x + 1;
+    for (let i = 1; i <= end; i++) {
       x -= 1;
     }
     return x;

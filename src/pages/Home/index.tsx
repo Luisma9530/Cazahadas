@@ -73,7 +73,7 @@ export default function Home() {
   }
 
   const handleChangeGameIdInput = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setGameId(e.target.value)
+    setGameId(e.target.value.trim())
   }
 
   return (

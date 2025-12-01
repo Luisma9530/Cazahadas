@@ -10,6 +10,7 @@ import { useModalStore } from "../../store/ModalStore";
 import { GameStartModal } from "../../components/Modals/GameStartModal";
 import { TurnModal } from "../../components/Modals/TurnModal";
 import { BattleModal } from "../../components/Modals/BattleModal";
+import { BattleEndModal } from "../../components/Modals/BattleEndModal";
 import useTurnStore from "../../store/TurnStore";
 import { EndGameModal } from "../../components/Modals/EndGameModal";
 import { useParams } from "react-router-dom";
@@ -20,6 +21,7 @@ import BattleConfirmModal from "../../components/Modals/BattleStartModal.tsx";
 import DrawConfirmModal from "../../components/Modals/DrawConfirmModal.tsx";
 import RequestDraw from "../../components/drawGame.tsx";
 import GameWrapper from "../../utils/GameWrapper.tsx";
+import SurrenderButton from "../../components/SurrenderButton.tsx";
 
 export default function Game() {
   const [loading, setLoading] = useState(true)
@@ -32,11 +34,13 @@ export default function Game() {
 
   const { id: gameId } = useParams<{ id: string }>()
 
-  const [gameStartModal, toggleGameStartModal, turnModal, toggleTurnModal, battleModal, toggleBattleModal] = useModalStore((state) => [state.gameStartModal, state.toggleGameStartModal, state.turnModal, state.toggleTurnModal, state.battleModal, state.toggleBattleModal])
+  const [gameStartModal, toggleGameStartModal, turnModal, toggleTurnModal, battleModal, toggleBattleModal, battleEndModal, toggleBattleEndModal] = useModalStore((state) => [state.gameStartModal, state.toggleGameStartModal, state.turnModal, state.toggleTurnModal, state.battleModal, state.toggleBattleModal, state.battleEndModal, state.toggleBattleEndModal]);
 
   useEffect(() => {
     if (isBattle) {
       toggleBattleModal()
+    } else {
+      toggleBattleEndModal()
     }
   }, [isBattle]);
 
@@ -73,7 +77,7 @@ export default function Game() {
         setPlayerSkippedTurn(data.playerSkippedTurn)
       }
       toggleTurnModal()
-      if (!isMyTurn) {
+      if (!isMyTurn) { // Solo actualizamos el tablero si no es nuestro turno (para evitar sobrescribir nuestros cambios)
         const mirroredTiles = mirrorBoard(data.tiles);
         setBoard(mirroredTiles);
       } else {
@@ -96,19 +100,10 @@ export default function Game() {
       if (data?.reason === 'player-skipped-turn') {
         var player1Fairies = 0
         var player2Fairies = 0
-        data.tiles.forEach(row => {
-          const tile = row[1]; // Columna 1
-          if (tile.type === 'capturedFairies' && tile.cards) {
-            // Contar según el propietario de la casilla
-            const fairyCount = tile.cards.length;
-
-            if (tile.owner === 'playerOne') {
-              player1Fairies += fairyCount;
-            } else if (tile.owner === 'playerTwo') {
-              player2Fairies += fairyCount;
-            }
-          }
-        });
+        if (data.tiles[0][1].type === 'capturedFairies' && data.tiles[0][1].cards && data.tiles[2][1].type === 'capturedFairies' && data.tiles[2][1].cards) {
+          player1Fairies = data.tiles[2][1].cards.length
+          player2Fairies = data.tiles[0][1].cards.length
+        }
 
         if (player1Fairies > player2Fairies) {
           setGameResult(Result.PLAYER1WIN)
@@ -265,6 +260,11 @@ export default function Game() {
                 <SkipTurn />
               </div>
 
+
+              <div className="fixed top-[75vh] right-0 scale-[0.8] z-[54]">
+                <SurrenderButton />
+              </div>
+
             </div>
           </>
         )
@@ -301,6 +301,13 @@ export default function Game() {
         battleModal && !gameOver && (
           <div className="relative z-[60]">
             <BattleModal />
+          </div>
+        )
+      }
+      {
+        battleEndModal && !gameOver && (
+          <div className="relative z-[60]">
+            <BattleEndModal />
           </div>
         )
       }

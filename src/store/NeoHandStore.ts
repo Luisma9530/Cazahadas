@@ -30,18 +30,23 @@ const useNeoHandStore = create<HandStore>((set) => ({
       discardPile: [...state.discardPile, card],
     }))
   },
-  drawCard: (isBattle: boolean) => { // Esta función se encarga de robar una carta del mazo y agregarla a la mano del jugador
+  drawCard: (isBattle: boolean) => {
     set((state) => {
-      if (isBattle) return { playerCards: state.playerCards }; // No robar si es batalla
+      if (isBattle) return { playerCards: state.playerCards };
 
       let newDeck = [...state.deck];
       const newHand = [...state.playerCards];
 
-      if (newDeck.length === 0 && newHand.length === 0) {
-        newDeck = [...deckCards]; // Reiniciar mazo al estado inicial
-      }
+      // Rellenar la mano hasta 7 cartas
+      while (newHand.length < 7) {
+        // Si el mazo está vacío, reiniciarlo
+        if (newDeck.length === 0) {
+          newDeck = [...deckCards];
+        }
 
-      while (newDeck.length > 0 && newHand.length < 7) {
+        // Si después de reiniciar sigue vacío (no hay cartas disponibles), salir
+        if (newDeck.length === 0) break;
+
         const randomIndex = Math.floor(Math.random() * newDeck.length);
         const [drawnCard] = newDeck.splice(randomIndex, 1);
         newHand.push({ ...drawnCard, id: index++ });
