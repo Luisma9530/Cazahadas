@@ -210,6 +210,18 @@ io.on("connection", (socket) => {
     });
   });
 
+  socket.on('surrender', (data: {gameId: string, amIP1: boolean, board: Tile[][]}) => {
+    // El que se rindió pierde
+    const winner = !data.amIP1; // Si se rinde P1, gana P2  
+
+    io.to(currentGames[data.gameId].playerIds).emit('game-end', {
+      tiles: data.board,
+      playerDisconnected: false,
+      winner: winner,
+      reason: 'surrender'
+    });
+  });
+
   socket.on("start-battle", (data: { gameId: string, amIP1: boolean }) => {
     io.to(currentGames[data.gameId].playerIds).emit("start-battle-player", {
       amIP1: data.amIP1

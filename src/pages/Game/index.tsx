@@ -77,12 +77,7 @@ export default function Game() {
         setPlayerSkippedTurn(data.playerSkippedTurn)
       }
       toggleTurnModal()
-      if (!isMyTurn) { // Solo actualizamos el tablero si no es nuestro turno (para evitar sobrescribir nuestros cambios)
-        const mirroredTiles = mirrorBoard(data.tiles);
-        setBoard(mirroredTiles);
-      } else {
-        setBoard(data.tiles);
-      }
+      setBoard(data.tiles);
       toggleTurn()
     })
 
@@ -114,6 +109,14 @@ export default function Game() {
         }
       }
 
+      if (data?.reason === 'surrender') {
+        if (data.winner) {
+          setGameResult(Result.PLAYER1WIN)
+        } else {
+          setGameResult(Result.PLAYER2WIN)
+        }
+      }
+
       if (data?.reason === 'draw-request') {
         setGameResult(Result.DRAW)
       }
@@ -125,7 +128,11 @@ export default function Game() {
 
         // Solo establecer victoria por desconexión si no hay resultado previo
         if (gameResult === Result.NONE) {
-          setGameResult(Result.PLAYER1WIN)
+          if (amIP1) {
+            setGameResult(Result.PLAYER1WIN)
+          } else {
+            setGameResult(Result.PLAYER2WIN)
+          }
         }
       }
 

@@ -52,13 +52,12 @@ const useBoardStore = create<BoardStore>((set, get) => ({
     const updatedBoard = currentBoard.map(row =>
       row.map(tile => {
         if (tile.type === 'deck' || tile.type === 'magic') {
-          return { ...tile, cards: []}
-        } else if (tile.type === 'fairy') {
-          return { ...tile, card: null}
+          return { ...tile, cards: [] }
         }
         return tile
       })
     )
+    console.log('Board after clearing decks and magic:', updatedBoard)
     set({ board: updatedBoard })
   },
   resetVariableX: () => {

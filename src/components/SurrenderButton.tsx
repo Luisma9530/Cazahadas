@@ -26,8 +26,8 @@ export default function SurrenderButton() {
         casillasRelevantes = useMemo(() => ({
             casilla01: board[0]?.[1],
             casilla21: board[2]?.[1]
-        }), [board[0]?.[1]?.cards?.length, board[0]?.[1]?.owner,
-        board[2]?.[1]?.cards?.length, board[2]?.[1]?.owner]);
+        }), [board[0]?.[1]?.cards?.length,
+        board[2]?.[1]?.cards?.length]);
     }
 
 
@@ -35,37 +35,28 @@ export default function SurrenderButton() {
         let puntosP1 = 0;
         let puntosP2 = 0;
 
-        // Casilla [0][1]
-        const tile01 = board[0][1];
-        if (tile01?.type === 'capturedFairies' && tile01.cards) {
-            if (tile01.owner === 'playerOne') {
-                puntosP1 += tile01.cards.length;
-            } else if (tile01.owner === 'playerTwo') {
-                puntosP2 += tile01.cards.length;
+        for (let col = 0; col < board[1].length; col++) {
+            const tile = board[1][col];
+
+            // Verificar que sea una casilla de hada y esté capturada
+            if (tile.type === 'fairy' && tile.captured) {
+                if (tile.placedByPlayerOne === true) {
+                    puntosP1++;
+                } else if (tile.placedByPlayerOne === false) {
+                    puntosP2++;
+                }
             }
         }
-
-        // Casilla [2][1]
-        const tile21 = board[2]?.[1];
-        if (tile21?.type === 'capturedFairies' && tile21.cards) {
-            if (tile21.owner === 'playerOne') {
-                puntosP1 += tile21.cards.length;
-            } else if (tile21.owner === 'playerTwo') {
-                puntosP2 += tile21.cards.length;
-            }
-        }
-
-        console.log(`Puntos - P1: ${puntosP1}, P2: ${puntosP2}`);
 
         if (amIP1) {
             return puntosP1 < puntosP2;
         } else {
             return puntosP2 < puntosP1;
         }
-    }, [casillasRelevantes, amIP1]);
+    }, [casillasRelevantes]);
 
     function handleSurrender() {
-        socket.emit('surrender', { gameId, amIP1 })
+        socket.emit('surrender', { gameId, amIP1, board })
     }
 
     return (

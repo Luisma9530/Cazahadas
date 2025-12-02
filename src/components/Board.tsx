@@ -222,15 +222,6 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
     gameIdRef.current = gameId;
   }, [amIP1, logedUser, tiles, gameId]);
 
-  function mirrorBoard(tiles: Tile[][]): Tile[][] {
-    // Cambia filas: 0 <-> 2, mantiene columnas
-    return [
-      tiles[2].map((col) => ({ ...col })), // fila 0 <- antes fila 2
-      tiles[1].map((col) => ({ ...col })), // fila 1 igual
-      tiles[0].map((col) => ({ ...col })), // fila 2 <- antes fila 0
-    ];
-  }
-
   useEffect(() => {
     // Ejecutar drawCard una vez al cargar el componente por primera vez
     drawCard(false);
@@ -270,8 +261,6 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
         if (logedUserRef.current) {
           sendCapturedFairies()
         }
-        console.log("Fairy captured by me");
-        console.log(tilesRef)
         if (tilesRef.current[2][1].type == "capturedFairies" && tilesRef.current[2][1].cards.length >= 2) {
           socket.emit('all-fairy-captured', {
             reason: 'captured-two-fairies',
@@ -462,6 +451,14 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
     return validCells;
   };
 
+  const getLogicalRowIndex = (visualRow: number): number => {
+    if (!amIP1) {
+      if (visualRow === 0) return 2;
+      if (visualRow === 2) return 0;
+    }
+    return visualRow;
+  };
+
   return (
     <div className="fixed inset-0 flex items-center justify-center pointer-events-none">
       {/* Contenedor del tablero */}
@@ -533,7 +530,7 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
               />
             )}
             <div className="relative z-10">
-              {tiles[1][0].type === 'fairy' && tiles[1][0].card && (
+              {tiles[1][0].type === 'fairy' && tiles[1][0].card && !tiles[1][0].captured && (
                 <div className="w-16 h-24 sm:w-24 sm:h-36">
                   <Card placed card={tiles[1][0].card} amIP1={amIP1} />
                 </div>
@@ -560,7 +557,7 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
               />
             )}
             <div className="relative z-10">
-              {tiles[1][1].type === 'fairy' && tiles[1][1].card && (
+              {tiles[1][1].type === 'fairy' && tiles[1][1].card && !tiles[1][1].captured && (
                 <div className="w-16 h-24 sm:w-24 sm:h-36">
                   <Card placed card={tiles[1][1].card} amIP1={amIP1} />
                 </div>
@@ -587,7 +584,7 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
               />
             )}
             <div className="relative z-10">
-              {tiles[1][2].type === 'fairy' && tiles[1][2].card && (
+              {tiles[1][2].type === 'fairy' && tiles[1][2].card && !tiles[1][2].captured && (
                 <div className="w-16 h-24 sm:w-24 sm:h-36">
                   <Card placed card={tiles[1][2].card} amIP1={amIP1} />
                 </div>
