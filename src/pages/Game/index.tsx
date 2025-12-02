@@ -29,7 +29,7 @@ export default function Game() {
   const [isCopied, setIsCopied] = useState(false);
 
   const [isMyTurn, toggleTurn, setPlayerSkippedTurn, setIsBattle, isBattle, setIsMyFirstTurnBattle, showBattleModal, setShowBattleModal, showDrawModal, setShowDrawModal] = useTurnStore((state) => [state.isMyTurn, state.toggleTurn, state.setPlayerSkippedTurn, state.setIsBattle, state.isBattle, state.setIsMyFirstTurnBattle, state.showBattleModal, state.setShowBattleModal, state.showDrawModal, state.setShowDrawModal]);
-  const [setBoard, board] = useBoardStore((state) => [state.setBoard, state.board])
+  const [setBoard, board, clearDeckAndMagic] = useBoardStore((state) => [state.setBoard, state.board, state.clearDeckAndMagic]);
   const [amIP1, setAmIP1, gameOver, setGameOver, setPlayerOneName, setPlayerTwoName, setPlayerDisconnected, setGameResult, gameResult] = useGameStore((state) => [state.amIP1, state.setAmIP1, state.gameOver, state.setGameOver, state.setPlayerOneName, state.setPlayerTwoName, state.setPlayerDisconnected, state.setGameResult, state.gameResult])
 
   const { id: gameId } = useParams<{ id: string }>()
@@ -224,6 +224,7 @@ export default function Game() {
               onReject={() => {
                 console.log("Battle rejected");
                 socket.emit("end-battle", { gameId: gameId, tiles: board });
+                clearDeckAndMagic();
                 setShowBattleModal(false);
               }}
             />
