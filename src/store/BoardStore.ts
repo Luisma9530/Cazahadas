@@ -51,7 +51,7 @@ const useBoardStore = create<BoardStore>((set, get) => ({
     const currentBoard = get().board
     const updatedBoard = currentBoard.map(row =>
       row.map(tile => {
-        if (tile.type === 'deck' || tile.type === 'magic') {
+        if (tile.type === 'deck' || tile.type === 'magic' || tile.type === 'fairy') {
           return { ...tile, cards: [] }
         }
         return tile
