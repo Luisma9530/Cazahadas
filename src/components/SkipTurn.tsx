@@ -40,7 +40,7 @@ export default function SkipTurn() {
             onClick={handleSkipTurn}
             type="button"
           >
-            {(playerSkippedTurn || isMyFirstTurnBattle) ? ((isBattle) ? 'End battle' : 'End game') : 'Skip turn'}
+            {((playerSkippedTurn && isBattle) || isMyFirstTurnBattle) ? 'End battle' : 'Skip turn'}
           </motion.button>
         )}
       </AnimatePresence>

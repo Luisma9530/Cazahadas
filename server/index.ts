@@ -49,14 +49,7 @@ io.on("connection", (socket) => {
     }
 
     var endBattle = false;
-    if (currentGames[data.gameId].playerSkippedTurn && !data.isBattle) { // Si el jugador ya había saltado su turno y no es una batalla
-      currentGames[data.gameId].gameEnded = true;
-      io.to(currentGames[data.gameId].playerIds).emit("game-end", {
-        tiles: data.tiles,
-        reason: "player-skipped-turn",
-      }); // Terminar el juego porque el jugador ya había saltado su turno
-      return;
-    } else if (currentGames[data.gameId].playerSkippedTurn && data.isBattle && !data.isMyFirstTurnBattle) { // Si el jugador ya había saltado su turno y es una batalla
+    if (currentGames[data.gameId].playerSkippedTurn && data.isBattle && !data.isMyFirstTurnBattle) { // Si el jugador ya había saltado su turno y es una batalla
       var captured = false
       endBattle = true
       currentGames[data.gameId].playerSkippedTurn = false; // Marcar que el jugador ha terminado la batalla
