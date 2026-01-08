@@ -5,7 +5,7 @@ export function BattleEndModal() {
     const [toggleBattleEndModal] = useModalStore((state) => [state.toggleBattleEndModal]);
 
     return (
-        <div className="fixed mt-[320px] top-0 left-0 w-full h-full flex items-start justify-center z-[53]">
+        <div className="fixed inset-0 flex items-center justify-center" style={{ zIndex: 53 }}>
             <motion.div
                 animate={{
                     opacity: [0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0],
@@ -20,7 +20,11 @@ export function BattleEndModal() {
                 onAnimationComplete={() => {
                     toggleBattleEndModal();
                 }}
-                className="w-[600px] border-y border-orange-400 bg-transparent text-center py-6 bg-gradient-to-r from-transparent via-[#ea580c_33%,_#ea580c_66%] to-transparent"
+                className="border-y border-orange-400 bg-transparent text-center bg-gradient-to-r from-transparent via-[#ea580c_33%,_#ea580c_66%] to-transparent"
+                style={{
+                    width: '600px',
+                    padding: '24px 0'  // py-6 → valor fijo
+                }}
             >
                 <motion.h2
                     animate={{
@@ -32,7 +36,8 @@ export function BattleEndModal() {
                         times: [0.0, 0.5, 0.55, 0.6, 0.65, 0.7, 0.75, 0.8, 0.85, 0.9, 1.0],
                         delay: 0
                     }}
-                    className="text-5xl font-normal text-orange-200"
+                    className="font-normal text-orange-200"
+                    style={{ fontSize: '48px' }}  // text-5xl → valor fijo
                 >
                     Battle Ended!
                 </motion.h2>

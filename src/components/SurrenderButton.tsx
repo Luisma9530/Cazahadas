@@ -60,16 +60,22 @@ export default function SurrenderButton() {
     }
 
     return (
-        <div className="flex w-11/12 items-center justify-end p-2 h-20 relative z-[52] pointer-events-none">
+        <div className="flex items-center justify-end relative pointer-events-none" style={{ width: '200px', height: '80px' }}>
             <AnimatePresence>
                 {imLosing && !gameOver && !showBattleModal && !showDrawModal && (
                     <motion.button
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
-                        className={`-mt-20 text-4xl rounded-full bg-blue-50 hover:bg-blue-200 transition duration-200
-                       shadow-xl cursor-pointer text-black border-4 border-blue-400 py-1 px-12 
-                       pointer-events-auto relative z-[101]`}
+                        className={`rounded-full bg-blue-50 hover:bg-blue-200 transition duration-200
+                       shadow-xl cursor-pointer text-black border-4 border-blue-400
+                       pointer-events-auto relative`}
+                        style={{
+                            fontSize: '20px',      // Reducido de text-4xl (36px)
+                            padding: '8px 48px',   // py-1 px-12 → valores fijos
+                            marginTop: '-80px',    // -mt-20 → valor fijo
+                            zIndex: 101
+                        }}
                         onClick={handleSurrender}
                         type="button"
                     >

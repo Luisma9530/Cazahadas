@@ -9,7 +9,7 @@ export default function TurnIndicator() {
   if (gameOver) return null
 
   return (
-    <div className="fixed top-16 sm:top-20 md:top-24 right-6 z-20">
+    <div className="relative"> {/* Cambiado de fixed a relative */}
       <motion.div
         className="relative"
         animate={{ 
@@ -23,23 +23,32 @@ export default function TurnIndicator() {
         }}
       >
         {/* Orbe principal */}
-        <div className={`
-          w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 rounded-full relative overflow-hidden
-          ${isMyTurn 
-            ? 'bg-gradient-to-br from-green-300 via-emerald-400 to-green-600 shadow-green-400/50' 
-            : 'bg-gradient-to-br from-red-400 via-rose-500 to-red-600 shadow-red-400/50'
-          }
-          shadow-2xl border-2 
-          ${isMyTurn ? 'border-green-200' : 'border-red-300'}
-        `}>
+        <div 
+          className={`
+            rounded-full relative overflow-hidden
+            ${isMyTurn 
+              ? 'bg-gradient-to-br from-green-300 via-emerald-400 to-green-600 shadow-green-400/50' 
+              : 'bg-gradient-to-br from-red-400 via-rose-500 to-red-600 shadow-red-400/50'
+            }
+            shadow-2xl border-2 
+            ${isMyTurn ? 'border-green-200' : 'border-red-300'}
+          `}
+          style={{ 
+            width: '112px',  // Valor fijo (equivalente a md:w-28)
+            height: '112px'  // Valor fijo (equivalente a md:h-28)
+          }}
+        >
           
           {/* Brillo interno */}
           <motion.div
-            className={`absolute inset-2 rounded-full ${
+            className={`absolute rounded-full ${
               isMyTurn 
                 ? 'bg-gradient-to-tr from-green-200/40 to-transparent' 
                 : 'bg-gradient-to-tr from-red-300/30 to-transparent'
             }`}
+            style={{ 
+              inset: '8px'  // Equivalente a inset-2
+            }}
             animate={{ 
               opacity: isMyTurn ? [0.3, 0.7, 0.3] : [0.2, 0.5, 0.2]
             }}
@@ -56,8 +65,10 @@ export default function TurnIndicator() {
               {[...Array(6)].map((_, i) => (
                 <motion.div
                   key={i}
-                  className="absolute w-1 h-1 bg-green-200 rounded-full"
+                  className="absolute bg-green-200 rounded-full"
                   style={{
+                    width: '4px',    // Valor fijo para w-1
+                    height: '4px',   // Valor fijo para h-1
                     left: `${20 + i * 12}%`,
                     top: `${30 + (i % 2) * 40}%`,
                   }}
@@ -80,9 +91,12 @@ export default function TurnIndicator() {
           {/* Texto del turno */}
           <div className="absolute inset-0 flex items-center justify-center">
             <motion.span
-              className={`text-xs sm:text-sm font-bold text-center leading-tight ${
+              className={`font-bold text-center leading-tight ${
                 isMyTurn ? 'text-green-900' : 'text-red-100'
               }`}
+              style={{ 
+                fontSize: '14px'  // Valor fijo (equivalente a sm:text-sm)
+              }}
               animate={{ 
                 scale: isMyTurn ? [1, 1.1, 1] : 1
               }}
@@ -115,9 +129,12 @@ export default function TurnIndicator() {
 
         {/* Sombra mágica */}
         <motion.div
-          className={`absolute -inset-4 rounded-full blur-xl ${
+          className={`absolute rounded-full blur-xl ${
             isMyTurn ? 'bg-green-400/30' : 'bg-red-400/30'
           }`}
+          style={{ 
+            inset: '-16px'  // Equivalente a -inset-4
+          }}
           animate={{ 
             opacity: isMyTurn ? [0.2, 0.4, 0.2] : [0.2, 0.4, 0.2]
           }}

@@ -27,6 +27,7 @@ export default function Game() {
   const [loading, setLoading] = useState(true)
   const [gameBusy, setGameBusy] = useState(false)
   const [isCopied, setIsCopied] = useState(false);
+  const [isPortrait, setIsPortrait] = useState(false);
 
   const [isMyTurn, toggleTurn, setPlayerSkippedTurn, setIsBattle, isBattle, setIsMyFirstTurnBattle, showBattleModal, setShowBattleModal, showDrawModal, setShowDrawModal] = useTurnStore((state) => [state.isMyTurn, state.toggleTurn, state.setPlayerSkippedTurn, state.setIsBattle, state.isBattle, state.setIsMyFirstTurnBattle, state.showBattleModal, state.setShowBattleModal, state.showDrawModal, state.setShowDrawModal]);
   const [setBoard, board, clearDeckAndMagic] = useBoardStore((state) => [state.setBoard, state.board, state.clearDeckAndMagic]);
@@ -43,6 +44,24 @@ export default function Game() {
       toggleBattleEndModal()
     }
   }, [isBattle]);
+
+  // Detectar orientación del dispositivo
+  useEffect(() => {
+    const checkOrientation = () => {
+      const isMobile = window.innerWidth < 768;
+      const isPortraitMode = window.innerHeight > window.innerWidth;
+      setIsPortrait(isMobile && isPortraitMode);
+    };
+
+    checkOrientation();
+    window.addEventListener('resize', checkOrientation);
+    window.addEventListener('orientationchange', checkOrientation);
+
+    return () => {
+      window.removeEventListener('resize', checkOrientation);
+      window.removeEventListener('orientationchange', checkOrientation);
+    };
+  }, []);
 
   function mirrorBoard(tiles: Tile[][]): Tile[][] {
     // Cambia filas: 0 <-> 2, mantiene columnas
@@ -180,10 +199,103 @@ export default function Game() {
 
   const shouldShowBoard = !loading && !gameBusy
 
+  // Pantalla de orientación
+  if (isPortrait) {
+    return (
+      <div className="h-full w-full flex items-center justify-center bg-gradient-to-br p-4">
+        <div className="text-center flex flex-col items-center gap-6">
+          {/* Icono de rotación animado */}
+          <div className="relative w-24 h-24">
+            <svg
+              className="w-full h-full animate-pulse"
+              viewBox="0 0 24 24"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M14 2H6C5.46957 2 4.96086 2.21071 4.58579 2.58579C4.21071 2.96086 4 3.46957 4 4V20C4 20.5304 4.21071 21.0391 4.58579 21.4142C4.96086 21.7893 5.46957 22 6 22H18C18.5304 22 19.0391 21.7893 19.4142 21.4142C19.7893 21.0391 20 20.5304 20 20V8L14 2Z"
+                stroke="white"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+              <path
+                d="M14 2V8H20"
+                stroke="white"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+              <path
+                d="M12 18V12"
+                stroke="white"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+              <path
+                d="M9 15L12 12L15 15"
+                stroke="white"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+            <div className="absolute inset-0 flex items-center justify-center">
+              <svg
+                className="w-16 h-16 animate-spin"
+                style={{ animationDuration: '3s' }}
+                viewBox="0 0 24 24"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2Z"
+                  stroke="rgba(255,255,255,0.3)"
+                  strokeWidth="2"
+                  strokeDasharray="4 4"
+                />
+              </svg>
+            </div>
+          </div>
+
+          {/* Texto principal */}
+          <div className="space-y-2">
+            <h1 className="text-white text-2xl font-bold">
+              Gira tu dispositivo
+            </h1>
+            <p className="text-gray-300 text-lg">
+              Por favor, usa tu teléfono en modo horizontal
+            </p>
+          </div>
+
+          {/* Indicador visual adicional */}
+          <div className="flex items-center gap-4 text-white opacity-70">
+            <div className="w-12 h-16 border-2 border-white rounded"></div>
+            <svg
+              className="w-8 h-8"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M14 5l7 7m0 0l-7 7m7-7H3"
+              />
+            </svg>
+            <div className="w-16 h-12 border-2 border-white rounded"></div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className={`h-full w-full overflow-hidden ${gameOver ? 'pointer-events-none' : ''}`}>
 
-      {/* Loading State */}
+      {/* Loading State - FUERA del GameWrapper */}
       {loading && (
         <div className="flex flex-col items-center justify-center h-full gap-4 sm:gap-6 px-4">
           <p className="text-center text-white text-base sm:text-lg md:text-xl">
@@ -204,8 +316,9 @@ export default function Game() {
         </div>
       )}
 
-      {<div className="absolute z-[60] w-full max-w-md">
-        {showDrawModal &&
+      {/* MODALES DE CONFIRMACIÓN - FUERA del GameWrapper pero dentro del juego */}
+      {showDrawModal && (
+        <div className="fixed inset-0 flex items-center justify-center z-[60]">
           <DrawConfirmModal
             isOpen={showDrawModal}
             onAccept={() => {
@@ -216,116 +329,94 @@ export default function Game() {
               setShowDrawModal(false);
             }}
           />
-        }
-      </div>
-      }
-      {
-        <div className="absolute z-[60] w-full max-w-md">
-          {showBattleModal &&
-            <BattleConfirmModal
-              isOpen={showBattleModal}
-              onAccept={() => {
-                console.log("Battle confirmed");
-                setShowBattleModal(false);
-              }}
-              onReject={() => {
-                console.log("Battle rejected");
-                socket.emit("end-battle", { gameId: gameId, tiles: board });
-                clearDeckAndMagic();
-                setShowBattleModal(false);
-              }}
-            />
-          }
         </div>
-      }
+      )}
 
-      <GameWrapper>
-        {/* Game Board - Diseño original para desktop, optimizado para móvil */}
-        {shouldShowBoard && (
-          <>
-            <div className="fixed inset-0 flex items-center justify-center overflow-hidden relative">
-              {/* Indicador de turno - Esquina superior derecha, por delante del tablero */}
-              <div className="absolute top-4 md:top-8 right-4 md:right-8 lg:right-12 z-[54]">
-                <TurnIndicator />
-              </div>
+      {showBattleModal && (
+        <div className="fixed inset-0 flex items-center justify-center z-[60]">
+          <BattleConfirmModal
+            isOpen={showBattleModal}
+            onAccept={() => {
+              console.log("Battle confirmed");
+              setShowBattleModal(false);
+            }}
+            onReject={() => {
+              console.log("Battle rejected");
+              socket.emit("end-battle", { gameId: gameId, tiles: board });
+              clearDeckAndMagic();
+              setShowBattleModal(false);
+            }}
+          />
+        </div>
+      )}
 
-              <div
-                className="absolute inset-0 flex items-center justify-center"
-                style={{
-                  transform: "scale(var(--board-scale))",
-                  transformOrigin: "center center"
-                }}
-              >
-                <Board amIP1={amIP1} />
-              </div>
-
-              {/* Botones FUERA del contenedor con scale */}
-              <div className="fixed top-[45vh] right-0 scale-[0.8] z-[54]">
-                <RequestDraw />
-              </div>
-
-              <div className="fixed top-[60vh] right-0 scale-[0.8] z-[54]">
-                <SkipTurn />
-              </div>
-
-
-              <div className="fixed top-[75vh] right-0 scale-[0.8] z-[54]">
-                <SurrenderButton />
-              </div>
-
-            </div>
-          </>
-        )
-        }
-      </GameWrapper >
-
-      {/* Game Busy - Centrado */}
-      {
-        gameBusy && (
-          <div className="flex items-center justify-center h-full">
-            <h1 className="text-center text-white px-4 text-lg">
-              Game is busy. Please try again later.
-            </h1>
+      {/* GAMEWRAPPER - Solo contiene el board y elementos que DEBEN escalar */}
+      {shouldShowBoard && (
+        <GameWrapper>
+          {/* Board centrado en el espacio de 1920x1080 */}
+          <div className="absolute inset-0 flex items-center justify-center">
+            <Board amIP1={amIP1} />
           </div>
-        )
-      }
 
-      {/* Modales - Sin cambios en funcionalidad */}
-      {
-        gameStartModal && !gameOver && (
-          <div className="relative z-[60]">
-            <GameStartModal />
+          {/* TurnIndicator - dentro del wrapper para que escale */}
+          <div className="absolute top-8 right-12">
+            <TurnIndicator />
           </div>
-        )
-      }
-      {
-        turnModal && !gameOver && (
-          <div className="relative z-[60]">
-            <TurnModal />
+
+          {/* Botones - dentro del wrapper para que escalen */}
+          <div className="absolute right-0" style={{ top: '250px' }}> 
+            <RequestDraw />
           </div>
-        )
-      }
-      {
-        battleModal && !gameOver && (
-          <div className="relative z-[60]">
-            <BattleModal />
+
+          <div className="absolute right-0" style={{ top: '360px' }}> 
+            <SkipTurn />
           </div>
-        )
-      }
-      {
-        battleEndModal && !gameOver && (
-          <div className="relative z-[60]">
-            <BattleEndModal />
+
+          <div className="absolute right-0" style={{ top: '0px', right: '650px' }}> 
+            <SurrenderButton />
           </div>
-        )
-      }
-      {
-        gameOver && (
-          <div className="relative z-[60]">
-            <EndGameModal amIP1={amIP1} winner={gameResult} />
-          </div>
-        )
-      }
-    </div >
+        </GameWrapper>
+      )}
+
+      {/* Game Busy - FUERA del GameWrapper */}
+      {gameBusy && (
+        <div className="flex items-center justify-center h-full">
+          <h1 className="text-center text-white px-4 text-lg">
+            Game is busy. Please try again later.
+          </h1>
+        </div>
+      )}
+
+      {/* TODOS LOS MODALES - FUERA del GameWrapper */}
+      {gameStartModal && !gameOver && (
+        <div className="fixed inset-0 flex items-center justify-center z-[60]">
+          <GameStartModal />
+        </div>
+      )}
+
+      {turnModal && !gameOver && (
+        <div className="fixed inset-0 flex items-center justify-center z-[60]">
+          <TurnModal />
+        </div>
+      )}
+
+      {battleModal && !gameOver && (
+        <div className="fixed inset-0 flex items-center justify-center z-[60]">
+          <BattleModal />
+        </div>
+      )}
+
+      {battleEndModal && !gameOver && (
+        <div className="fixed inset-0 flex items-center justify-center z-[60]">
+          <BattleEndModal />
+        </div>
+      )}
+
+      {gameOver && (
+        <div className="fixed inset-0 flex items-center justify-center z-[60]">
+          <EndGameModal amIP1={amIP1} winner={gameResult} />
+        </div>
+      )}
+    </div>
   )
 }

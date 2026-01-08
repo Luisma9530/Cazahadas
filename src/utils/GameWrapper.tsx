@@ -12,13 +12,18 @@ export default function GameWrapper({ children }: GameWrapperProps) {
         const updateScale = () => {
             const baseWidth = 1920;
             const baseHeight = 1080;
-            const screenWidth = window.innerWidth;
-            const screenHeight = window.innerHeight;
+
+            // Obtener el contenedor padre (el área disponible bajo el header)
+            const container = document.getElementById('game-container');
+            if (!container) return;
+
+            const screenWidth = container.clientWidth;
+            const screenHeight = container.clientHeight;
 
             // Calcula el factor de escala manteniendo proporción 16:9
             const scaleFactor = Math.min(screenWidth / baseWidth, screenHeight / baseHeight);
 
-            // Calcula las barras negras (offsets) necesarias para centrar correctamente
+            // Calcula los offsets para centrar
             const scaledWidth = baseWidth * scaleFactor;
             const scaledHeight = baseHeight * scaleFactor;
             const offsetX = (screenWidth - scaledWidth) / 2;
@@ -34,7 +39,7 @@ export default function GameWrapper({ children }: GameWrapperProps) {
     }, []);
 
     return (
-        <div className="fixed inset-0 z-[20]">
+        <div id="game-container" className="relative w-full h-full overflow-hidden">
             <div
                 className="absolute origin-top-left"
                 style={{

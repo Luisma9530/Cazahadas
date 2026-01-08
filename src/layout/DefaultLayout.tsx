@@ -81,7 +81,7 @@ export default function DefaultLayout() {
   }
 
   return (
-    <div className="h-full overflow-x-hidden overflow-y-hidden"
+    <div className="h-full overflow-x-hidden overflow-y-hidden flex flex-col"
       style={{
         backgroundImage: background != "none" ? background : getBackgroundImage(),
         backgroundSize: "cover",
@@ -89,11 +89,11 @@ export default function DefaultLayout() {
         height: "100vh",
       }}
     >
-      {/* Header con botones - Versión compacta */}
-      <div className="absolute top-0 left-0 right-0 z-50 p-2">
+      {/* Header - Ocupa espacio real, no absolute */}
+      <div className="relative z-50 p-2 flex-shrink-0">
         <div className="flex justify-between items-center">
-          
-          {/* Título en el header - más pequeño */}
+
+          {/* Título en el header */}
           {(!showRules && !showAuth && !showScoreboard) && (
             <h1
               className="font-light z-40 text-xl sm:text-2xl md:text-3xl hover:cursor-pointer 
@@ -103,7 +103,7 @@ export default function DefaultLayout() {
               Cazahadas
             </h1>
           )}
-          
+
           {/* Botones agrupados a la derecha */}
           <div className="flex items-center gap-2">
             {/* Botón de Inicio/Cierre de Sesión */}
@@ -180,8 +180,8 @@ export default function DefaultLayout() {
         />
       }
 
-      {/* Contenido principal - con menos padding superior */}
-      <div className="flex flex-col justify-center items-center h-full w-full px-4 pt-14">
+      {/* Contenido principal - Ocupa el resto del espacio */}
+      <div className="flex-1 flex flex-col justify-center items-center overflow-hidden px-4">
         <Outlet />
       </div>
     </div>

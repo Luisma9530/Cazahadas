@@ -460,21 +460,18 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
   };
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center pointer-events-none">
+    <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
       {/* Contenedor del tablero */}
       <div
         className="relative pointer-events-auto"
         style={{
           width: "1280px",
           height: "720px",
-          transform: "scale(var(--board-scale))",
-          transformOrigin: "center center",
-          left: "-7%"
         }}
       >
 
         {/* HADAS CAPTURADAS - RIVAL (Esquina superior izquierda) */}
-        <div className="absolute top-[-10%] left-[-20%] w-[120px] h-[150px] sm:w-[150px] sm:h-[186px]">
+        <div className="absolute" style={{ top: '-72px', left: '-256px', width: '150px', height: '186px' }}>
           <div className="rival-cell-3d game-cell captured-fairies-cell flex items-center justify-center hover-container w-full h-full">
             <div className="fairy-particles"></div>
             <div className="fairy-capture-icon"></div>
@@ -488,7 +485,7 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
         </div>
 
         {/* DEFENSA RIVAL (Izquierda, arriba del centro) */}
-        <div className="absolute top-[10%] left-[8%] w-[100px] h-[150px] sm:w-[146px] sm:h-[217px]">
+        <div className="absolute" style={{ top: '15px', left: '10px', width: '219px', height: '325.5px' }}>
           <div className="rival-cell-3d defense-cell-castle game-cell flex items-center justify-center hover-container w-full h-full">
             <div className="defense-shield-icon"></div>
             {tiles[0][0].type === 'deck' && tiles[0][0].cards.length > 0 && (
@@ -510,16 +507,17 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
         </div>
 
         {/* HADAS - RIVAL (Centro superior) */}
-        <div className="absolute top-[20%] left-1/2 transform -translate-x-1/2 flex gap-2 sm:gap-4">
+        <div className="absolute left-1/2 -translate-x-1/2 flex gap-4" style={{ top: '144px' }}>
           {/* Hada 1 - Encarada */}
           <div
             className={getCellHighlightClasses(
               1,
               0,
               selectedCard,
-              `middle-cell-3d game-cell relative flex items-center justify-center border cursor-pointer overflow-hidden w-[240px] h-[341px]
-              ${tiles[1][0].type === 'fairy' && tiles[1][0].captured ? 'bg-gray-500' : 'bg-gray-200'}`
+              `middle-cell-3d game-cell relative flex items-center justify-center border cursor-pointer overflow-hidden
+            ${tiles[1][0].type === 'fairy' && tiles[1][0].captured ? 'bg-gray-500' : 'bg-gray-200'}`
             )}
+            style={{ width: '240px', height: '341px' }}
             onClick={() => handleCellClick(tiles[1][0], 1, 0)}
           >
             {tiles[1][0].type === 'fairy' && !tiles[1][0].captured && (
@@ -531,7 +529,7 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
             )}
             <div className="relative z-10">
               {tiles[1][0].type === 'fairy' && tiles[1][0].card && !tiles[1][0].captured && (
-                <div className="w-16 h-24 sm:w-24 sm:h-36">
+                <div className="w-24 h-36">
                   <Card placed card={tiles[1][0].card} amIP1={amIP1} />
                 </div>
               )}
@@ -544,9 +542,10 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
               1,
               1,
               selectedCard,
-              `middle-cell-3d game-cell relative flex items-center justify-center border cursor-pointer overflow-hidden w-[240px] h-[341px]
-              ${tiles[1][1].type === 'fairy' && tiles[1][1].captured ? 'bg-gray-500' : 'bg-gray-200'}`
+              `middle-cell-3d game-cell relative flex items-center justify-center border cursor-pointer overflow-hidden
+            ${tiles[1][1].type === 'fairy' && tiles[1][1].captured ? 'bg-gray-500' : 'bg-gray-200'}`
             )}
+            style={{ width: '240px', height: '341px' }}
             onClick={() => handleCellClick(tiles[1][1], 1, 1)}
           >
             {tiles[1][1].type === 'fairy' && !tiles[1][1].captured && (
@@ -558,7 +557,7 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
             )}
             <div className="relative z-10">
               {tiles[1][1].type === 'fairy' && tiles[1][1].card && !tiles[1][1].captured && (
-                <div className="w-16 h-24 sm:w-24 sm:h-36">
+                <div className="w-24 h-36">
                   <Card placed card={tiles[1][1].card} amIP1={amIP1} />
                 </div>
               )}
@@ -571,9 +570,10 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
               1,
               2,
               selectedCard,
-              `middle-cell-3d game-cell relative flex items-center justify-center border cursor-pointer overflow-hidden w-[240px] h-[341px]
-              ${tiles[1][2].type === 'fairy' && tiles[1][2].captured ? 'bg-gray-500' : 'bg-gray-200'}`
+              `middle-cell-3d game-cell relative flex items-center justify-center border cursor-pointer overflow-hidden
+            ${tiles[1][2].type === 'fairy' && tiles[1][2].captured ? 'bg-gray-500' : 'bg-gray-200'}`
             )}
+            style={{ width: '240px', height: '341px' }}
             onClick={() => handleCellClick(tiles[1][2], 1, 2)}
           >
             {tiles[1][2].type === 'fairy' && !tiles[1][2].captured && (
@@ -585,7 +585,7 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
             )}
             <div className="relative z-10">
               {tiles[1][2].type === 'fairy' && tiles[1][2].card && !tiles[1][2].captured && (
-                <div className="w-16 h-24 sm:w-24 sm:h-36">
+                <div className="w-24 h-36">
                   <Card placed card={tiles[1][2].card} amIP1={amIP1} />
                 </div>
               )}
@@ -594,12 +594,12 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
         </div>
 
         {/* VARIABLE X (Derecha del centro de las hadas) */}
-        <div className="absolute top-[30%] right-[3%] w-[215px] h-[210px]">
+        <div className="absolute" style={{ top: '216px', right: '38px', width: '215px', height: '210px' }}>
           <div
             className="middle-cell-3d game-cell bg-transparent flex items-center justify-center border-0 cursor-pointer w-full h-full"
             onClick={() => handleCellClick(tiles[1][3], 1, 3)}
           >
-            <span className="text-6xl sm:text-7xl font-bold text-green-400 drop-shadow-[0_2px_8px_rgba(0,0,0,0.8)]"
+            <span className="text-7xl font-bold text-green-400 drop-shadow-[0_2px_8px_rgba(0,0,0,0.8)]"
               style={{ fontFamily: "'MedievalSharp', 'cursive'" }}>
               {tiles[1][3].type === 'variableX' ? `X= ${tiles[1][3].value}` : "X"}
             </span>
@@ -607,7 +607,7 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
         </div>
 
         {/* MAGIA (Más a la derecha) */}
-        <div className="absolute top-[29%] right-[-10%] w-[147px] h-[218px]">
+        <div className="absolute" style={{ top: '209px', right: '-128px', width: '147px', height: '218px' }}>
           <div
             className={getCellHighlightClasses(
               1,
@@ -625,7 +625,7 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
                     className="absolute top-0 left-0"
                     style={{ top: `${i * 4}px`, left: `${i * 2}px`, zIndex: i }}
                   >
-                    <div className="w-16 h-24 sm:w-24 sm:h-36 overflow-hidden">
+                    <div className="w-24 h-36 overflow-hidden">
                       <Card placed card={card} amIP1={amIP1} />
                     </div>
                   </div>
@@ -638,7 +638,7 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
         </div>
 
         {/* DEFENSA JUGADOR (Izquierda, abajo del centro) */}
-        <div className="absolute top-[55%] left-[8%] w-[100px] h-[150px] sm:w-[146px] sm:h-[217px]">
+        <div className="absolute" style={{ top: '350px', left: '10px', width: '219px', height: '325.5px' }}>
           <div
             className={getCellHighlightClasses(
               2,
@@ -657,7 +657,7 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
                     className="absolute top-0 left-0 group"
                     style={{ top: `${i * 4}px`, left: `${i * 2}px`, zIndex: i }}
                   >
-                    <div className="w-20 h-28 sm:w-28 sm:h-40 overflow-hidden">
+                    <div className="w-28 h-40 overflow-hidden">
                       <Card placed card={card} amIP1={amIP1} />
                     </div>
                   </div>
@@ -670,12 +670,12 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
         </div>
 
         {/* HADAS CAPTURADAS - JUGADOR (Esquina inferior izquierda) */}
-        <div className="absolute top-[75%] left-[-20%] w-[120px] h-[150px] sm:w-[150px] sm:h-[186px]">
+        <div className="absolute" style={{ top: '540px', left: '-256px', width: '150px', height: '186px' }}>
           <div className="player-cell-3d game-cell captured-fairies-cell flex items-center justify-center hover-container w-full h-full">
             <div className="fairy-particles"></div>
             <div className="fairy-capture-icon"></div>
             {tiles[2][1].type === 'capturedFairies' && (
-              <span className="text-6xl sm:text-7xl font-bold text-green-400 drop-shadow-[0_2px_8px_rgba(0,0,0,0.8)]"
+              <span className="text-7xl font-bold text-green-400 drop-shadow-[0_2px_8px_rgba(0,0,0,0.8)]"
                 style={{ fontFamily: "'MedievalSharp', 'cursive'" }}>
                 {tiles[2][1].cards.length}
               </span>
@@ -684,7 +684,7 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
         </div>
 
         {/* CALDERO - DESCARTES (Esquina inferior derecha) */}
-        <div className="absolute bottom-[5%] right-[-10%] w-[140px] h-[130px] sm:w-[192px] sm:h-[178px]">
+        <div className="absolute" style={{ bottom: '36px', right: '-128px', width: '192px', height: '178px' }}>
           <div
             className={getCellHighlightClasses(
               2,
@@ -715,9 +715,9 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
             )}
           </div>
         </div>
+
         {/* Mano de cartas - Abajo fijo */}
-        <div className="fixed bottom-[17%] left-1/2 transform -translate-x-1/2 z-50"
-          style={{ transform: 'translateX(-40%) scale(1)' }}>
+        <div className="absolute left-1/2 -translate-x-1/2 z-50" style={{ bottom: '-30px' }}>
           <Hand />
         </div>
       </div>

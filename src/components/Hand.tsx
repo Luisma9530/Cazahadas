@@ -54,7 +54,10 @@ export default function Hand() {
   return (
     <motion.ul
       className="flex items-end justify-center w-full pt-2 pb-3 px-8 relative"
-      style={{ height: '20vh' }}
+      style={{
+        height: '216px', // Valor fijo en lugar de 20vh (20% de 1080px)
+        width: '1280px'   // Ancho del contenedor del board
+      }}
       animate={{ transition: { staggerChildren: 0.5 } }}
     >
       <AnimatePresence>
@@ -65,7 +68,8 @@ export default function Hand() {
             const angleStep = totalCards > 1 ? maxAngle / (totalCards - 1) : 0;
             const angle = totalCards > 1 ? -maxAngle / 2 + (index * angleStep) : 0;
 
-            const radius = window.innerHeight * 0.18; // 18% del alto del viewport
+            // Radio fijo basado en el contenedor de 1080px de altura
+            const radius = 194; // Aproximadamente 18% de 1080px
 
             const radian = (angle * Math.PI) / 180;
             const x = Math.sin(radian) * radius;
@@ -87,14 +91,16 @@ export default function Hand() {
                 }}
                 exit={{ opacity: 0, transition: { duration: 1 } }}
                 className={`border-2 border-solid shadow-lg rounded-lg cursor-pointer absolute ${isSelected
-                    ? 'border-green-400 -translate-y-5 transform z-10'
-                    : 'border-black hover:scale-105 hover:duration-100 hover:border-blue-500'
-                  } sm:h-[30vh] aspect-[36/44]`
+                  ? 'border-green-400 -translate-y-5 transform z-10'
+                  : 'border-black hover:scale-105 hover:duration-100 hover:border-blue-500'
+                  }`
                 }
                 style={{
                   transformOrigin: 'bottom center',
                   zIndex: (isSelected || isHovered) ? 10 : index,
                   bottom: 0,
+                  height: '280px', // Valor fijo en lugar de 30vh (30% de 1080px)
+                  aspectRatio: '36/44',
                   transition: 'transform 0.3s ease-in-out'
                 }}
                 onHoverStart={() => handleHoverStart(card)}
