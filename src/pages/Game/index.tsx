@@ -29,7 +29,7 @@ export default function Game() {
   const [isCopied, setIsCopied] = useState(false);
   const [isPortrait, setIsPortrait] = useState(false);
 
-  const [isMyTurn, toggleTurn, setPlayerSkippedTurn, setIsBattle, isBattle, setIsMyFirstTurnBattle, showBattleModal, setShowBattleModal, showDrawModal, setShowDrawModal] = useTurnStore((state) => [state.isMyTurn, state.toggleTurn, state.setPlayerSkippedTurn, state.setIsBattle, state.isBattle, state.setIsMyFirstTurnBattle, state.showBattleModal, state.setShowBattleModal, state.showDrawModal, state.setShowDrawModal]);
+  const [isMyTurn, toggleTurn, setPlayerSkippedTurn, setIsBattle, isBattle, setIsMyFirstTurnBattle, showBattleModal, setShowBattleModal, showDrawModal, setShowDrawModal, isMyFirstTurn] = useTurnStore((state) => [state.isMyTurn, state.toggleTurn, state.setPlayerSkippedTurn, state.setIsBattle, state.isBattle, state.setIsMyFirstTurnBattle, state.showBattleModal, state.setShowBattleModal, state.showDrawModal, state.setShowDrawModal, state.isMyFirstTurn]);
   const [setBoard, board, clearDeckAndMagic] = useBoardStore((state) => [state.setBoard, state.board, state.clearDeckAndMagic]);
   const [amIP1, setAmIP1, gameOver, setGameOver, setPlayerOneName, setPlayerTwoName, setPlayerDisconnected, setGameResult, gameResult] = useGameStore((state) => [state.amIP1, state.setAmIP1, state.gameOver, state.setGameOver, state.setPlayerOneName, state.setPlayerTwoName, state.setPlayerDisconnected, state.setGameResult, state.gameResult])
 
@@ -40,7 +40,7 @@ export default function Game() {
   useEffect(() => {
     if (isBattle) {
       toggleBattleModal()
-    } else {
+    } else if (!isBattle && !isMyFirstTurn) {
       toggleBattleEndModal()
     }
   }, [isBattle]);
@@ -364,15 +364,15 @@ export default function Game() {
           </div>
 
           {/* Botones - dentro del wrapper para que escalen */}
-          <div className="absolute right-0" style={{ top: '250px' }}> 
+          <div className="absolute right-0" style={{ top: '200px' }}> 
             <RequestDraw />
           </div>
 
-          <div className="absolute right-0" style={{ top: '360px' }}> 
+          <div className="absolute right-0" style={{ top: '300px' }}> 
             <SkipTurn />
           </div>
 
-          <div className="absolute right-0" style={{ top: '0px', right: '650px' }}> 
+          <div className="absolute right-0" style={{ top: '50px', right: '650px' }}> 
             <SurrenderButton />
           </div>
         </GameWrapper>

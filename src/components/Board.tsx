@@ -520,11 +520,12 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
             style={{ width: '240px', height: '341px' }}
             onClick={() => handleCellClick(tiles[1][0], 1, 0)}
           >
-            {tiles[1][0].type === 'fairy' && !tiles[1][0].captured && (
+            {tiles[1][0].type === 'fairy' && (
               <img
                 src="/cartasPNG/Hada_encarada.png"
                 alt="Fairy background"
-                className="absolute inset-0 w-full h-full object-cover z-0"
+                className={`absolute inset-0 w-full h-full object-cover z-0 ${tiles[1][0].captured ? 'grayscale opacity-50' : ''
+                  }`}
               />
             )}
             <div className="relative z-10">
@@ -548,11 +549,12 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
             style={{ width: '240px', height: '341px' }}
             onClick={() => handleCellClick(tiles[1][1], 1, 1)}
           >
-            {tiles[1][1].type === 'fairy' && !tiles[1][1].captured && (
+            {tiles[1][1].type === 'fairy' && (
               <img
                 src="/cartasPNG/Hada_malhablada.png"
                 alt="Fairy background"
-                className="absolute inset-0 w-full h-full object-cover z-0"
+                className={`absolute inset-0 w-full h-full object-cover z-0 ${tiles[1][1].captured ? 'grayscale opacity-50' : ''
+                  }`}
               />
             )}
             <div className="relative z-10">
@@ -576,11 +578,12 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
             style={{ width: '240px', height: '341px' }}
             onClick={() => handleCellClick(tiles[1][2], 1, 2)}
           >
-            {tiles[1][2].type === 'fairy' && !tiles[1][2].captured && (
+            {tiles[1][2].type === 'fairy' && (
               <img
                 src="/cartasPNG/Hada_resabiada.png"
                 alt="Fairy background"
-                className="absolute inset-0 w-full h-full object-cover z-0"
+                className={`absolute inset-0 w-full h-full object-cover z-0 ${tiles[1][2].captured ? 'grayscale opacity-50' : ''
+                  }`}
               />
             )}
             <div className="relative z-10">
