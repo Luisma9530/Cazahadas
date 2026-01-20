@@ -275,8 +275,8 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
       setIsMyFirstTurnBattle(false);
     };
 
-    // ⚠️ IMPORTANTE: Remover TODOS los listeners anteriores antes de registrar
-    console.log("🧹 Limpiando todos los listeners anteriores");
+    //Remover TODOS los listeners anteriores antes de registrar
+    console.log("Limpiando todos los listeners anteriores");
     socket.off('update-tiles');
     socket.off('request-draw-player');
     socket.off('start-battle-player');
@@ -449,14 +449,6 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
     }
 
     return validCells;
-  };
-
-  const getLogicalRowIndex = (visualRow: number): number => {
-    if (!amIP1) {
-      if (visualRow === 0) return 2;
-      if (visualRow === 2) return 0;
-    }
-    return visualRow;
   };
 
   return (
