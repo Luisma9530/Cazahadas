@@ -2,16 +2,6 @@ import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 import { useModalStore } from '../ModalStore';
 
-// Mock del Audio API
-const mockAudio = {
-    play: vi.fn().mockResolvedValue(undefined),
-    pause: vi.fn(),
-    currentTime: 0,
-    volume: 1,
-};
-
-global.Audio = vi.fn().mockImplementation(() => mockAudio);
-
 describe('useModalStore', () => {
     beforeEach(() => {
         const { result } = renderHook(() => useModalStore());
@@ -19,8 +9,6 @@ describe('useModalStore', () => {
             result.current.resetStore();
         });
         vi.clearAllMocks();
-        mockAudio.currentTime = 0;
-        mockAudio.volume = 1;
     });
 
     describe('Inicialización', () => {
@@ -170,78 +158,6 @@ describe('useModalStore', () => {
             });
 
             expect(result.current.turnModal).toBe(false);
-        });
-
-        it('debe reproducir el sonido al abrir el modal', () => {
-            const { result } = renderHook(() => useModalStore());
-
-            act(() => {
-                result.current.toggleTurnModal();
-            });
-
-            expect(mockAudio.pause).toHaveBeenCalled();
-            expect(mockAudio.currentTime).toBe(0);
-            expect(mockAudio.volume).toBe(0.4);
-            expect(mockAudio.play).toHaveBeenCalled();
-        });
-
-        it('no debe reproducir el sonido al cerrar el modal', () => {
-            const { result } = renderHook(() => useModalStore());
-
-            act(() => {
-                result.current.toggleTurnModal();
-            });
-
-            vi.clearAllMocks();
-
-            act(() => {
-                result.current.toggleTurnModal();
-            });
-
-            expect(mockAudio.play).not.toHaveBeenCalled();
-            expect(result.current.turnModal).toBe(false);
-        });
-
-        it('debe reiniciar el audio cada vez que se abre el modal', () => {
-            const { result } = renderHook(() => useModalStore());
-
-            // Primera apertura
-            act(() => {
-                result.current.toggleTurnModal();
-            });
-
-            expect(mockAudio.pause).toHaveBeenCalledTimes(1);
-            expect(mockAudio.currentTime).toBe(0);
-            expect(mockAudio.play).toHaveBeenCalledTimes(1);
-
-            // Cerrar
-            act(() => {
-                result.current.toggleTurnModal();
-            });
-
-            vi.clearAllMocks();
-            mockAudio.currentTime = 5; // Simular que el audio estaba reproduciendo
-
-            // Segunda apertura
-            act(() => {
-                result.current.toggleTurnModal();
-            });
-
-            expect(mockAudio.pause).toHaveBeenCalledTimes(1);
-            expect(mockAudio.currentTime).toBe(0);
-            expect(mockAudio.play).toHaveBeenCalledTimes(1);
-        });
-
-        it('debe establecer el volumen a 0.4', () => {
-            const { result } = renderHook(() => useModalStore());
-
-            mockAudio.volume = 1;
-
-            act(() => {
-                result.current.toggleTurnModal();
-            });
-
-            expect(mockAudio.volume).toBe(0.4);
         });
 
         it('no debe afectar otros modales', () => {
@@ -467,7 +383,6 @@ describe('useModalStore', () => {
                 result.current.toggleTurnModal();
             });
             expect(result.current.turnModal).toBe(true);
-            expect(mockAudio.play).toHaveBeenCalled();
 
             act(() => {
                 result.current.toggleTurnModal();

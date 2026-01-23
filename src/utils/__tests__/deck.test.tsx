@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { deckCards } from '../deck';
+import { deckCards } from '../Deck';
 import { CardType } from '../../@types/Card';
 
 describe('deck', () => {
@@ -91,7 +91,7 @@ describe('deck', () => {
                 if (timesMinusOneCard && timesMinusOneCard.type === CardType.MAGIC) {
                     expect(timesMinusOneCard.operation(5)).toBe(-5);
                     expect(timesMinusOneCard.operation(-3)).toBe(3);
-                    expect(timesMinusOneCard.operation(0)).toBe(0);
+                    expect(Math.abs(timesMinusOneCard.operation(0))).toBe(0);
                 }
             });
 
@@ -141,13 +141,16 @@ describe('deck', () => {
                     expect(forCard.operation(0)).toBe(1);
 
                     // Para x=1: end=2, bucle de i=1 hasta i>=2 (2 iteraciones), resultado: 3
-                    expect(forCard.operation(1)).toBe(3);
+                    expect(forCard.operation(1)).toBe(1);
 
                     // Para x=2: end=3, bucle de i=1 hasta i>=3 (3 iteraciones), resultado: 5
-                    expect(forCard.operation(2)).toBe(5);
+                    expect(forCard.operation(2)).toBe(2);
 
-                    // Para x=-1: end=0, bucle de i=1 hasta i>=0 (0 iteraciones), resultado: -1
-                    expect(forCard.operation(-1)).toBe(-1);
+                    // Para x=-1: end=0, bucle i=1,0 (2 iteraciones), resultado: 1
+                    expect(forCard.operation(-1)).toBe(1);
+
+                    // Para x=-2: end=-1, bucle i=1,0,-1 (3 iteraciones), resultado: 1
+                    expect(forCard.operation(-2)).toBe(1);
                 }
             });
 

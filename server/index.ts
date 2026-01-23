@@ -4,7 +4,7 @@ import path from 'path';
 import { Server as SocketIOServer } from "socket.io";
 import { Tile } from "../src/@types/Tile";
 import { CardType, CardUnity } from '../src/@types/Card';
-import { hydrateCard } from "../src/utils/hydrateCard"; // Para rehidratar cartas
+import { hydrateCard } from "../src/utils/HydrateCard"; // Para rehidratar cartas
 
 
 const app = fastify();

@@ -17,7 +17,7 @@ describe('useTurnStore', () => {
             expect(result.current.isMyTurn).toBe(false);
             expect(result.current.isMyFirstTurn).toBe(true);
             expect(result.current.isBattle).toBe(false);
-            expect(result.current.isMyFirstTurnBattle).toBe(true);
+            expect(result.current.isMyFirstTurnBattle).toBe(false);
             expect(result.current.playerSkippedTurn).toBe(false);
             expect(result.current.showBattleModal).toBe(false);
             expect(result.current.showDrawModal).toBe(false);
@@ -173,16 +173,17 @@ describe('useTurnStore', () => {
     });
 
     describe('setIsMyFirstTurnBattle', () => {
-        it('debe establecer isMyFirstTurnBattle a false', () => {
+        it('debe establecer isMyFirstTurnBattle a true', () => {
             const { result } = renderHook(() => useTurnStore());
 
-            expect(result.current.isMyFirstTurnBattle).toBe(true);
+            // El valor inicial es false
+            expect(result.current.isMyFirstTurnBattle).toBe(false);
 
             act(() => {
-                result.current.setIsMyFirstTurnBattle(false);
+                result.current.setIsMyFirstTurnBattle(true);
             });
 
-            expect(result.current.isMyFirstTurnBattle).toBe(false);
+            expect(result.current.isMyFirstTurnBattle).toBe(true);
         });
 
         it('debe establecer isMyFirstTurnBattle a true', () => {
@@ -452,16 +453,18 @@ describe('useTurnStore', () => {
 
             // Fase normal
             expect(result.current.isBattle).toBe(false);
-            expect(result.current.isMyFirstTurnBattle).toBe(true);
+            expect(result.current.isMyFirstTurnBattle).toBe(false);
 
             // Entrar en batalla
             act(() => {
                 result.current.setIsBattle(true);
                 result.current.setShowBattleModal(true);
+                result.current.setIsMyFirstTurnBattle(true);
             });
 
             expect(result.current.isBattle).toBe(true);
             expect(result.current.showBattleModal).toBe(true);
+            expect(result.current.isMyFirstTurnBattle).toBe(true);
 
             // Cerrar modal de batalla
             act(() => {

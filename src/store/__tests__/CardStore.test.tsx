@@ -5,9 +5,11 @@ import useTurnStore from '../TurnStore';
 import { CardUnity, CardType } from '../../@types/Card';
 
 // Mock del TurnStore
-vi.mock('./TurnStore', () => ({
+vi.mock('../TurnStore', () => ({
     default: {
-        getState: vi.fn()
+        getState: vi.fn(),
+        setState: vi.fn(),
+        subscribe: vi.fn(),
     }
 }));
 
@@ -39,11 +41,33 @@ describe('useCardStore', () => {
     };
 
     beforeEach(() => {
+        // Limpiar todos los mocks
+        vi.clearAllMocks();
+
+        // Configuración por defecto: fuera de batalla
+        vi.mocked(useTurnStore.getState).mockReturnValue({
+            isBattle: false,
+            isMyTurn: false,
+            isMyFirstTurn: true,
+            toggleTurn: vi.fn(),
+            setIsMyFirstTurn: vi.fn(),
+            playerSkippedTurn: false,
+            setPlayerSkippedTurn: vi.fn(),
+            resetStore: vi.fn(),
+            isMyFirstTurnBattle: true,
+            setIsBattle: vi.fn(),
+            setIsMyFirstTurnBattle: vi.fn(),
+            showBattleModal: false,
+            setShowBattleModal: vi.fn(),
+            showDrawModal: false,
+            setShowDrawModal: vi.fn(),
+        } as any);
+
+        // Resetear el CardStore
         const { result } = renderHook(() => useCardStore());
         act(() => {
             result.current.resetStore();
         });
-        vi.clearAllMocks();
     });
 
     describe('Inicialización', () => {
@@ -101,7 +125,24 @@ describe('useCardStore', () => {
 
     describe('setSelectedCard - en batalla', () => {
         beforeEach(() => {
-            vi.mocked(useTurnStore.getState).mockReturnValue({ isBattle: true } as any);
+            // Sobrescribir el mock para este bloque específico
+            vi.mocked(useTurnStore.getState).mockReturnValue({
+                isBattle: true, // ✅ En batalla
+                isMyTurn: false,
+                isMyFirstTurn: true,
+                toggleTurn: vi.fn(),
+                setIsMyFirstTurn: vi.fn(),
+                playerSkippedTurn: false,
+                setPlayerSkippedTurn: vi.fn(),
+                resetStore: vi.fn(),
+                isMyFirstTurnBattle: true,
+                setIsBattle: vi.fn(),
+                setIsMyFirstTurnBattle: vi.fn(),
+                showBattleModal: false,
+                setShowBattleModal: vi.fn(),
+                showDrawModal: false,
+                setShowDrawModal: vi.fn(),
+            } as any);
         });
 
         it('debe seleccionar una sola carta en batalla', () => {

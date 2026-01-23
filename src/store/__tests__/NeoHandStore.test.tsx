@@ -2,7 +2,7 @@ import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 import useNeoHandStore from '../NeoHandStore';
 import { CardUnity, CardType } from '../../@types/Card';
-import { deckCards } from '../../utils/deck';
+import { deckCards } from '../../utils/Deck';
 
 // Mock de deckCards
 vi.mock('../utils/deck', () => ({

@@ -22,6 +22,8 @@ import DrawConfirmModal from "../../components/Modals/DrawConfirmModal.tsx";
 import RequestDraw from "../../components/drawGame.tsx";
 import GameWrapper from "../../utils/GameWrapper.tsx";
 import SurrenderButton from "../../components/SurrenderButton.tsx";
+import { useHideAddressBar } from "../../hooks/useHideAddressBar.tsx";
+
 
 export default function Game() {
   const [loading, setLoading] = useState(true)
@@ -36,6 +38,8 @@ export default function Game() {
   const { id: gameId } = useParams<{ id: string }>()
 
   const [gameStartModal, toggleGameStartModal, turnModal, toggleTurnModal, battleModal, toggleBattleModal, battleEndModal, toggleBattleEndModal] = useModalStore((state) => [state.gameStartModal, state.toggleGameStartModal, state.turnModal, state.toggleTurnModal, state.battleModal, state.toggleBattleModal, state.battleEndModal, state.toggleBattleEndModal]);
+
+  useHideAddressBar();
 
   useEffect(() => {
     if (isBattle) {
@@ -62,15 +66,6 @@ export default function Game() {
       window.removeEventListener('orientationchange', checkOrientation);
     };
   }, []);
-
-  function mirrorBoard(tiles: Tile[][]): Tile[][] {
-    // Cambia filas: 0 <-> 2, mantiene columnas
-    return [
-      tiles[2].map((col) => ({ ...col })), // fila 0 <- antes fila 2
-      tiles[1].map((col) => ({ ...col })), // fila 1 igual
-      tiles[0].map((col) => ({ ...col })), // fila 2 <- antes fila 0
-    ];
-  }
 
   useEffect(() => {
     socket.on('player-connected', (data: { firstPlayer: boolean }) => {

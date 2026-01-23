@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor  } from '@testing-library/react';
 import GameWrapper from '../GameWrapper';
 
 describe('GameWrapper', () => {
@@ -20,9 +20,32 @@ describe('GameWrapper', () => {
         });
     };
 
+    // Helper para mockear el clientWidth/clientHeight del contenedor
+    const mockContainerSize = (width: number, height: number) => {
+        Object.defineProperty(HTMLElement.prototype, 'clientWidth', {
+            configurable: true,
+            get() {
+                if (this.id === 'game-container') {
+                    return width;
+                }
+                return 0;
+            },
+        });
+        Object.defineProperty(HTMLElement.prototype, 'clientHeight', {
+            configurable: true,
+            get() {
+                if (this.id === 'game-container') {
+                    return height;
+                }
+                return 0;
+            },
+        });
+    };
+
     beforeEach(() => {
         // Resetear tamaño de ventana
         setWindowSize(1920, 1080);
+        mockContainerSize(1920, 1080);
     });
 
     afterEach(() => {
@@ -51,7 +74,7 @@ describe('GameWrapper', () => {
             );
 
             const wrapper = container.firstChild as HTMLElement;
-            expect(wrapper).toHaveClass('fixed', 'inset-0', 'z-[20]');
+            expect(wrapper).toHaveClass('relative', 'w-full', 'h-full', 'overflow-hidden');
         });
 
         it('debe tener dimensiones base de 1920x1080', () => {
@@ -69,7 +92,7 @@ describe('GameWrapper', () => {
 
     describe('Escalado en pantalla completa (1920x1080)', () => {
         it('debe tener escala 1 y offset 0 en resolución base', () => {
-            setWindowSize(1920, 1080);
+            mockContainerSize(1920, 1080);
 
             const { container } = render(
                 <GameWrapper>
@@ -85,7 +108,7 @@ describe('GameWrapper', () => {
 
     describe('Escalado en resoluciones diferentes', () => {
         it('debe escalar correctamente en 960x540 (mitad de tamaño)', () => {
-            setWindowSize(960, 540);
+            mockContainerSize(960, 540);
 
             const { container } = render(
                 <GameWrapper>
@@ -100,7 +123,7 @@ describe('GameWrapper', () => {
         });
 
         it('debe escalar correctamente en 3840x2160 (4K)', () => {
-            setWindowSize(3840, 2160);
+            mockContainerSize(3840, 2160);
 
             const { container } = render(
                 <GameWrapper>
@@ -118,7 +141,7 @@ describe('GameWrapper', () => {
     describe('Manejo de aspect ratio diferente (letterboxing/pillarboxing)', () => {
         it('debe añadir barras negras verticales en pantallas ultrawide', () => {
             // Pantalla ultrawide: 2560x1080 (21:9)
-            setWindowSize(2560, 1080);
+            mockContainerSize(2560, 1080);
 
             const { container } = render(
                 <GameWrapper>
@@ -137,7 +160,7 @@ describe('GameWrapper', () => {
 
         it('debe añadir barras negras horizontales en pantallas verticales', () => {
             // Pantalla vertical: 1080x1920 (portrait)
-            setWindowSize(1080, 1920);
+            mockContainerSize(1080, 1920);
 
             const { container } = render(
                 <GameWrapper>
@@ -156,7 +179,7 @@ describe('GameWrapper', () => {
         });
 
         it('debe manejar pantalla cuadrada (1:1)', () => {
-            setWindowSize(1000, 1000);
+            mockContainerSize(1000, 1000);
 
             const { container } = render(
                 <GameWrapper>
@@ -171,13 +194,14 @@ describe('GameWrapper', () => {
             // scaledHeight = 1080 * 0.5208 = 562.5
             // offsetY = (1000 - 562.5) / 2 = 218.75
             const transform = innerDiv.style.transform;
-            expect(transform).toMatch(/scale\(0\.52083+\)/);
+
+            expect(transform).toMatch(/scale\(0\.52083\d*\)/);
         });
     });
 
     describe('Responsive - cambios de tamaño', () => {
-        it('debe actualizar escala cuando cambia el tamaño de ventana', () => {
-            setWindowSize(1920, 1080);
+        it('debe actualizar escala cuando cambia el tamaño de ventana', async () => {
+            mockContainerSize(1920, 1080);
 
             const { container } = render(
                 <GameWrapper>
@@ -189,11 +213,14 @@ describe('GameWrapper', () => {
             expect(innerDiv.style.transform).toContain('scale(1)');
 
             // Cambiar tamaño
-            setWindowSize(960, 540);
+            mockContainerSize(960, 540);
             window.dispatchEvent(new Event('resize'));
 
-            innerDiv = container.querySelector('.absolute') as HTMLElement;
-            expect(innerDiv.style.transform).toContain('scale(0.5)');
+            // Esperar a que React actualice el DOM
+            await waitFor(() => {
+                innerDiv = container.querySelector('.absolute') as HTMLElement;
+                expect(innerDiv.style.transform).toContain('scale(0.5)');
+            });
         });
 
         it('debe limpiar el event listener al desmontar', () => {
@@ -213,7 +240,7 @@ describe('GameWrapper', () => {
 
     describe('Casos edge', () => {
         it('debe manejar ventanas muy pequeñas', () => {
-            setWindowSize(320, 180);
+            mockContainerSize(320, 180);
 
             const { container } = render(
                 <GameWrapper>
@@ -229,7 +256,7 @@ describe('GameWrapper', () => {
         });
 
         it('debe manejar ventanas muy grandes', () => {
-            setWindowSize(7680, 4320); // 8K
+            mockContainerSize(7680, 4320); // 8K
 
             const { container } = render(
                 <GameWrapper>
@@ -244,7 +271,7 @@ describe('GameWrapper', () => {
         });
 
         it('debe manejar proporciones extremas (muy ancho)', () => {
-            setWindowSize(5760, 1080); // 32:6 aprox
+            mockContainerSize(5760, 1080); // 32:6 aprox
 
             const { container } = render(
                 <GameWrapper>
@@ -261,7 +288,7 @@ describe('GameWrapper', () => {
         });
 
         it('debe manejar proporciones extremas (muy alto)', () => {
-            setWindowSize(1920, 3240); // 16:27 aprox
+            mockContainerSize(1920, 3240); // 16:27 aprox
 
             const { container } = render(
                 <GameWrapper>

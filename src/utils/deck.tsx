@@ -86,6 +86,7 @@ const magicCard9: CardInfo = {
   image: "/cartasPNG/ataque4.png"
 };
 
+// Transforma los números negativos y el cero a uno
 const magicCard10: CardInfo = {
   name: "endfor+=1",
   type: CardType.MAGIC,

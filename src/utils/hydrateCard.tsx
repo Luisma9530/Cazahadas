@@ -1,5 +1,5 @@
 import { CardInfo, CardType } from "../@types/Card";
-import { deckCards } from "./deck";
+import { deckCards } from "./Deck";
 
 type CardKey = `${CardType}-${string}`;
 

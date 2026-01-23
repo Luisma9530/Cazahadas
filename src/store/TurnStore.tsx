@@ -40,7 +40,7 @@ const useTurnStore = create<useTurnStore>((set) => ({
       showDrawModal: false,
       isMyFirstTurnBattle: false
     }),
-  isMyFirstTurnBattle: true,
+  isMyFirstTurnBattle: false,
   setIsMyFirstTurnBattle: (value: boolean) => set({ isMyFirstTurnBattle: value }),
   setShowBattleModal: (value: boolean) => set({ showBattleModal: value }),
   setShowDrawModal: (value: boolean) => set({ showDrawModal: value }),

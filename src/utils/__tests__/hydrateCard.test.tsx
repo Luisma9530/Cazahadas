@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { hydrateCard } from '../hydrateCard';
+import { hydrateCard } from '../HydrateCard';
 import { CardType, CardInfo } from '../../@types/Card';
 
 describe('hydrateCard', () => {
