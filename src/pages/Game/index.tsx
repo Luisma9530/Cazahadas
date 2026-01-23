@@ -29,6 +29,25 @@ export default function Game() {
   const [gameBusy, setGameBusy] = useState(false)
   const [isCopied, setIsCopied] = useState(false);
   const [isPortrait, setIsPortrait] = useState(false);
+  const [showFullscreenPrompt, setShowFullscreenPrompt] = useState(false);
+  const enterFullscreen = async () => {
+    try {
+      const elem = document.documentElement;
+
+      if (elem.requestFullscreen) {
+        await elem.requestFullscreen();
+      } else if ((elem as any).webkitRequestFullscreen) { // Safari
+        await (elem as any).webkitRequestFullscreen();
+      } else if ((elem as any).mozRequestFullScreen) { // Firefox
+        await (elem as any).mozRequestFullScreen();
+      } else if ((elem as any).msRequestFullscreen) { // IE/Edge
+        await (elem as any).msRequestFullscreen();
+      }
+      setShowFullscreenPrompt(false);
+    } catch (err) {
+      console.log('No se pudo activar fullscreen:', err);
+    }
+  };
 
   const [isMyTurn, toggleTurn, setPlayerSkippedTurn, setIsBattle, isBattle, setIsMyFirstTurnBattle, showBattleModal, setShowBattleModal, showDrawModal, setShowDrawModal, isMyFirstTurn] = useTurnStore((state) => [state.isMyTurn, state.toggleTurn, state.setPlayerSkippedTurn, state.setIsBattle, state.isBattle, state.setIsMyFirstTurnBattle, state.showBattleModal, state.setShowBattleModal, state.showDrawModal, state.setShowDrawModal, state.isMyFirstTurn]);
   const [setBoard, board, clearDeckAndMagic] = useBoardStore((state) => [state.setBoard, state.board, state.clearDeckAndMagic]);
@@ -52,6 +71,11 @@ export default function Game() {
       const isMobile = window.innerWidth < 768;
       const isPortraitMode = window.innerHeight > window.innerWidth;
       setIsPortrait(isMobile && isPortraitMode);
+
+      // Si cambió a landscape en móvil, mostrar prompt de fullscreen
+      if (isMobile && !isPortraitMode && !document.fullscreenElement) {
+        setShowFullscreenPrompt(true);
+      }
     };
 
     checkOrientation();
@@ -284,6 +308,33 @@ export default function Game() {
     );
   }
 
+  if (showFullscreenPrompt && !loading && !gameBusy) {
+    return (
+      <div className="h-full w-full flex items-center justify-center bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 p-4">
+        <div className="text-center flex flex-col items-center gap-6 max-w-md">
+          <div className="text-white text-2xl font-bold">
+            🎮 Cazahadas
+          </div>
+          <p className="text-gray-200 text-lg">
+            Para una mejor experiencia, activa el modo pantalla completa
+          </p>
+          <button
+            onClick={enterFullscreen}
+            className="px-8 py-4 bg-purple-600 hover:bg-purple-700 text-white text-xl font-bold rounded-lg transition-colors shadow-lg"
+          >
+            Activar Pantalla Completa
+          </button>
+          <button
+            onClick={() => setShowFullscreenPrompt(false)}
+            className="text-gray-400 hover:text-gray-300 underline text-sm"
+          >
+            Continuar sin pantalla completa
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className={`h-full w-full overflow-hidden ${gameOver ? 'pointer-events-none' : ''}`}>
 
@@ -356,15 +407,15 @@ export default function Game() {
           </div>
 
           {/* Botones - dentro del wrapper para que escalen */}
-          <div className="absolute right-0" style={{ top: '200px' }}> 
+          <div className="absolute right-0" style={{ top: '200px' }}>
             <RequestDraw />
           </div>
 
-          <div className="absolute right-0" style={{ top: '300px' }}> 
+          <div className="absolute right-0" style={{ top: '300px' }}>
             <SkipTurn />
           </div>
 
-          <div className="absolute right-0" style={{ top: '50px', right: '650px' }}> 
+          <div className="absolute right-0" style={{ top: '50px', right: '650px' }}>
             <SurrenderButton />
           </div>
         </GameWrapper>
