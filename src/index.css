@@ -9,23 +9,11 @@
 }
 
 html, body, #root {
-  height: 100vh;
-  height: 100dvh; /* Dynamic Viewport Height - se ajusta automáticamente cuando la barra desaparece */
-  width: 100vw;
-  width: 100dvw; /* Dynamic Viewport Width */
+  height: 100%;
+  width: 100%;
   overflow: hidden;
-  position: fixed; /* Importante: previene el scroll y el bounce */
   margin: 0;
   padding: 0;
-  top: 0;
-  left: 0;
-}
-
-/* Prevenir comportamientos de scroll en móviles */
-body {
-  overscroll-behavior: none; /* Previene el bounce en iOS */
-  -webkit-overflow-scrolling: touch;
-  touch-action: pan-x pan-y; /* Permite gestos de navegación pero previene zoom */
 }
 
 .game-wrapper {

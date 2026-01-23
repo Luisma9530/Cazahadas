@@ -22,7 +22,6 @@ import DrawConfirmModal from "../../components/Modals/DrawConfirmModal.tsx";
 import RequestDraw from "../../components/drawGame.tsx";
 import GameWrapper from "../../utils/GameWrapper.tsx";
 import SurrenderButton from "../../components/SurrenderButton.tsx";
-import { useHideAddressBar } from "../../hooks/useHideAddressBar.tsx";
 
 
 export default function Game() {
@@ -38,8 +37,6 @@ export default function Game() {
   const { id: gameId } = useParams<{ id: string }>()
 
   const [gameStartModal, toggleGameStartModal, turnModal, toggleTurnModal, battleModal, toggleBattleModal, battleEndModal, toggleBattleEndModal] = useModalStore((state) => [state.gameStartModal, state.toggleGameStartModal, state.turnModal, state.toggleTurnModal, state.battleModal, state.toggleBattleModal, state.battleEndModal, state.toggleBattleEndModal]);
-
-  useHideAddressBar();
 
   useEffect(() => {
     if (isBattle) {
