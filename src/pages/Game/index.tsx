@@ -23,31 +23,13 @@ import RequestDraw from "../../components/drawGame.tsx";
 import GameWrapper from "../../utils/GameWrapper.tsx";
 import SurrenderButton from "../../components/SurrenderButton.tsx";
 
-
 export default function Game() {
   const [loading, setLoading] = useState(true)
   const [gameBusy, setGameBusy] = useState(false)
   const [isCopied, setIsCopied] = useState(false);
   const [isPortrait, setIsPortrait] = useState(false);
-  const [showFullscreenPrompt, setShowFullscreenPrompt] = useState(false);
-  const enterFullscreen = async () => {
-    try {
-      const elem = document.documentElement;
+  const [isFullscreen, setIsFullscreen] = useState(false); // CAMBIO: ahora solo trackea el estado
 
-      if (elem.requestFullscreen) {
-        await elem.requestFullscreen();
-      } else if ((elem as any).webkitRequestFullscreen) { // Safari
-        await (elem as any).webkitRequestFullscreen();
-      } else if ((elem as any).mozRequestFullScreen) { // Firefox
-        await (elem as any).mozRequestFullScreen();
-      } else if ((elem as any).msRequestFullscreen) { // IE/Edge
-        await (elem as any).msRequestFullscreen();
-      }
-      setShowFullscreenPrompt(false);
-    } catch (err) {
-      console.log('No se pudo activar fullscreen:', err);
-    }
-  };
 
   const [isMyTurn, toggleTurn, setPlayerSkippedTurn, setIsBattle, isBattle, setIsMyFirstTurnBattle, showBattleModal, setShowBattleModal, showDrawModal, setShowDrawModal, isMyFirstTurn] = useTurnStore((state) => [state.isMyTurn, state.toggleTurn, state.setPlayerSkippedTurn, state.setIsBattle, state.isBattle, state.setIsMyFirstTurnBattle, state.showBattleModal, state.setShowBattleModal, state.showDrawModal, state.setShowDrawModal, state.isMyFirstTurn]);
   const [setBoard, board, clearDeckAndMagic] = useBoardStore((state) => [state.setBoard, state.board, state.clearDeckAndMagic]);
@@ -58,35 +40,75 @@ export default function Game() {
   const [gameStartModal, toggleGameStartModal, turnModal, toggleTurnModal, battleModal, toggleBattleModal, battleEndModal, toggleBattleEndModal] = useModalStore((state) => [state.gameStartModal, state.toggleGameStartModal, state.turnModal, state.toggleTurnModal, state.battleModal, state.toggleBattleModal, state.battleEndModal, state.toggleBattleEndModal]);
 
   useEffect(() => {
-    if (isBattle) {
-      toggleBattleModal()
-    } else if (!isBattle && !isMyFirstTurn) {
-      toggleBattleEndModal()
-    }
-  }, [isBattle]);
-
-  // Detectar orientación del dispositivo
-  useEffect(() => {
     const checkOrientation = () => {
       const isMobile = window.innerWidth < 768;
       const isPortraitMode = window.innerHeight > window.innerWidth;
       setIsPortrait(isMobile && isPortraitMode);
-
-      // Si cambió a landscape en móvil, mostrar prompt de fullscreen
-      if (isMobile && !isPortraitMode && !document.fullscreenElement) {
-        setShowFullscreenPrompt(true);
-      }
     };
 
     checkOrientation();
     window.addEventListener('resize', checkOrientation);
     window.addEventListener('orientationchange', checkOrientation);
 
+    // Listener para sincronizar el estado cuando el usuario salga de fullscreen con ESC
+    const handleFullscreenChange = () => {
+      const isInFullscreen = !!(
+        document.fullscreenElement ||
+        (document as any).webkitFullscreenElement
+      );
+      setIsFullscreen(isInFullscreen);
+    };
+
+    document.addEventListener('fullscreenchange', handleFullscreenChange);
+    document.addEventListener('webkitfullscreenchange', handleFullscreenChange);
+
     return () => {
       window.removeEventListener('resize', checkOrientation);
       window.removeEventListener('orientationchange', checkOrientation);
+      document.removeEventListener('fullscreenchange', handleFullscreenChange);
+      document.removeEventListener('webkitfullscreenchange', handleFullscreenChange);
     };
   }, []);
+
+  const toggleFullscreen = async () => {
+    try {
+      const isCurrentlyFullscreen = !!(
+        document.fullscreenElement ||
+        (document as any).webkitFullscreenElement ||
+        (document as any).mozFullScreenElement ||
+        (document as any).msFullscreenElement
+      );
+
+      if (isCurrentlyFullscreen) {
+        // Salir de fullscreen
+        if (document.exitFullscreen) {
+          await document.exitFullscreen();
+        } else if ((document as any).webkitExitFullscreen) {
+          await (document as any).webkitExitFullscreen();
+        } else if ((document as any).mozCancelFullScreen) {
+          await (document as any).mozCancelFullScreen();
+        } else if ((document as any).msExitFullscreen) {
+          await (document as any).msExitFullscreen();
+        }
+        setIsFullscreen(false);
+      } else {
+        // Entrar en fullscreen
+        const elem = document.documentElement;
+        if (elem.requestFullscreen) {
+          await elem.requestFullscreen();
+        } else if ((elem as any).webkitRequestFullscreen) {
+          await (elem as any).webkitRequestFullscreen();
+        } else if ((elem as any).mozRequestFullScreen) {
+          await (elem as any).mozRequestFullScreen();
+        } else if ((elem as any).msRequestFullscreen) {
+          await (elem as any).msRequestFullscreen();
+        }
+        setIsFullscreen(true);
+      }
+    } catch (err) {
+      console.log('Error con fullscreen:', err);
+    }
+  };
 
   useEffect(() => {
     socket.on('player-connected', (data: { firstPlayer: boolean }) => {
@@ -308,35 +330,42 @@ export default function Game() {
     );
   }
 
-  if (showFullscreenPrompt && !loading && !gameBusy) {
-    return (
-      <div className="h-full w-full flex items-center justify-center bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 p-4">
-        <div className="text-center flex flex-col items-center gap-6 max-w-md">
-          <div className="text-white text-2xl font-bold">
-            🎮 Cazahadas
-          </div>
-          <p className="text-gray-200 text-lg">
-            Para una mejor experiencia, activa el modo pantalla completa
-          </p>
-          <button
-            onClick={enterFullscreen}
-            className="px-8 py-4 bg-purple-600 hover:bg-purple-700 text-white text-xl font-bold rounded-lg transition-colors shadow-lg"
-          >
-            Activar Pantalla Completa
-          </button>
-          <button
-            onClick={() => setShowFullscreenPrompt(false)}
-            className="text-gray-400 hover:text-gray-300 underline text-sm"
-          >
-            Continuar sin pantalla completa
-          </button>
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div className={`h-full w-full overflow-hidden ${gameOver ? 'pointer-events-none' : ''}`}>
+
+      {!isPortrait && (
+        <button
+          onClick={toggleFullscreen}
+          className="fixed top-15 left-1 z-[70] text-white px-4 py-2 rounded-lg shadow-lg transition-all flex items-center gap-2 text-sm font-semibold"
+          title={isFullscreen ? "Salir de pantalla completa" : "Activar pantalla completa"}
+        >
+          <svg
+            className="w-5 h-5"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            {isFullscreen ? (
+              // Icono para salir de fullscreen
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M9 9V4.5M9 9H4.5M9 9L3.75 3.75M15 9h4.5M15 9V4.5M15 9l5.25-5.25M9 15v4.5M9 15H4.5M9 15l-5.25 5.25M15 15h4.5M15 15v4.5m0-4.5l5.25 5.25"
+              />
+            ) : (
+              // Icono para entrar en fullscreen
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"
+              />
+            )}
+          </svg>
+          {isFullscreen ? "Salir" : "Pantalla completa"}
+        </button>
+      )}
 
       {/* Loading State - FUERA del GameWrapper */}
       {loading && (
