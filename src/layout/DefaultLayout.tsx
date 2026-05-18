@@ -91,68 +91,67 @@ export default function DefaultLayout() {
     >
       {/* Header - Ocupa espacio real, no absolute */}
       <div className="relative z-50 p-2 flex-shrink-0">
-        <div className="flex justify-between items-center">
-
-          {/* Título en el header */}
-          {(!showRules && !showAuth && !showScoreboard) && (
+        {(!showRules && !showAuth && !showScoreboard) && (
+          <div className="flex justify-between items-center">
+            {/* Título en el header */}
             <h1
               className="font-light z-40 text-xl sm:text-2xl md:text-3xl hover:cursor-pointer 
-                         font-title text-white drop-shadow-lg"
+                   font-title text-white drop-shadow-lg"
               onClick={handleTitleClick}
             >
               Cazahadas
             </h1>
-          )}
 
-          {/* Botones agrupados a la derecha */}
-          <div className="flex items-center gap-2">
-            {/* Botón de Inicio/Cierre de Sesión */}
-            {!logedUser ? (
+            {/* Botones agrupados a la derecha */}
+            <div className="flex items-center gap-2">
+              {/* Botón de Inicio/Cierre de Sesión */}
+              {!logedUser ? (
+                <button
+                  onClick={() => setShowAuth(true)}
+                  className="bg-gradient-to-r from-purple-400 to-pink-500 text-white 
+                       p-2 rounded-full shadow-lg hover:scale-110 transition-transform
+                       w-10 h-10 flex items-center justify-center"
+                  title="Iniciar sesión"
+                >
+                  <User className="w-4 h-4" />
+                </button>
+              ) : (
+                <button
+                  onClick={() => closeSesion()}
+                  className="bg-gradient-to-r from-purple-400 to-pink-500 text-white 
+                       px-3 py-2 rounded-full shadow-lg hover:scale-110 transition-transform
+                       text-xs font-medium whitespace-nowrap"
+                  title="Cerrar sesión"
+                >
+                  <span className="hidden sm:inline">Cerrar sesión</span>
+                  <span className="sm:hidden">Salir</span>
+                </button>
+              )}
+
+              {/* Botón de Scoreboard */}
               <button
-                onClick={() => setShowAuth(true)}
-                className="bg-gradient-to-r from-purple-400 to-pink-500 text-white 
-                           p-2 rounded-full shadow-lg hover:scale-110 transition-transform
-                           w-10 h-10 flex items-center justify-center"
-                title="Iniciar sesión"
+                onClick={() => handleScoreboardClick()}
+                className="bg-gradient-to-r from-green-400 to-blue-500 text-white 
+                     p-2 rounded-full shadow-lg hover:scale-110 transition-transform
+                     w-10 h-10 flex items-center justify-center"
+                title="Ver puntuaciones"
               >
-                <User className="w-4 h-4" />
+                <Trophy className="w-4 h-4" />
               </button>
-            ) : (
+
+              {/* Botón de Reglas */}
               <button
-                onClick={() => closeSesion()}
-                className="bg-gradient-to-r from-purple-400 to-pink-500 text-white 
-                           px-3 py-2 rounded-full shadow-lg hover:scale-110 transition-transform
-                           text-xs font-medium whitespace-nowrap"
-                title="Cerrar sesión"
+                onClick={() => setShowRules(true)}
+                className="bg-gradient-to-r from-pink-400 to-purple-500 text-white 
+                     p-2 rounded-full shadow-lg hover:scale-110 transition-transform
+                     w-10 h-10 flex items-center justify-center"
+                title="Ver reglas del juego"
               >
-                <span className="hidden sm:inline">Cerrar sesión</span>
-                <span className="sm:hidden">Salir</span>
+                <Sparkles className="w-4 h-4" />
               </button>
-            )}
-
-            {/* Botón de Scoreboard */}
-            <button
-              onClick={() => handleScoreboardClick()}
-              className="bg-gradient-to-r from-green-400 to-blue-500 text-white 
-                         p-2 rounded-full shadow-lg hover:scale-110 transition-transform
-                         w-10 h-10 flex items-center justify-center"
-              title="Ver puntuaciones"
-            >
-              <Trophy className="w-4 h-4" />
-            </button>
-
-            {/* Botón de Reglas */}
-            <button
-              onClick={() => setShowRules(true)}
-              className="bg-gradient-to-r from-pink-400 to-purple-500 text-white 
-                         p-2 rounded-full shadow-lg hover:scale-110 transition-transform
-                         w-10 h-10 flex items-center justify-center"
-              title="Ver reglas del juego"
-            >
-              <Sparkles className="w-4 h-4" />
-            </button>
+            </div>
           </div>
-        </div>
+        )}
       </div>
 
       {/* Modal de Reglas */}

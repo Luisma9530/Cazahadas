@@ -1,133 +1,160 @@
 <h1 align='Center'>
- 👑 React Queen's Blood 👑
+  🧚 Cazahadas 🧚
 </h1>
 
-React Queen's Blood is a simplified multiplayer web version of the card game _Queen's Blood_ from _Final Fantasy VII Rebirth_, made using React.
+Cazahadas es una aplicación web multijugador que digitaliza el juego de cartas educativo del mismo nombre, creado por Enol Junquera Álvarez como herramienta didáctica para la enseñanza de conceptos básicos de programación. Dos jugadores se enfrentan en tiempo real con el objetivo de capturar más hadas que el rival mediante el uso estratégico de cartas mágicas y defensivas.
 
 <img src=".github/game.png"/>
 
-Disclaimer: The game is currently designed specifically for 1080p monitors. I do not own the Intellectual Property of Queen's Blood. I only implemented a simplistic version of the game.
+> **Nota:** La aplicación está optimizada para navegadores modernos en resolución 1920x1080. En dispositivos móviles se recomienda el modo horizontal.
 
-## 🖥️ Technologies used
+## 🖥️ Tecnologías utilizadas
 
-- React 18 and Typescript for code structure
-- Tailwind CSS for styling
-- Zustand for global state management
-- Framer Motion for animations
-- Socket.io for socket connection
+**Frontend**
+- React 18 y TypeScript
+- Tailwind CSS para los estilos
+- Zustand para la gestión del estado global
+- Vite como bundler
 
-## 🔧 How to set up the project locally
+**Backend**
+- Node.js con Socket.io para la comunicación en tiempo real
 
-In your terminal, run:
+**Proxy**
+- FastAPI (Python) para la gestión segura de la base de datos
+
+**Base de datos**
+- MongoDB Atlas
+
+**Despliegue**
+- Render (tier gratuito)
+
+## 🌐 Versión desplegada
+
+La aplicación está disponible en:
+
+👉 `https://cazahadas.onrender.com`
+
+> Al estar en el tier gratuito de Render, el servicio puede tardar hasta 30 segundos en responder tras un periodo de inactividad.
+
+## 🔧 Cómo ejecutar el proyecto en local
+
+Clona el repositorio (requiere acceso, ver sección de contribución):
 
 ```sh
-$ git clone https://github.com/xRiku/react-queens-blood.git
-$ cd react-queens-blood
-$ npm i
+git clone https://github.com/<usuario>/cazahadas.git
+cd cazahadas
+npm install
 ```
 
-Then you have to set up both the server and the application.
-
-To set up the **application** you have to run
+Arranca el frontend y el servidor Node.js simultáneamente:
 
 ```sh
- $ npm run dev
+npm run dev
 ```
 
-To set up the **server** you just have to run
+En una terminal separada, instala las dependencias Python y arranca el proxy FastAPI:
 
 ```sh
- $ npm run server
+pip install -r requirements.txt
+uvicorn main:app --reload
 ```
 
-After setting up everything, the application is accesible at `localhost:5173` and you're ready to play.
+Crea un fichero `.env` en la raíz del proyecto con las variables de entorno necesarias. Consulta la sección de despliegue de la memoria para ver la lista completa de variables requeridas.
 
-### 🌟 Optimal way to play
+La aplicación estará disponible en `localhost:5173`.
 
-Part of the fun in a Queen's Blood game is not having access to the opponent's hand. So the optimal way to play is setting up the server and playing on two different devices in the same network. This requires that the 5173 port of the device running the app is exposed to the LAN.
+## 🧩 Cómo jugar
 
-Once the port is exposed, access the application in the other computer's browser using the following address `<IP_RUNNING_THE_APP>:5173`. In order to acquire the IP, run the following command:
+### Pantalla de inicio
 
-Linux
+Desde la pantalla de inicio puedes crear una nueva partida o unirte a una existente mediante un código de sala.
 
-```
-ifconfig | grep 192.168
-```
+<img src=".github/home_screen.png"/>
 
-<img src=".github/linux_ip.png" >
+### Crear una partida
 
-Windows
+Pulsa el botón "Crear Partida". Se generará un código UUID único que deberás compartir con el otro jugador.
 
-```
-ipconfig
-```
+<img src=".github/game_id.png"/>
 
-On Windows, the IP is located after `IPv4 Address`.
+### Unirse a una partida
 
-<img src=".github/windows_ip.png" >
+Pulsa el botón "Unirse a partida", introduce el código de sala que te ha proporcionado el otro jugador y pulsa "Unirse".
 
-## 🧩 How to play
+<img src=".github/join_game.png"/>
 
-### ➡️ Entering the game
+### Tablero de juego
 
-You can either create a game room or join a game. Each room has its own game ID and you can only have two players per room.
+Una vez iniciada la partida, el tablero muestra las tres hadas disponibles en el centro, la variable X, las zonas de defensa y magia de ambos jugadores, y la mano de cartas en la parte inferior.
 
-<img src=".github/home_screen.png">
+<img src=".github/game_board.png"/>
 
-To start a new game, type your name and click the `Start Game` button. A random game ID is generated and showcased in the waiting room.
+### Mecánica de batalla
 
-<img src=".github/game_ID.png">
+Cuando un jugador intenta capturar un hada, el defensor recibe una notificación para decidir si acepta la batalla o cede el hada directamente.
 
-This game ID is meant to be used when joining a new game. In order to join a game, input the ID in the join game input field and click `Join Game`. After that, the joining player will be prompted to type a name.
+<img src=".github/battle_modal.png"/>
 
-<img src=".github/join_game.png">
+### Fin de partida
 
-After clicking on the `Join Game` button, the game will start. The player that creates the room will always be Player 1.
+La partida finaliza cuando un jugador captura dos de las tres hadas, por acuerdo de tablas, o por abandono de uno de los jugadores.
 
-### 📜 Rules
+<img src=".github/end_game.png"/>
 
-The game is composed of a board and a deck of 15 cards. The board contains three rows and five playable columns. Each player has a score for each row. Points are scored by placing cards on the board. Whoever has the highest sum of the points for each row wins.
+### Ranking
 
-<img src=".github/game_board.png">
+Cualquier usuario puede consultar el ranking general ordenado por número de hadas capturadas. Para acumular puntuación es necesario registrarse.
 
-The user playing is always displayed in green, on the left side, and the opponent in red, on the right side. The first and last column of the board represents the total score for that row in each player's respective color. You may also note that there are pawns in each row and each side of the board. In React Queen's Blood, you can only place a card in a tile with a pawn in it and if it is from your color, which is green. The tile can contain 1-3 pawns, which represent the cost of the card (to be explained).
+<img src=".github/scoreboard.png"/>
 
-The card is built of 4 key informations. The text on the bottom represents the card name. Each deck can only contain 2 cards of the same name. The pawn piece on the top left indicates the cost to play that card on the board. It varies from 1-3. The number on the top right indicates the score of that card.
+## 📜 Reglas básicas
 
-<img src=".github/card.png">
+Cada jugador dispone de una baraja de 28 cartas de tres tipos:
 
-Lastly, each card has a 5x5 board in the middle that informs how the card interacts with the game board. When placing a card in React Queen's Blood it has the ability to also place pawns for you to increase the number of tiles you have access to. The inner board in the card is composed of tiles of three different colors. The **Gray** tiles do not have any effect and are just the rest of the tile postions. The **White** tile is the position in the game board where the card is placed. The **Yellow** tiles are the location of the pawns placed relative to the placed card in the game board.
+- **Cartas de captura:** inician un intento de captura sobre un hada disponible.
+- **Cartas mágicas:** modifican el valor de la variable X mediante operaciones matemáticas y bucles de programación.
+- **Cartas defensivas:** establecen una condición lógica que protege el hada si se cumple al finalizar la batalla.
 
-<img src=".github/yellow_tile_example.png">
+El objetivo es capturar dos de las tres hadas disponibles. Durante cada batalla, ambos jugadores pueden usar cartas mágicas para modificar la variable X. El defensor puede colocar una carta defensiva cuya condición se evaluará al finalizar el combate. La batalla termina cuando ambos jugadores saltan turno consecutivamente.
 
-:warning: When placing a card on the board and the yellow tile's position already contains a pawn of your color, the pawn is added to the tile. If it's an opponent's pawn, all of the pawns in the tile are converted to your color.
+## 🔨 Cómo modificar el juego
 
-<img src=".github/pawn_converted_example.gif">
+### Añadir o modificar cartas
 
-The game starts with Player 1. For each player's first turn, they receive 5 cards each. For the following turns, each player draws 1 random card from the deck at the start, before executing their action. Each turn requires that the player executes one of the following actions: place a card on the board or skip their turn by clicking the `Skip Turn` button. When placing a card in a row, the score of the card is summed into the row score for that player. The game ends when the two players skip their turn consecutively. When the game ends, for each row, if the player's score for that row is greater than the opponent's, the score for that row is summed to the total score. If you either lose in that row or get a draw, you sum 0 to the total score. Wins whoever has the highest total score in the end.
+El mazo completo está definido en `src/utils/Deck.tsx`. Cada carta mágica incluye una función `operation(x: number): number` y cada carta defensiva una función `defenseCondition(x: number): boolean`. Al añadir una carta nueva en `Deck.tsx`, `HydrateCard.tsx` la recoge automáticamente sin necesidad de modificación adicional.
 
-<img src=".github/end_game_example.png">
+### Modificar reglas de batalla
 
-## 🚧 Room for improvement
+La lógica de resolución de batalla reside en `server/index.ts`, en el manejador del evento `skip-turn`.
 
-List of ideas already planned out to be implemented (in no specific order):
+## 🚀 Despliegue propio en Render
 
-- [ ] Add buffs and debuffs
-- [ ] Improve code legibility
-- [ ] Improve animations and timings (such as the initial draw of the card or when the card is used)
-- [ ] Add a pawn preview for the selected card
-- [ ] Add a tile highlight for available tiles to place the card
-- [ ] Add a mulligan phase to prevent cards with high cost in the first hand
-- [ ] Add more cards
-- [ ] Improve SFX
-- [ ] Add responsive design
-- [ ] Improve card's visual design
-- [ ] Add a rematch button
-- [ ] Create database to store data such as user account and match info
-- [ ] Deploy application
-- [ ] Add chat between players
-- [ ] Add turn timer to prevent endless matches
+Para desplegar una instancia propia son necesarios dos servicios en Render:
 
-## 👥 Contributing
+**Servidor Node.js**
+- Runtime: Node
+- Build command: `npm run build`
+- Start command: `npm run start`
 
-Feel free to submit pull requests, create issues with suggestions or anything you find valuable to the project.
+**Proxy FastAPI**
+- Runtime: Python
+- Build command: `pip install -r requirements.txt`
+- Start command: `uvicorn main:app --host 0.0.0.0 --port $PORT`
+
+Despliega primero el proxy FastAPI y usa su URL como valor de `VITE_API_URL` en el servicio Node.js antes de realizar el build, ya que Vite incrusta esa URL en el bundle de producción durante la compilación.
+
+## 🎬 Videotutoriales
+
+- [Manejo general de la aplicación](#) *(pendiente de publicación)*
+- [Desarrollo de una partida completa](#) *(pendiente de publicación)*
+- [Cómo modificar el juego](#) *(pendiente de publicación)*
+
+## 👥 Contribución
+
+El repositorio es privado. Para solicitar acceso, contacta con el autor a través de su perfil de GitHub o del correo institucional de la Universidad de Oviedo.
+
+Se aceptan sugerencias de mejora mediante issues una vez concedido el acceso.
+
+## 📄 Licencia
+
+Este proyecto está bajo la licencia incluida en el fichero `LICENSE` del repositorio.
