@@ -4,8 +4,6 @@
 
 Cazahadas es una aplicación web multijugador que digitaliza el juego de cartas educativo del mismo nombre, creado por Enol Junquera Álvarez como herramienta didáctica para la enseñanza de conceptos básicos de programación. Dos jugadores se enfrentan en tiempo real con el objetivo de capturar más hadas que el rival mediante el uso estratégico de cartas mágicas y defensivas.
 
-<img src=".github/game.png"/>
-
 > **Nota:** La aplicación está optimizada para navegadores modernos en resolución 1920x1080. En dispositivos móviles se recomienda el modo horizontal.
 
 ## 🖥️ Tecnologías utilizadas
@@ -49,7 +47,7 @@ npm install
 Arranca el frontend y el servidor Node.js simultáneamente:
 
 ```sh
-npm run dev
+npm run dev-client
 ```
 
 En una terminal separada, instala las dependencias Python y arranca el proxy FastAPI:
@@ -142,19 +140,3 @@ Para desplegar una instancia propia son necesarios dos servicios en Render:
 - Start command: `uvicorn main:app --host 0.0.0.0 --port $PORT`
 
 Despliega primero el proxy FastAPI y usa su URL como valor de `VITE_API_URL` en el servicio Node.js antes de realizar el build, ya que Vite incrusta esa URL en el bundle de producción durante la compilación.
-
-## 🎬 Videotutoriales
-
-- [Manejo general de la aplicación](#) *(pendiente de publicación)*
-- [Desarrollo de una partida completa](#) *(pendiente de publicación)*
-- [Cómo modificar el juego](#) *(pendiente de publicación)*
-
-## 👥 Contribución
-
-El repositorio es privado. Para solicitar acceso, contacta con el autor a través de su perfil de GitHub o del correo institucional de la Universidad de Oviedo.
-
-Se aceptan sugerencias de mejora mediante issues una vez concedido el acceso.
-
-## 📄 Licencia
-
-Este proyecto está bajo la licencia incluida en el fichero `LICENSE` del repositorio.
