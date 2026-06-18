@@ -29,7 +29,7 @@ describe('hydrateCard', () => {
                 name: 'Catch',
                 type: CardType.CATCH,
                 text: 'Atrapar',
-                image: '/cartasPNG/Hatrapahadas.png'
+                image: '/cartasPNG/Hatrapahadas.jpg'
             };
 
             const result = hydrateCard(catchCard);
@@ -58,7 +58,7 @@ describe('hydrateCard', () => {
                 name: '+=1',
                 type: CardType.MAGIC,
                 text: '+=1',
-                image: '/cartasPNG/ataque1.png'
+                image: '/cartasPNG/ataque1.jpg'
             };
 
             const result = hydrateCard(magicCard);
@@ -103,7 +103,7 @@ describe('hydrateCard', () => {
                 name: 'x>=0',
                 type: CardType.SHIELD,
                 text: 'if x>=0\n[[no consigue el\nhada]]\nendif',
-                image: '/cartasPNG/escudo1.png'
+                image: '/cartasPNG/escudo1.jpg'
             };
 
             const result = hydrateCard(shieldCard);
@@ -125,7 +125,7 @@ describe('hydrateCard', () => {
                 name: 'x<=0',
                 type: CardType.SHIELD,
                 text: 'if x<=0\n[[no consigue el\nhada]]\nendif',
-                image: '/cartasPNG/escudo4.png'
+                image: '/cartasPNG/escudo4.jpg'
             };
 
             const result = hydrateCard(shieldCard);
@@ -144,7 +144,7 @@ describe('hydrateCard', () => {
                 name: 'x>=1',
                 type: CardType.SHIELD,
                 text: 'if x>=1\n[[no consigue el\nhada]]\nendif',
-                image: '/cartasPNG/escudo2.png'
+                image: '/cartasPNG/escudo2.jpg'
             };
 
             const result = hydrateCard(shieldCard);
@@ -164,7 +164,7 @@ describe('hydrateCard', () => {
                 name: 'x<=1',
                 type: CardType.SHIELD,
                 text: 'if x<=1\n[[no consigue el\nhada]]\nendif',
-                image: '/cartasPNG/escudo3.png'
+                image: '/cartasPNG/escudo3.jpg'
             };
 
             const result = hydrateCard(shieldCard);
@@ -184,7 +184,7 @@ describe('hydrateCard', () => {
                 name: 'x>=0',
                 type: CardType.SHIELD,
                 text: 'if x>=0\n[[no consigue el\nhada]]\nendif',
-                image: '/cartasPNG/escudo1.png',
+                image: '/cartasPNG/escudo1.jpg',
                 placedByPlayerOne: true
             };
 
@@ -193,7 +193,7 @@ describe('hydrateCard', () => {
             expect(result.name).toBe('x>=0');
             expect(result.type).toBe(CardType.SHIELD);
             expect(result.text).toBe('if x>=0\n[[no consigue el\nhada]]\nendif');
-            expect(result.image).toBe('/cartasPNG/escudo1.png');
+            expect(result.image).toBe('/cartasPNG/escudo1.jpg');
             expect(result.placedByPlayerOne).toBe(true);
 
             if (result.type === CardType.SHIELD) {

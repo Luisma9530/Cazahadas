@@ -31,7 +31,7 @@ describe('deck', () => {
             catchCards.forEach(card => {
                 expect(card.name).toBe('Catch');
                 expect(card.text).toBe('Atrapar');
-                expect(card.image).toBe('/cartasPNG/Hatrapahadas.png');
+                expect(card.image).toBe('/cartasPNG/Hatrapahadas.jpg');
                 expect(card.type).toBe(CardType.CATCH);
             });
         });
@@ -392,7 +392,7 @@ describe('deck', () => {
             deckCards.forEach(card => {
                 expect(card.image).toBeDefined();
                 expect(typeof card.image).toBe('string');
-                expect(card.image).toMatch(/^\/cartasPNG\/.+\.png$/);
+                expect(card.image).toMatch(/^\/cartasPNG\/.+\.jpg$/);
             });
         });
 

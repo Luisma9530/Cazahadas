@@ -326,3 +326,9 @@ app.listen({ port: parseInt(process.env.PORT!) || 4000, host: '0.0.0.0' }, (err,
   }
   console.log(`Server listening at ${address}`);
 });
+
+setInterval(() => {
+  const mem = process.memoryUsage();
+  const games = Object.keys(currentGames).length;
+  console.log(`Partidas activas: ${games} | RSS: ${(mem.rss / 1024 / 1024).toFixed(2)} MB | Heap usado: ${(mem.heapUsed / 1024 / 1024).toFixed(2)} MB | Heap total: ${(mem.heapTotal / 1024 / 1024).toFixed(2)} MB`);
+}, 10000);

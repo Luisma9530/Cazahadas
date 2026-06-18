@@ -4,14 +4,14 @@ const catchCard1: CardInfo = {
   name: "Catch",
   type: CardType.CATCH,
   text: "Atrapar",
-  image: "/cartasPNG/Hatrapahadas.png"
+  image: "/cartasPNG/Hatrapahadas.jpg"
 };
 
 const catchCard2: CardInfo = {
   name: "Catch",
   type: CardType.CATCH,
   text: "Atrapar",
-  image: "/cartasPNG/Hatrapahadas.png"
+  image: "/cartasPNG/Hatrapahadas.jpg"
 };
 
 const magicCard1: CardInfo = {
@@ -19,7 +19,7 @@ const magicCard1: CardInfo = {
   type: CardType.MAGIC,
   operation: (x: number) => x + 1,
   text: "+=1",
-  image: "/cartasPNG/ataque1.png"
+  image: "/cartasPNG/ataque1.jpg"
 };
 
 const magicCard2: CardInfo = {
@@ -27,7 +27,7 @@ const magicCard2: CardInfo = {
   type: CardType.MAGIC,
   operation: (x: number) => x + 1,
   text: "+=1",
-  image: "/cartasPNG/ataque1.png"
+  image: "/cartasPNG/ataque1.jpg"
 };
 
 const magicCard3: CardInfo = {
@@ -35,7 +35,7 @@ const magicCard3: CardInfo = {
   type: CardType.MAGIC,
   operation: (x: number) => x - 1,
   text: "-=1",
-  image: "/cartasPNG/ataque3.png"
+  image: "/cartasPNG/ataque3.jpg"
 };
 
 const magicCard4: CardInfo = {
@@ -43,7 +43,7 @@ const magicCard4: CardInfo = {
   type: CardType.MAGIC,
   operation: (x: number) => x - 1,
   text: "-=1",
-  image: "/cartasPNG/ataque3.png"
+  image: "/cartasPNG/ataque3.jpg"
 };
 
 const magicCard5: CardInfo = {
@@ -51,7 +51,7 @@ const magicCard5: CardInfo = {
   type: CardType.MAGIC,
   operation: (x: number) => x * (-1),
   text: "*=-1",
-  image: "/cartasPNG/ataque5.png"
+  image: "/cartasPNG/ataque5.jpg"
 };
 
 const magicCard6: CardInfo = {
@@ -59,7 +59,7 @@ const magicCard6: CardInfo = {
   type: CardType.MAGIC,
   operation: (x: number) => x + 2,
   text: "+=2",
-  image: "/cartasPNG/ataque2.png"
+  image: "/cartasPNG/ataque2.jpg"
 };
 
 const magicCard7: CardInfo = {
@@ -67,7 +67,7 @@ const magicCard7: CardInfo = {
   type: CardType.MAGIC,
   operation: (x: number) => x + 2,
   text: "+=2",
-  image: "/cartasPNG/ataque2.png"
+  image: "/cartasPNG/ataque2.jpg"
 };
 
 const magicCard8: CardInfo = {
@@ -75,7 +75,7 @@ const magicCard8: CardInfo = {
   type: CardType.MAGIC,
   operation: (x: number) => x - 2,
   text: "-=2",
-  image: "/cartasPNG/ataque4.png"
+  image: "/cartasPNG/ataque4.jpg"
 };
 
 const magicCard9: CardInfo = {
@@ -83,7 +83,7 @@ const magicCard9: CardInfo = {
   type: CardType.MAGIC,
   operation: (x: number) => x - 2,
   text: "-=2",
-  image: "/cartasPNG/ataque4.png"
+  image: "/cartasPNG/ataque4.jpg"
 };
 
 // Transforma los números negativos y el cero a uno
@@ -98,7 +98,7 @@ const magicCard10: CardInfo = {
     return x;
   },
   text: "for i=1:-1:x+1\nx += 1\nendfor",
-  image: "/cartasPNG/bucle1.png"
+  image: "/cartasPNG/bucle1.jpg"
 };
 
 const magicCard11: CardInfo = {
@@ -112,7 +112,7 @@ const magicCard11: CardInfo = {
     return x;
   },
   text: "for i=1:x+1\nx -= 1\nendfor",
-  image: "/cartasPNG/bucle6.png"
+  image: "/cartasPNG/bucle6.jpg"
 };
 
 const magicCard12: CardInfo = {
@@ -126,7 +126,7 @@ const magicCard12: CardInfo = {
     return x;
   },
   text: "do\nx += 1\nuntil x>0",
-  image: "/cartasPNG/bucle2.png"
+  image: "/cartasPNG/bucle2.jpg"
 };
 
 const magicCard13: CardInfo = {
@@ -139,7 +139,7 @@ const magicCard13: CardInfo = {
     return x;
   },
   text: "while x<=0\nx += 1\nendwhile",
-  image: "/cartasPNG/bucle5.png"
+  image: "/cartasPNG/bucle5.jpg"
 };
 
 const magicCard14: CardInfo = {
@@ -153,7 +153,7 @@ const magicCard14: CardInfo = {
     return x;
   },
   text: "do\nx -= 1\nuntil x<0",
-  image: "/cartasPNG/bucle3.png"
+  image: "/cartasPNG/bucle3.jpg"
 };
 
 const magicCard15: CardInfo = {
@@ -166,7 +166,7 @@ const magicCard15: CardInfo = {
     return x;
   },
   text: "while x>=0\nx -= 1\nendwhile",
-  image: "/cartasPNG/bucle4.png"
+  image: "/cartasPNG/bucle4.jpg"
 };
 
 const shieldCard1: CardInfo = {
@@ -174,7 +174,7 @@ const shieldCard1: CardInfo = {
   type: CardType.SHIELD,
   defenseCondition: (x: number) => x >= 0,
   text: "if x>=0\n[[no consigue el\nhada]]\nendif",
-  image: "/cartasPNG/escudo1.png"
+  image: "/cartasPNG/escudo1.jpg"
 };
 
 const shieldCard2: CardInfo = {
@@ -182,7 +182,7 @@ const shieldCard2: CardInfo = {
   type: CardType.SHIELD,
   defenseCondition: (x: number) => x <= 0,
   text: "if x<=0\n[[no consigue el\nhada]]\nendif",
-  image: "/cartasPNG/escudo4.png"
+  image: "/cartasPNG/escudo4.jpg"
 };
 
 const shieldCard3: CardInfo = {
@@ -190,7 +190,7 @@ const shieldCard3: CardInfo = {
   type: CardType.SHIELD,
   defenseCondition: (x: number) => x >= 1,
   text: "if x>=1\n[[no consigue el\nhada]]\nendif",
-  image: "/cartasPNG/escudo2.png"
+  image: "/cartasPNG/escudo2.jpg"
 };
 
 const shieldCard4: CardInfo = {
@@ -198,7 +198,7 @@ const shieldCard4: CardInfo = {
   type: CardType.SHIELD,
   defenseCondition: (x: number) => x <= 1,
   text: "if x<=1\n[[no consigue el\nhada]]\nendif",
-  image: "/cartasPNG/escudo3.png"
+  image: "/cartasPNG/escudo3.jpg"
 };
 
 const shieldCard5: CardInfo = {
@@ -206,7 +206,7 @@ const shieldCard5: CardInfo = {
   type: CardType.SHIELD,
   defenseCondition: (x: number) => x >= 0,
   text: "if x>=0\n[[no consigue el\nhada]]\nendif",
-  image: "/cartasPNG/escudo1.png"
+  image: "/cartasPNG/escudo1.jpg"
 };
 
 const shieldCard6: CardInfo = {
@@ -214,7 +214,7 @@ const shieldCard6: CardInfo = {
   type: CardType.SHIELD,
   defenseCondition: (x: number) => x <= 0,
   text: "if x<=0\n[[no consigue el\nhada]]\nendif",
-  image: "/cartasPNG/escudo4.png"
+  image: "/cartasPNG/escudo4.jpg"
 };
 
 const shieldCard7: CardInfo = {
@@ -222,7 +222,7 @@ const shieldCard7: CardInfo = {
   type: CardType.SHIELD,
   defenseCondition: (x: number) => x >= 0,
   text: "if x>=0\n[[no consigue el\nhada]]\nendif",
-  image: "/cartasPNG/escudo1.png"
+  image: "/cartasPNG/escudo1.jpg"
 };
 
 const shieldCard8: CardInfo = {
@@ -230,7 +230,7 @@ const shieldCard8: CardInfo = {
   type: CardType.SHIELD,
   defenseCondition: (x: number) => x <= 0,
   text: "if x<=0\n[[no consigue el\nhada]]\nendif",
-  image: "/cartasPNG/escudo4.png"
+  image: "/cartasPNG/escudo4.jpg"
 };
 
 export const deckCards = [

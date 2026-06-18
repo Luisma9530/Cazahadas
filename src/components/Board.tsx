@@ -154,7 +154,7 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
                 name: "Hada Encarada",
                 type: CardType.CATCH,
                 text: "Hada Encarada",
-                image: "/cartasPNG/Hada_encarada.png"
+                image: "/cartasPNG/Hada_encarada.jpg"
 
               };
               break;
@@ -164,7 +164,7 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
                 name: "Hada Malhablada",
                 type: CardType.CATCH,
                 text: "Hada Malhablada",
-                image: "/cartasPNG/Hada_malhablada.png"
+                image: "/cartasPNG/Hada_malhablada.jpg"
               };
               break;
 
@@ -173,7 +173,7 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
                 name: "Hada Resabiada",
                 type: CardType.CATCH,
                 text: "Hada Resabiada",
-                image: "/cartasPNG/Hada_resabiada.png"
+                image: "/cartasPNG/Hada_resabiada.jpg"
               };
               break;
 
@@ -514,7 +514,7 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
           >
             {tiles[1][0].type === 'fairy' && (
               <img
-                src="/cartasPNG/Hada_encarada.png"
+                src="/cartasPNG/Hada_encarada.jpg"
                 alt="Fairy background"
                 className={`absolute inset-0 w-full h-full object-cover z-0 ${tiles[1][0].captured ? 'grayscale opacity-50' : ''
                   }`}
@@ -543,7 +543,7 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
           >
             {tiles[1][1].type === 'fairy' && (
               <img
-                src="/cartasPNG/Hada_malhablada.png"
+                src="/cartasPNG/Hada_malhablada.jpg"
                 alt="Fairy background"
                 className={`absolute inset-0 w-full h-full object-cover z-0 ${tiles[1][1].captured ? 'grayscale opacity-50' : ''
                   }`}
@@ -572,7 +572,7 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
           >
             {tiles[1][2].type === 'fairy' && (
               <img
-                src="/cartasPNG/Hada_resabiada.png"
+                src="/cartasPNG/Hada_resabiada.jpg"
                 alt="Fairy background"
                 className={`absolute inset-0 w-full h-full object-cover z-0 ${tiles[1][2].captured ? 'grayscale opacity-50' : ''
                   }`}
