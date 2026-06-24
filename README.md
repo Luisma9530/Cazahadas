@@ -39,7 +39,7 @@ La aplicación está disponible en:
 Clona el repositorio (requiere acceso, ver sección de contribución):
 
 ```sh
-git clone https://github.com/<usuario>/cazahadas.git
+git clone https://github.com/Luisma9530/cazahadas.git
 cd cazahadas
 npm install
 ```
