@@ -451,6 +451,22 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
     return validCells;
   };
 
+  var myDefenseCards: CardInfo[] = [];
+  var rivalDefenseCards: CardInfo[] = [];
+
+  if (tiles[0][0].type === 'deck' && tiles[2][0].type === 'deck') {
+    myDefenseCards = [
+      ...(tiles[0][0].cards ?? []),
+      ...(tiles[2][0].cards ?? [])
+    ].filter(card => card.placedByPlayerOne === amIP1);
+
+
+    rivalDefenseCards = [
+      ...(tiles[0][0].cards ?? []),
+      ...(tiles[2][0].cards ?? [])
+    ].filter(card => card.placedByPlayerOne !== amIP1);
+  }
+
   return (
     <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
       {/* Contenedor del tablero */}
@@ -480,15 +496,26 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
         <div className="absolute" style={{ top: '15px', left: '10px', width: '219px', height: '325.5px' }}>
           <div className="rival-cell-3d defense-cell-castle game-cell flex items-center justify-center hover-container w-full h-full">
             <div className="defense-shield-icon"></div>
-            {tiles[0][0].type === 'deck' && tiles[0][0].cards.length > 0 && (
+            {tiles[0][0].type === 'deck' && rivalDefenseCards.length > 0 && (
               <div className="relative w-full h-full">
-                {tiles[0][0].cards.slice(-3).map((card, i) => (
+                {rivalDefenseCards.slice(-3).map((card, i) => (
                   <div
                     key={i}
                     className="absolute top-0 left-0 group"
                     style={{ top: `${i * 4}px`, left: `${i * 2}px`, zIndex: i }}
                   >
-                    <div className="w-20 h-28 sm:w-28 sm:h-40 overflow-hidden">
+                    <div className="w-48 h-64 overflow-hidden">
+                      <Card placed card={card} amIP1={amIP1} />
+                    </div>
+                    {/* Zoom al hacer hover */}
+                    <div className="absolute hidden group-hover:block z-[100]"
+                      style={{
+                        top: '0px',
+                        left: '220px',
+                        width: '300px',
+                        height: '420px'
+                      }}
+                    >
                       <Card placed card={card} amIP1={amIP1} />
                     </div>
                   </div>
@@ -644,15 +671,26 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
             onClick={() => handleCellClick(tiles[2][0], 2, 0)}
           >
             <div className="defense-shield-icon"></div>
-            {tiles[2][0].type === 'deck' && tiles[2][0].cards.length > 0 ? (
+            {tiles[2][0].type === 'deck' && myDefenseCards.length > 0 ? (
               <div className="relative w-full h-full">
-                {tiles[2][0].cards.slice(-3).map((card, i) => (
+                {myDefenseCards.slice(-3).map((card, i) => (
                   <div
                     key={i}
                     className="absolute top-0 left-0 group"
                     style={{ top: `${i * 4}px`, left: `${i * 2}px`, zIndex: i }}
                   >
-                    <div className="w-28 h-40 overflow-hidden">
+                    <div className="w-48 h-64 overflow-hidden">
+                      <Card placed card={card} amIP1={amIP1} />
+                    </div>
+                    {/* Zoom al hacer hover */}
+                    <div className="absolute hidden group-hover:block z-[100]"
+                      style={{
+                        top: '0px',
+                        left: '220px',
+                        width: '300px',
+                        height: '420px'
+                      }}
+                    >
                       <Card placed card={card} amIP1={amIP1} />
                     </div>
                   </div>
