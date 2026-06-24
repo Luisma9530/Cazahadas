@@ -45,7 +45,8 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
           case CardType.SHIELD:
             var defensePlaced = false;
             if ((tiles[0][0].type === 'deck' && tiles[0][0].cards.length > 0) ||
-              (tiles[2][0].type === 'deck' && tiles[2][0].cards.length > 0)
+              (tiles[2][0].type === 'deck' && tiles[2][0].cards.length > 0 ||
+                myDefenseCards.length > 0 || rivalDefenseCards.length > 0)
             ) {
               defensePlaced = true;
             }
