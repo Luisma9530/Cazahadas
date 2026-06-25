@@ -81,11 +81,15 @@ Pulsa el botón "Unirse a partida", introduce el código de sala que te ha propo
 
 <img src=".github/join_game.png"/>
 
+▶️ [Ver vídeo: Cómo unirse a una partida](https://www.youtube.com/watch?v=hJsq4UkHWCU)
+
 ### Tablero de juego
 
 Una vez iniciada la partida, el tablero muestra las tres hadas disponibles en el centro, la variable X, las zonas de defensa y magia de ambos jugadores, y la mano de cartas en la parte inferior.
 
 <img src=".github/game_board.png"/>
+
+▶️ [Ver vídeo: Ejemplo de partida completa](https://www.youtube.com/watch?v=4J0RtAslSVc)
 
 ### Mecánica de batalla
 
