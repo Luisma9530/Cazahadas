@@ -6,6 +6,19 @@ import { AnimatePresence, motion } from 'framer-motion'
 import useTurnStore from "../store/TurnStore"
 import { useParams } from "react-router-dom"
 
+/**
+ * Componente que muestra el botón para saltar turno o finalizar batalla.
+ * El botón solo es visible cuando es el turno del jugador local, la partida
+ * no ha finalizado, y no hay ningún modal de batalla o de tablas activo.
+ * El texto del botón varía según el contexto: muestra "End battle" cuando
+ * el jugador rival ya ha saltado turno en batalla o cuando es el primer turno
+ * de batalla del defensor, y "Skip turn" en el resto de casos.
+ * Al pulsarlo, emite el evento Socket.IO "skip-turn" con el estado actual
+ * del tablero para que el servidor gestione la lógica correspondiente.
+ *
+ * No recibe props. Obtiene el estado del tablero de BoardStore, el estado
+ * del turno de TurnStore, y el estado del juego de GameStore.
+ */
 export default function SkipTurn() {
   const [tiles] = useBoardStore((state) => [
     state.board,
@@ -21,6 +34,12 @@ export default function SkipTurn() {
 
   const { id: gameId } = useParams<{ id: string }>()
 
+  /**
+   * Gestiona la acción de saltar turno o finalizar batalla.
+   * Limpia las cartas seleccionadas en CardStore y emite el evento Socket.IO
+   * "skip-turn" al servidor con el estado actual del tablero, el identificador
+   * de sala, el estado de batalla y la identidad del jugador local.
+   */
   function handleSkipTurn() {
     resetSelectedCard()
     socket.emit('skip-turn', { tiles, gameId, isBattle, isMyFirstTurnBattle, amIP1 })

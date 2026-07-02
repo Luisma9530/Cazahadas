@@ -1,6 +1,14 @@
 import { motion } from "framer-motion";
 import { useModalStore } from "../../store/ModalStore";
 
+/**
+ * Modal animado que notifica a ambos jugadores la finalización de una batalla.
+ * Muestra el texto "Battle Ended!" con una animación de entrada y salida basada
+ * en Framer Motion. Al completarse la animación, invoca toggleBattleEndModal para
+ * ocultar el modal y permitir que el flujo del juego continúe.
+ *
+ * No recibe props. Gestiona su visibilidad a través de ModalStore.
+ */
 export function BattleEndModal() {
     const [toggleBattleEndModal] = useModalStore((state) => [state.toggleBattleEndModal]);
 

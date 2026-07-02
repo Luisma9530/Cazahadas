@@ -23,6 +23,20 @@ import RequestDraw from "../../components/drawGame.tsx";
 import GameWrapper from "../../utils/GameWrapper.tsx";
 import SurrenderButton from "../../components/SurrenderButton.tsx";
 
+/**
+ * Página principal de juego que coordina todos los elementos visuales
+ * y la comunicación con el servidor durante una partida activa.
+ * Gestiona el ciclo de vida de la partida mediante listeners Socket.IO,
+ * controla la visibilidad de los modales de juego, y adapta la interfaz
+ * según la orientación del dispositivo y el estado de pantalla completa.
+ * Mientras espera al segundo jugador, muestra el código de sala con un
+ * botón de copia. Una vez iniciada la partida, renderiza el tablero dentro
+ * de GameWrapper junto con los controles de turno, rendición y tablas.
+ *
+ * No recibe props. Obtiene el identificador de sala de los parámetros
+ * de la URL y el estado de la partida de BoardStore, GameStore, TurnStore
+ * y ModalStore.
+ */
 export default function Game() {
   const [loading, setLoading] = useState(true)
   const [gameBusy, setGameBusy] = useState(false)
@@ -39,6 +53,14 @@ export default function Game() {
 
   const [gameStartModal, toggleGameStartModal, turnModal, toggleTurnModal, battleModal, toggleBattleModal, battleEndModal, toggleBattleEndModal] = useModalStore((state) => [state.gameStartModal, state.toggleGameStartModal, state.turnModal, state.toggleTurnModal, state.battleModal, state.toggleBattleModal, state.battleEndModal, state.toggleBattleEndModal]);
 
+  /**
+   * Efecto de inicialización que gestiona la detección de orientación del
+   * dispositivo y el estado de pantalla completa. Registra listeners para
+   * los eventos "resize" y "orientationchange" para detectar si el dispositivo
+   * está en modo vertical, y para "fullscreenchange" y "webkitfullscreenchange"
+   * para sincronizar el estado isFullscreen cuando el usuario sale de pantalla
+   * completa mediante la tecla ESC. Limpia todos los listeners al desmontar.
+   */
   useEffect(() => {
     const checkOrientation = () => {
       const isMobile = window.innerWidth < 768;
@@ -70,6 +92,14 @@ export default function Game() {
     };
   }, []);
 
+  /**
+   * Alterna el modo de pantalla completa del navegador de forma compatible
+   * con los principales navegadores mediante las APIs estándar y sus
+   * variantes con prefijo de proveedor (webkit, moz, ms). Si el navegador
+   * está en pantalla completa, sale de ella; en caso contrario, entra en
+   * pantalla completa usando el elemento raíz del documento.
+   * Actualiza el estado isFullscreen según el resultado de la operación.
+   */
   const toggleFullscreen = async () => {
     try {
       const isCurrentlyFullscreen = !!(
@@ -110,6 +140,20 @@ export default function Game() {
     }
   };
 
+  /**
+   * Efecto que registra los listeners Socket.IO principales para el flujo
+   * de la partida. Se ejecuta cuando cambian isMyTurn o amIP1 para evitar
+   * closures obsoletos. Gestiona los siguientes eventos:
+   * - "player-connected": establece la identidad del jugador local (amIP1).
+   * - "game-start": inicia la partida, activa el modal de inicio y el turno
+   *   del Jugador 1 si corresponde.
+   * - "new-turn": actualiza el tablero, el estado de batalla y alterna el turno.
+   * - "game-end": determina el resultado de la partida según la razón de
+   *   finalización (captura de dos hadas, rendición, tablas, o desconexión)
+   *   y activa el modal de fin de partida.
+   * - "game-busy": indica que la sala está completa y no se puede unir.
+   * Limpia todos los listeners al desmontar o cuando cambian las dependencias.
+   */
   useEffect(() => {
     socket.on('player-connected', (data: { firstPlayer: boolean }) => {
       setAmIP1(data.firstPlayer)
@@ -210,6 +254,15 @@ export default function Game() {
     }
   }, [isMyTurn, amIP1]);
 
+  /**
+   * Copia el código de sala al portapapeles del usuario.
+   * Utiliza la API Clipboard moderna cuando está disponible, con un fallback
+   * a document.execCommand para navegadores que no soportan HTTPS o versiones
+   * antiguas. Actualiza el estado isCopied para reflejar visualmente la acción.
+   *
+   * @param {string} [gameId] - Identificador de sala a copiar. Si no se
+   *   proporciona, la función no realiza ninguna acción.
+   */
   const handleGameIdClick = (gameId?: string) => {
     if (!gameId) return;
 

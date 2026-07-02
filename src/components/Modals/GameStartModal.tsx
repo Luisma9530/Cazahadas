@@ -1,6 +1,15 @@
 import { motion } from "framer-motion";
 import { useModalStore } from "../../store/ModalStore";
 
+/**
+ * Modal animado que notifica a ambos jugadores el inicio de la partida.
+ * Muestra el texto "Draw Blood!" con una animación de aparición y desvanecimiento
+ * basada en Framer Motion durante 3 segundos. Al completarse la animación,
+ * cierra el modal de inicio e invoca el modal de turno con un retardo de 100 ms
+ * para evitar conflictos entre transiciones.
+ *
+ * No recibe props. Gestiona su visibilidad a través de ModalStore.
+ */
 export function GameStartModal() {
   const [toggleGameStartModal, toggleTurnModal] = useModalStore((state) => [
     state.toggleGameStartModal,

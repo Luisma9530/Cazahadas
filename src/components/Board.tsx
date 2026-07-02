@@ -12,6 +12,17 @@ import { useParams } from "react-router-dom";
 import { useAuthStore } from '../store/LoginStore';
 import './BoardCss/main-styles.css';
 
+/**
+ * Componente principal del tablero de juego.
+ * Gestiona la representación visual del tablero 3x5, la interacción del jugador
+ * con las casillas, la lógica de colocación de cartas, y la comunicación con el
+ * servidor mediante eventos Socket.IO. Sincroniza el estado del juego con BoardStore,
+ * TurnStore, CardStore y NeoHandStore, y registra los listeners de Socket.IO
+ * necesarios para recibir actualizaciones del servidor.
+ *
+ * @param {boolean} amIP1 - Indica si el jugador local es el Jugador 1.
+ *   Determina la perspectiva visual del tablero y la lógica de captura de hadas.
+ */
 export default function Board({ amIP1 }: { amIP1: boolean }) {
   // Obtenemos el estado del tablero (estructura 3x4) desde el store
   const [tiles, setTiles, clearDeckAndMagic, resetVariableX] = useBoardStore((state) => [state.board, state.setBoard, state.clearDeckAndMagic, state.resetVariableX]);
@@ -29,7 +40,18 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
   const { id: gameId } = useParams<{ id: string }>();
   const API_URL = import.meta.env.VITE_API_URL;
 
-  // Validación para colocar carta en zona de juego
+  /**
+   * Determina si una carta seleccionada puede colocarse en una posición concreta
+   * del tablero según las reglas del juego y el estado actual de la partida.
+   * Valida el turno activo, el tipo de carta, el estado de batalla, y las
+   * restricciones específicas de cada tipo de casilla.
+   *
+   * @param {CardUnity[]} selectedCards - Array de cartas actualmente seleccionadas.
+   * @param {Tile} position - Casilla del tablero sobre la que se intenta colocar la carta.
+   * @param {number} rowIndex - Índice de fila de la casilla (0: rival, 1: central, 2: jugador).
+   * @returns {boolean} True si la carta puede colocarse en la posición indicada,
+   *   false en caso contrario.
+   */
   function canAddCardToPosition(selectedCards: CardUnity[], position: Tile, rowIndex: number): boolean {
     if (!isMyTurn) {
       return false
@@ -70,6 +92,13 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
     } else { return false; } // Si no hay cartas seleccionadas, no se puede colocar nada
   }
 
+  /**
+   * Comprueba si el jugador local ha iniciado la batalla actual.
+   * Recorre las casillas de hadas de la fila central buscando alguna marcada
+   * por el jugador local, lo que indica que fue él quien colocó la carta de captura.
+   *
+   * @returns {boolean} True si el jugador local inició la batalla, false en caso contrario.
+   */
   function haveIStartedBattle() {
     // Recorremos las casillas de hadas para ver si alguna está marcada por mí
     for (let colIndex = 0; colIndex < tiles[1].length - 1; colIndex++) {
@@ -83,6 +112,12 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
 
   let isAddingScore = false;
 
+  /**
+   * Envía una petición al proxy FastAPI para incrementar el contador de hadas
+   * capturadas del jugador autenticado. Incluye un mecanismo de guardia para
+   * evitar peticiones concurrentes duplicadas, liberando el bloqueo tras 1 segundo.
+   * Solo se invoca cuando el jugador local está autenticado y captura un hada.
+   */
   async function sendCapturedFairies() {
     if (isAddingScore) {
       console.log("⏳ Ya hay una petición en curso, ignorando...");
@@ -115,7 +150,17 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
   }
 
 
-  // Al hacer clic en una celda de la zona de juego (fila 1, columnas 0 a 2)
+  /**
+   * Gestiona el clic sobre una casilla del tablero.
+   * Valida si la carta seleccionada puede colocarse en la posición indicada
+   * mediante canAddCardToPosition. Si la validación es correcta, transforma
+   * el tablero mediante mapPawns, actualiza BoardStore y NeoHandStore, y emite
+   * el evento Socket.IO "place-card" al servidor con el nuevo estado del tablero.
+   *
+   * @param {Tile} position - Casilla del tablero sobre la que se ha hecho clic.
+   * @param {number} rowIndex - Índice de fila de la casilla.
+   * @param {number} colIndex - Índice de columna de la casilla.
+   */
   function handleCellClick(position: Tile, rowIndex: number, colIndex: number) {
     console.log(tiles)
     console.log("Is battle:", isBattle);
@@ -133,6 +178,17 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
     socket.emit("place-card", { tiles: newTiles, gameId: gameId, isBattle: isBattle, selectedCard: selectedCard });
   }
 
+  /**
+   * Comprueba el estado de captura de las hadas marcadas en la fila central
+   * y distribuye las cartas de hada capturadas en las casillas correspondientes
+   * de cada jugador. Si el jugador local acumula dos o más hadas capturadas,
+   * emite el evento Socket.IO "all-fairy-captured" para notificar la victoria.
+   *
+   * @param {Tile[][]} tiles - Estado actual del tablero.
+   * @param {boolean} amIP1 - Indica si el jugador local es el Jugador 1.
+   * @returns {Tile[][]} Nuevo estado del tablero con las casillas de hadas
+   *   capturadas actualizadas.
+   */
   function checkMarkedFairiesForCapture(
     tiles: Tile[][],
     amIP1: boolean
@@ -216,6 +272,12 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
   const gameIdRef = useRef(gameId);
 
   // 2. useEffect para mantener los refs actualizados
+  /**
+   * Efecto que mantiene actualizados los refs de las variables más relevantes
+   * del componente. Se utiliza para evitar closures obsoletos en los listeners
+   * de Socket.IO, garantizando que siempre accedan a los valores más recientes
+   * de amIP1, logedUser, tiles y gameId.
+   */
   useEffect(() => {
     amIP1Ref.current = amIP1;
     logedUserRef.current = logedUser;
@@ -223,6 +285,16 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
     gameIdRef.current = gameId;
   }, [amIP1, logedUser, tiles, gameId]);
 
+  /**
+   * Efecto de inicialización del componente y registro de listeners de Socket.IO.
+   * Se ejecuta una única vez al montar el componente. Roba la mano inicial de cartas,
+   * elimina listeners previos para evitar duplicados, y registra los handlers para
+   * los eventos: "update-tiles" (actualización del tablero tras finalizar batalla),
+   * "request-draw-player" (solicitud de tablas del rival), "start-battle-player"
+   * (inicio de batalla), "captured-fairy" (captura de hada) y
+   * "end-first-turn-battle" (fin del primer turno de batalla).
+   * Limpia todos los listeners al desmontar el componente.
+   */
   useEffect(() => {
     // Ejecutar drawCard una vez al cargar el componente por primera vez
     drawCard(false);
@@ -300,12 +372,23 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
     };
   }, []);
 
+  /**
+   * Efecto que activa el indicador de primer turno de batalla cuando el estado
+   * de batalla cambia a activo. Garantiza que isMyFirstTurnBattle se establezca
+   * correctamente al inicio de cada nueva batalla.
+   */
   useEffect(() => {
     if (isBattle) {
       setIsMyFirstTurnBattle(true);
     }
   }, [isBattle]);
 
+  /**
+   * Efecto que se ejecuta al cambiar el turno activo.
+   * Actualiza el estado de captura de hadas en el tablero, gestiona el robo
+   * de cartas según el estado de batalla, y marca el primer turno como completado
+   * si corresponde.
+   */
   useEffect(() => {
     var updatedTiles = tiles.map((row) => row.map((tile) => ({ ...tile })));
 
@@ -323,7 +406,21 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
   }, [isMyTurn]);
 
 
-  // Función para transformar el tablero al colocar una carta en la zona de juego.
+  /**
+   * Transforma el estado del tablero al colocar una carta en una casilla.
+   * Aplica la lógica específica de cada tipo de carta: las cartas mágicas
+   * se añaden a la casilla de magia y aplican su operación sobre la variable X;
+   * las cartas defensivas se añaden a la casilla de defensa del jugador; las
+   * cartas de captura marcan el hada como en disputa e inician la batalla
+   * emitiendo el evento Socket.IO "start-battle".
+   *
+   * @param {CardUnity[]} cards - Array de cartas a colocar, se procesa solo la primera.
+   * @param {number} rowIndex - Índice de fila de la casilla destino.
+   * @param {number} colIndex - Índice de columna de la casilla destino.
+   * @param {Tile[][]} currentTiles - Estado actual del tablero.
+   * @param {boolean} amIP1 - Indica si el jugador local es el Jugador 1.
+   * @returns {Tile[][]} Nuevo estado del tablero con la carta colocada.
+   */
   function mapPawns(
     cards: CardUnity[],
     rowIndex: number,
@@ -384,13 +481,31 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
     return newTiles;
   }
 
-  // Método para verificar si una casilla específica es válida
+  /**
+   * Determina si una casilla específica del tablero es una posición válida
+   * para colocar la carta actualmente seleccionada.
+   *
+   * @param {number} row - Índice de fila de la casilla.
+   * @param {number} col - Índice de columna de la casilla.
+   * @param {CardUnity[]} selectedCards - Array de cartas actualmente seleccionadas.
+   * @returns {boolean} True si la casilla es una posición válida, false en caso contrario.
+   */
   const isCellValid = (row: number, col: number, selectedCards: CardUnity[]): boolean => {
     const validCells = getValidCellsFlexible(selectedCards);
     return validCells[row] && validCells[row][col];
   };
 
-  // Método para obtener las clases CSS de una casilla según si es válida o no
+  /**
+   * Genera las clases CSS de una casilla del tablero añadiendo el resaltado
+   * visual cuando es una posición válida para colocar la carta seleccionada.
+   * Las casillas válidas reciben efectos de brillo, animación y borde naranja.
+   *
+   * @param {number} row - Índice de fila de la casilla.
+   * @param {number} col - Índice de columna de la casilla.
+   * @param {CardUnity[]} selectedCards - Array de cartas actualmente seleccionadas.
+   * @param {string} baseClasses - Clases CSS base de la casilla sin resaltado.
+   * @returns {string} Cadena de clases CSS con o sin resaltado según validez.
+   */
   const getCellHighlightClasses = (row: number, col: number, selectedCards: CardUnity[], baseClasses: string): string => {
     const isValid = isCellValid(row, col, selectedCards);
 
@@ -405,7 +520,14 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
     return baseClasses;
   };
 
-  // Método adicional para personalizar las reglas de validación fácilmente
+  /**
+   * Define las reglas de posicionamiento válido para cada tipo de carta.
+   * Devuelve un mapa con las coordenadas de fila y columna permitidas para
+   * cartas de captura, magia, defensa y descarte.
+   *
+   * @returns {{ [key: string]: number[][] }} Mapa de tipo de carta a lista
+   *   de coordenadas [fila, columna] permitidas.
+   */
   const updateValidationRules = (): { [key: string]: number[][] } => {
     const rules = {
       CATCH: [[1, 0], [1, 1], [1, 2]], // Casillas de hadas
@@ -417,8 +539,17 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
     return rules;
   };
 
-  // Versión alternativa más flexible del método getValidCells
-  // Versión alternativa más flexible del método getValidCells
+  /**
+   * Calcula una matriz de booleanos indicando qué casillas del tablero son
+   * posiciones válidas para colocar la carta actualmente seleccionada.
+   * Aplica las reglas de validación definidas en updateValidationRules y
+   * verifica cada posición candidata mediante canAddCardToPosition.
+   * La zona de descarte solo se marca como válida fuera de batalla.
+   *
+   * @param {CardUnity[]} selectedCards - Array de cartas actualmente seleccionadas.
+   * @returns {boolean[][]} Matriz 3xN donde true indica que la casilla es
+   *   una posición válida para colocar la carta.
+   */
   const getValidCellsFlexible = (selectedCards: CardUnity[]): boolean[][] => {
     const validCells = Array(3).fill(null).map(() => Array(4).fill(false));
 
@@ -452,6 +583,13 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
     return validCells;
   };
 
+  /**
+   * Distribuye las cartas defensivas de ambas casillas de defensa del tablero
+   * en dos arrays separados según quién las colocó: myDefenseCards contiene
+   * las cartas del jugador local y rivalDefenseCards las del rival.
+   * Esta separación permite renderizar cada carta en la casilla visual correcta
+   * independientemente de su posición real en el array de tiles.
+   */
   var myDefenseCards: CardInfo[] = [];
   var rivalDefenseCards: CardInfo[] = [];
 

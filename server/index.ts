@@ -6,23 +6,45 @@ import { Tile } from "../src/@types/Tile";
 import { CardType, CardUnity } from '../src/@types/Card';
 import { hydrateCard } from "../src/utils/HydrateCard"; // Para rehidratar cartas
 
+/**
+ * Servidor principal de Cazahadas.
+ * Implementa un servidor Fastify que sirve el frontend compilado como archivos
+ * estáticos y gestiona la comunicación en tiempo real entre jugadores mediante
+ * Socket.IO. Mantiene el estado autoritativo de todas las partidas activas en
+ * el objeto currentGames, valida las acciones de los jugadores y sincroniza
+ * el estado del juego entre ambos clientes.
+ */
 
 const app = fastify();
 
 const __dirname = path.resolve();
 
-
-
+/**
+ * Registro del plugin de archivos estáticos de Fastify.
+ * Sirve el bundle de producción generado por Vite desde el directorio dist.
+ * La opción wildcard desactivada evita conflictos con las peticiones HEAD.
+ */
 app.register(fastifyStatic, {
   root: path.join(__dirname, 'dist'),
   prefix: '/',
   wildcard: false, //evita conflictos con HEAD
 });
 
+/**
+ * Manejador de rutas no encontradas que redirige todas las peticiones
+ * desconocidas a index.html, habilitando el enrutamiento del lado del cliente
+ * de React Router sin requerir configuración adicional en el servidor.
+ */
 app.setNotFoundHandler((_, reply) => {
   reply.sendFile('index.html');
 });
 
+/**
+ * Instancia del servidor Socket.IO asociada al servidor HTTP de Fastify.
+ * CORS configurado para aceptar conexiones desde cualquier origen, necesario
+ * para permitir conexiones desde el cliente React durante el desarrollo local
+ * y desde el dominio de producción en Render.
+ */
 const io = new SocketIOServer(app.server, {
   cors: {
     origin: "*",
@@ -30,6 +52,14 @@ const io = new SocketIOServer(app.server, {
     methods: ["GET", "POST"],
   },
 });
+
+/**
+ * Almacén en memoria de todas las partidas activas indexadas por su código UUID.
+ * Cada entrada mantiene los identificadores de socket de ambos jugadores,
+ * sus nombres, el estado del salto de turno para detectar doble salto
+ * consecutivo, si la partida ha finalizado, y el identificador del jugador
+ * con el turno activo.
+ */
 let currentGames = {} as {
   [key: string]: {
     playerIds: string[];
@@ -40,9 +70,27 @@ let currentGames = {} as {
   };
 };
 
+/**
+ * Manejador del evento de nueva conexión Socket.IO.
+ * Se ejecuta cada vez que un cliente establece conexión con el servidor
+ * y registra todos los listeners de eventos del juego para ese socket.
+ */
 io.on("connection", (socket) => {
   console.log("A Player with id", socket.id, "connected");
 
+  /**
+   * Manejador del evento "skip-turn".
+   * Gestiona tres escenarios distintos según el estado de la partida:
+   * 1. Doble salto consecutivo en batalla: finaliza la batalla evaluando la carta
+   *    defensiva del defensor mediante hydrateCard y determina si el hada es
+   *    capturada según el valor final de la variable X.
+   * 2. Salto en el primer turno de batalla: el defensor renuncia automáticamente
+   *    y el atacante captura el hada sin evaluación de defensas.
+   * 3. Primer salto consecutivo: registra el salto en playerSkippedTurn para
+   *    detectar un posible doble salto en el siguiente turno.
+   * En todos los casos transfiere el turno al jugador contrario y emite
+   * los eventos de actualización correspondientes.
+   */
   socket.on("skip-turn", (data: { tiles: Tile[][]; gameId: string, isBattle: boolean, isMyFirstTurnBattle: boolean, amIP1: boolean }) => {
     if (currentGames[data.gameId].currentTurnPlayerId !== socket.id) {
       return;
@@ -153,6 +201,13 @@ io.on("connection", (socket) => {
     }
   });
 
+  /**
+   * Manejador del evento "place-card".
+   * Valida que el socket emisor tiene el turno activo antes de procesar la acción.
+   * Resetea el contador de salto consecutivo, notifica el fin del primer turno
+   * de batalla si corresponde, transfiere el turno al jugador contrario y emite
+   * el nuevo estado del tablero a ambos jugadores.
+   */
   socket.on("place-card", (data: { tiles: Tile[][]; gameId: string, isBattle: boolean, selectedCard: CardUnity[] }) => {
     // VALIDACIÓN: Verificar que es el turno de este jugador
     if (currentGames[data.gameId].currentTurnPlayerId !== socket.id) {
@@ -176,6 +231,13 @@ io.on("connection", (socket) => {
     });
   });
 
+  /**
+   * Manejador del evento "end-battle".
+   * Se invoca cuando el defensor cede el hada sin combate desde BattleConfirmModal.
+   * Marca el hada disputada como capturada por el atacante, emite el evento
+   * "captured-fairy" para actualizar las puntuaciones y sincroniza el tablero
+   * actualizado con ambos clientes mediante "update-tiles".
+   */
   socket.on("end-battle", (data: { gameId: string, tiles: Tile[][] }) => {
     var player = true
     data.tiles[1] = data.tiles[1].map(tile => {
@@ -204,13 +266,25 @@ io.on("connection", (socket) => {
     });
   });
 
+  /**
+   * Manejador del evento "request-draw".
+   * Reenvía la solicitud de tablas del jugador emisor al rival mediante el
+   * evento "request-draw-player", incluyendo la identidad del solicitante
+   * para que el cliente receptor pueda mostrar la notificación correctamente.
+   */
   socket.on("request-draw", (data: { gameId: string, amIP1: boolean }) => {
     io.to(currentGames[data.gameId].playerIds).emit("request-draw-player", {
       amIP1: data.amIP1
     });
   });
 
-  socket.on('surrender', (data: {gameId: string, amIP1: boolean, board: Tile[][]}) => {
+  /**
+   * Manejador del evento "surrender".
+   * Procesa la rendición voluntaria de un jugador. Determina el ganador como
+   * el jugador contrario al que se rinde y emite "game-end" a ambos jugadores
+   * con la razón "surrender" para que el cliente muestre el resultado correcto.
+   */
+  socket.on('surrender', (data: { gameId: string, amIP1: boolean, board: Tile[][] }) => {
     // El que se rindió pierde
     const winner = !data.amIP1; // Si se rinde P1, gana P2  
 
@@ -222,12 +296,24 @@ io.on("connection", (socket) => {
     });
   });
 
+  /**
+   * Manejador del evento "start-battle".
+   * Retransmite el inicio de batalla a ambos jugadores mediante "start-battle-player",
+   * incluyendo la identidad del atacante para que cada cliente configure
+   * correctamente su estado de batalla y muestre el modal correspondiente.
+   */
   socket.on("start-battle", (data: { gameId: string, amIP1: boolean }) => {
     io.to(currentGames[data.gameId].playerIds).emit("start-battle-player", {
       amIP1: data.amIP1
     });
   });
 
+  /**
+   * Manejador del evento de desconexión de un socket.
+   * Busca si el socket desconectado pertenecía a una partida activa no finalizada.
+   * Si es así, emite "game-end" con playerDisconnected a true al jugador restante
+   * para declararlo ganador por abandono.
+   */
   socket.on("disconnect", () => {
     console.log("A Player with id", socket.id, "disconnected");
     const gameIdForDcedPlayer = Object.keys(currentGames).find((gameId) =>
@@ -241,6 +327,13 @@ io.on("connection", (socket) => {
       return;
     }
   });
+
+  /**
+   * Manejador del evento "all-fairy-captured".
+   * Se invoca cuando un jugador captura su segunda hada, alcanzando la condición
+   * de victoria. Marca la partida como finalizada en currentGames y emite
+   * "game-end" a ambos jugadores con el ganador y la razón de finalización.
+   */
   socket.on("all-fairy-captured", (data) => {
     const game = currentGames[data.gameId];
     if (!game) return;
@@ -252,6 +345,13 @@ io.on("connection", (socket) => {
       winner: data.winner,
     });
   });
+
+  /**
+   * Manejador del evento "draw-game".
+   * Se invoca cuando ambos jugadores aceptan terminar la partida en tablas.
+   * Marca la partida como finalizada y emite "game-end" con razón "draw-request"
+   * a ambos jugadores para mostrar el resultado de empate.
+   */
   socket.on("draw-game", (data) => {
     const game = currentGames[data.gameId];
     if (!game) return;
@@ -263,9 +363,12 @@ io.on("connection", (socket) => {
     });
   });
 
-
-  // rooms
-
+  /**
+   * Manejador del evento "start-game-info".
+   * Registra una nueva partida en currentGames con el socket del creador
+   * como primer jugador y notifica al cliente que ha sido asignado como
+   * Jugador 1 mediante el evento "player-connected".
+   */
   socket.on(
     "start-game-info",
     (data: { playerName: string; gameId: string }) => {
@@ -282,6 +385,12 @@ io.on("connection", (socket) => {
     }
   );
 
+  /**
+   * Manejador del evento "join-game".
+   * Completa el proceso de unión registrando el nombre del segundo jugador,
+   * asignando el turno inicial al Jugador 1 y emitiendo "game-start" a ambos
+   * clientes con los nombres de los jugadores para iniciar la partida.
+   */
   socket.on("join-game", (data: { playerName: string; gameId: string }) => {
     console.log("Player", data.playerName, "is trying to join game", data.gameId);
     if (currentGames[data.gameId]["playerIds"].includes(socket.id)) {
@@ -302,6 +411,13 @@ io.on("connection", (socket) => {
     }
   });
 
+  /**
+   * Manejador del evento "attempt-to-join-game".
+   * Valida si la sala solicitada existe y tiene espacio disponible antes de
+   * permitir la unión. Emite "game-found" si la sala está disponible y añade
+   * el socket a playerIds, "game-busy" si ya tiene dos jugadores, o
+   * "game-not-found" si el código de sala no corresponde a ninguna partida activa.
+   */
   socket.on("attempt-to-join-game", (data: { gameId: string }) => {
     if (currentGames[data.gameId]?.playerIds.length >= 2) {
       io.to(socket.id).emit("game-busy");
@@ -319,6 +435,12 @@ io.on("connection", (socket) => {
   });
 });
 
+/**
+ * Inicia el servidor Fastify en el puerto especificado por la variable de
+ * entorno PORT o en el puerto 4000 por defecto. Escucha en todas las
+ * interfaces de red para permitir conexiones externas en el entorno de
+ * producción de Render.
+ */
 app.listen({ port: parseInt(process.env.PORT!) || 4000, host: '0.0.0.0' }, (err, address) => {
   if (err) {
     console.error(err);
@@ -327,8 +449,16 @@ app.listen({ port: parseInt(process.env.PORT!) || 4000, host: '0.0.0.0' }, (err,
   console.log(`Server listening at ${address}`);
 });
 
+/**
+ * Intervalo de monitorización de memoria del proceso Node.js.
+ * Registra cada 10 segundos el número de partidas activas y las métricas
+ * de memoria RSS, heap usado y heap total para facilitar el análisis del
+ * consumo de recursos del servidor en función de la carga de partidas.
+ */
+/** 
 setInterval(() => {
   const mem = process.memoryUsage();
   const games = Object.keys(currentGames).length;
   console.log(`Partidas activas: ${games} | RSS: ${(mem.rss / 1024 / 1024).toFixed(2)} MB | Heap usado: ${(mem.heapUsed / 1024 / 1024).toFixed(2)} MB | Heap total: ${(mem.heapTotal / 1024 / 1024).toFixed(2)} MB`);
 }, 10000);
+*/

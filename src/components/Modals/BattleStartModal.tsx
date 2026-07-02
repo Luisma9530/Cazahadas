@@ -8,6 +8,18 @@ interface BattleConfirmModalProps {
     fairyName?: string; // Nombre del hada en disputa (opcional)
 }
 
+/**
+ * Modal de confirmación que presenta al jugador defensor las opciones de aceptar
+ * o ceder el hada cuando el jugador atacante inicia un intento de captura.
+ * Incluye una animación de despliegue de pergamino al abrirse. Si el defensor
+ * acepta, se inicia la batalla; si cede, el hada pasa directamente al atacante.
+ *
+ * @param {boolean} isOpen - Indica si el modal está visible.
+ * @param {() => void} onAccept - Callback invocado cuando el defensor acepta la batalla.
+ * @param {() => void} onReject - Callback invocado cuando el defensor cede el hada.
+ * @param {string} [fairyName="Hada Encantada"] - Nombre del hada en disputa,
+ *   mostrado en el contenido del modal.
+ */
 const BattleConfirmModal: React.FC<BattleConfirmModalProps> = ({
     isOpen,
     onAccept,
@@ -17,6 +29,12 @@ const BattleConfirmModal: React.FC<BattleConfirmModalProps> = ({
     const [isUnrolling, setIsUnrolling] = useState(false);
     const [showContent, setShowContent] = useState(false);
 
+    /**
+     * Efecto que controla la animación de despliegue del pergamino en función
+     * del estado de visibilidad del modal. Al abrirse, activa la animación de
+     * despliegue y retrasa 1200 ms la aparición del contenido interior para
+     * sincronizarla con la animación. Al cerrarse, restablece ambos estados.
+     */
     useEffect(() => {
         if (isOpen) {
             setIsUnrolling(true);
@@ -48,9 +66,8 @@ const BattleConfirmModal: React.FC<BattleConfirmModalProps> = ({
 
                 {/* Sombra del pergamino */}
                 <div
-                    className={`absolute inset-0 bg-amber-900/20 -z-10 transition-all duration-1000 ease-out ${
-                        isUnrolling ? 'animate-unroll-shadow' : 'animate-roll-up-shadow'
-                    }`}
+                    className={`absolute inset-0 bg-amber-900/20 -z-10 transition-all duration-1000 ease-out ${isUnrolling ? 'animate-unroll-shadow' : 'animate-roll-up-shadow'
+                        }`}
                     style={{
                         clipPath: 'polygon(2% 0%, 98% 1%, 99% 4%, 97% 8%, 99% 12%, 98% 96%, 95% 99%, 92% 97%, 8% 98%, 5% 96%, 1% 92%, 3% 8%, 1% 4%)',
                         filter: 'blur(8px)',

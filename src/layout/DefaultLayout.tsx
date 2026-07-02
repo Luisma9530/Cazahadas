@@ -15,6 +15,16 @@ import AuthModal from '../components/Modals/AuthModal';
 import { User } from 'lucide-react';
 import { useAuthStore } from "../store/LoginStore";
 
+/**
+ * Componente de layout principal de la aplicación.
+ * Envuelve todas las rutas mediante React Router y proporciona la estructura
+ * común de cabecera, fondo y modales globales. Gestiona la visualización
+ * de los modales de reglas, ranking y autenticación, así como el estado
+ * de sesión del usuario. Al navegar al inicio, desconecta el socket y
+ * reinicia todos los stores de la aplicación.
+ *
+ * No recibe props. Renderiza el contenido de la ruta activa mediante Outlet.
+ */
 export default function DefaultLayout() {
   const navigate = useNavigate()
   const [resetBoardStore] = useBoardStore((state) => [state.resetStore])
@@ -32,6 +42,13 @@ export default function DefaultLayout() {
 
   const location = useLocation();
 
+  /**
+   * Determina la imagen de fondo a aplicar en función de la ruta activa.
+   * Todas las rutas principales de la aplicación comparten el mismo fondo.
+   * Si la ruta no coincide con ninguna de las rutas conocidas, devuelve "none".
+   *
+   * @returns {string} Valor CSS para la propiedad backgroundImage.
+   */
   const getBackgroundImage = () => {
     if (location.pathname === "/") {
       return `url(${homeBackground})`;
@@ -45,6 +62,12 @@ export default function DefaultLayout() {
     return "none";
   };
 
+  /**
+   * Obtiene la lista de puntuaciones del ranking desde el proxy FastAPI
+   * mediante una petición GET al endpoint /get-scores y actualiza el estado
+   * local scores con los datos recibidos. En caso de error de red, lo registra
+   * en consola sin interrumpir el flujo de la aplicación.
+   */
   const fetchScores = async () => {
     try {
       const response = await fetch(`${API_URL}/get-scores`);
@@ -55,6 +78,11 @@ export default function DefaultLayout() {
     }
   };
 
+  /**
+   * Reinicia el estado de todos los stores de la aplicación a sus valores
+   * iniciales. Se invoca al volver a la pantalla de inicio para garantizar
+   * que una nueva partida comienza con un estado limpio.
+   */
   const resetAllStores = () => {
     resetBoardStore()
     resetGameStore()
@@ -64,17 +92,31 @@ export default function DefaultLayout() {
     resetBackground()
   }
 
+  /**
+   * Gestiona el clic sobre el título de la aplicación en la cabecera.
+   * Desconecta el socket activo, reinicia todos los stores mediante
+   * resetAllStores y navega a la ruta raíz.
+   */
   const handleTitleClick = () => {
     socket.disconnect()
     resetAllStores()
     navigate('/')
   }
 
+  /**
+   * Gestiona el clic sobre el botón de ranking.
+   * Obtiene las puntuaciones actualizadas mediante fetchScores y activa
+   * la visibilidad del modal de ranking.
+   */
   const handleScoreboardClick = () => {
     fetchScores();
     setShowScoreboard(true);
   };
 
+  /**
+   * Cierra la sesión del usuario autenticado eliminando el nombre de usuario
+   * y el token JWT almacenados en LoginStore.
+   */
   const closeSesion = () => {
     setLogedUser(null);
     setPassword(null);

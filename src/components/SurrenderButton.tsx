@@ -7,6 +7,18 @@ import { useParams } from "react-router-dom"
 import { useMemo } from "react";
 import { Tile } from "../@types/Tile";
 
+/**
+ * Componente que muestra el botón de rendición cuando el jugador local
+ * va perdiendo la partida. El botón solo es visible cuando el jugador tiene
+ * menos hadas capturadas que el rival, la partida no ha finalizado, y no
+ * hay ningún modal de batalla o de tablas activo. Al pulsarlo, emite el
+ * evento Socket.IO "surrender" al servidor, que declara ganador al rival
+ * y notifica el resultado a ambos jugadores.
+ *
+ * No recibe props. Obtiene el estado del tablero de BoardStore, el estado
+ * del juego de GameStore, el estado de los modales de TurnStore, y el
+ * identificador de sala de los parámetros de la URL.
+ */
 export default function SurrenderButton() {
 
     const [showDrawModal, showBattleModal] = useTurnStore((state) => [state.showDrawModal, state.showBattleModal])
@@ -21,7 +33,12 @@ export default function SurrenderButton() {
         casilla21: Tile;
     } | null = null;
 
-    // Extraemos solo los datos relevantes de las casillas que nos 
+    /**
+     * Extrae y memoriza las casillas de hadas capturadas de ambos jugadores
+     * del tablero. Se recalcula únicamente cuando cambia el número de cartas
+     * en dichas casillas, evitando recálculos innecesarios del resto del
+     * componente.
+     */
     if (board[0]?.[1].type == 'capturedFairies' && board[2]?.[1].type == 'capturedFairies') {
         casillasRelevantes = useMemo(() => ({
             casilla01: board[0]?.[1],
@@ -30,7 +47,17 @@ export default function SurrenderButton() {
         board[2]?.[1]?.cards?.length]);
     }
 
-
+    /**
+     * Determina si el jugador local va perdiendo la partida comparando el número
+     * de hadas capturadas por cada jugador. Recorre la fila central del tablero
+     * contando las hadas capturadas según el valor de placedByPlayerOne y compara
+     * los totales en función de la identidad del jugador local.
+     * Se recalcula únicamente cuando cambia el número de hadas capturadas en las
+     * casillas relevantes.
+     *
+     * @returns {boolean} True si el jugador local tiene menos hadas que el rival,
+     *   false en caso contrario.
+     */
     const imLosing = useMemo((): boolean => {
         let puntosP1 = 0;
         let puntosP2 = 0;
@@ -55,6 +82,11 @@ export default function SurrenderButton() {
         }
     }, [casillasRelevantes]);
 
+    /**
+     * Emite al servidor la rendición del jugador local.
+     * Envía el identificador de sala, la identidad del jugador y el estado
+     * actual del tablero mediante el evento Socket.IO "surrender".
+     */
     function handleSurrender() {
         socket.emit('surrender', { gameId, amIP1, board })
     }

@@ -43,10 +43,33 @@ const initialBoard: Tile[][] = new Array(3).fill(null).map((_, rowIndex) =>
   })
 )
 
+/**
+ * Store que mantiene el estado del tablero de juego.
+ * Gestiona la matriz 3x5 de casillas que representa el tablero completo,
+ * incluyendo las hadas, la variable X, las zonas de magia, defensa,
+ * captura y descarte de ambos jugadores.
+ */
 const useBoardStore = create<BoardStore>((set, get) => ({
   board: initialBoard,
+
+  /**
+   * Reemplaza el estado completo del tablero con el valor recibido.
+   *
+   * @param {Tile[][]} board - Nuevo estado del tablero.
+   */
   setBoard: (board) => set({ board }),
+
+  /**
+   * Restablece el tablero a su estado inicial, eliminando todas las cartas
+   * colocadas y restaurando los valores por defecto de todas las casillas.
+   */
   resetStore: () => set({ board: initialBoard }),
+
+  /**
+   * Vacía las cartas de todas las casillas de tipo deck y magic del tablero.
+   * Se invoca al finalizar una batalla para limpiar las cartas defensivas
+   * y mágicas jugadas durante el combate.
+   */
   clearDeckAndMagic: () => {
     const currentBoard = get().board
     const updatedBoard = currentBoard.map(row =>
@@ -60,6 +83,12 @@ const useBoardStore = create<BoardStore>((set, get) => ({
     console.log('Board after clearing decks and magic:', updatedBoard)
     set({ board: updatedBoard })
   },
+
+  /**
+   * Restablece el valor de la variable X a 0.
+   * Se invoca al finalizar una batalla para preparar el tablero para
+   * el siguiente combate.
+   */
   resetVariableX: () => {
     const currentBoard = get().board
     const updatedBoard = currentBoard.map((row, rowIndex) =>
@@ -72,6 +101,12 @@ const useBoardStore = create<BoardStore>((set, get) => ({
     )
     set({ board: updatedBoard })
   },
+
+  /**
+   * Combina las operaciones de clearDeckAndMagic y resetVariableX en una
+   * única acción atómica. Vacía las casillas de deck y magic y restablece
+   * la variable X a 0 en una sola actualización del store.
+   */
   endBattle: () => {
     const currentBoard = get().board
     const updatedBoard = currentBoard.map((row, rowIndex) =>

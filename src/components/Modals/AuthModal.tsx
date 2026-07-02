@@ -7,6 +7,15 @@ interface AuthModalProps {
   onClose: () => void;
 }
 
+/**
+ * Modal de autenticación que gestiona el inicio de sesión y el registro de usuarios.
+ * Presenta una interfaz con efecto de pergamino animado y dos pestañas diferenciadas
+ * para login y creación de cuenta. Se comunica con el proxy FastAPI para validar
+ * credenciales y crear nuevos usuarios en MongoDB Atlas.
+ *
+ * @param {boolean} isOpen - Indica si el modal está visible.
+ * @param {() => void} onClose - Función de callback invocada al cerrar el modal.
+ */
 const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
   const [isUnrolling, setIsUnrolling] = useState(false);
   const [showContent, setShowContent] = useState(false);
@@ -46,11 +55,28 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
     PROJECT_ID: import.meta.env.MONGODB_PROJECT_ID || ''
   };
 
+  /**
+ * Muestra una notificación temporal en el interior del modal.
+ * La notificación desaparece automáticamente tras 5 segundos.
+ *
+ * @param {'success' | 'error'} type - Tipo de notificación, determina el estilo visual.
+ * @param {string} message - Mensaje a mostrar al usuario.
+ */
   const showNotification = (type: 'success' | 'error', message: string) => {
     setNotification({ type, message });
     setTimeout(() => setNotification(null), 5000);
   };
 
+  /**
+ * Valida los campos del formulario de registro o login antes de enviar la petición.
+ * Comprueba que el nombre de usuario tenga al menos 3 caracteres, que la contraseña
+ * tenga al menos 6 caracteres, y en caso de registro, que ambas contraseñas coincidan.
+ *
+ * @param {typeof registerData} data - Objeto con los datos introducidos en el formulario.
+ * @param {boolean} isRegister - Indica si la validación corresponde al registro (true)
+ *   o al login (false).
+ * @returns {string | null} Mensaje de error si la validación falla, o null si es correcta.
+ */
   const validateForm = (data: typeof registerData, isRegister: boolean): string | null => {
     if (!data.username.trim()) return 'El nombre de usuario es requerido';
     if (data.username.length < 3) return 'El nombre de usuario debe tener al menos 3 caracteres';
@@ -65,6 +91,14 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
     return null;
   };
 
+  /**
+ * Gestiona el envío del formulario de inicio de sesión.
+ * Realiza una petición POST al endpoint /login del proxy FastAPI con las credenciales
+ * introducidas. Si el login es exitoso, almacena el nombre de usuario y el token JWT
+ * en LoginStore y cierra el modal. En caso de error, muestra una alerta al usuario.
+ *
+ * @param {React.FormEvent} e - Evento de envío del formulario.
+ */
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
@@ -93,8 +127,14 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
     }
   };
 
-
-
+/**
+ * Gestiona el proceso de registro de un nuevo usuario.
+ * Valida el formulario mediante validateForm antes de realizar la petición.
+ * Si la validación es correcta, envía una petición POST al endpoint /create-user
+ * del proxy FastAPI. Si el registro es exitoso, muestra una confirmación y cierra
+ * el modal. Si el usuario ya existe o se produce otro error, muestra el mensaje
+ * de error devuelto por el servidor.
+ */
   const handleRegister = async () => {
     const validationError = validateForm(registerData, true);
     if (validationError) {

@@ -8,6 +8,18 @@ interface DrawConfirmModalProps {
   playerName?: string; // Nombre del jugador que solicita el empate (opcional)
 }
 
+/**
+ * Modal de confirmación que notifica a un jugador que su rival ha solicitado
+ * terminar la partida en tablas. Presenta las opciones de aceptar o rechazar
+ * la propuesta. Si ambos jugadores aceptan, la partida finaliza en empate;
+ * si se rechaza, la partida continúa con normalidad.
+ *
+ * @param {boolean} isOpen - Indica si el modal está visible.
+ * @param {() => void} onAccept - Callback invocado cuando el jugador acepta las tablas.
+ * @param {() => void} onReject - Callback invocado cuando el jugador rechaza las tablas.
+ * @param {string} [playerName="Tu oponente"] - Nombre del jugador que solicita
+ *   las tablas, mostrado en el contenido del modal.
+ */
 const DrawConfirmModal: React.FC<DrawConfirmModalProps> = ({
   isOpen,
   onAccept,
@@ -17,6 +29,12 @@ const DrawConfirmModal: React.FC<DrawConfirmModalProps> = ({
   const [isUnrolling, setIsUnrolling] = useState(false);
   const [showContent, setShowContent] = useState(false);
 
+  /**
+   * Efecto que controla la animación de despliegue del pergamino en función
+   * del estado de visibilidad del modal. Al abrirse, activa la animación de
+   * despliegue y retrasa 1200 ms la aparición del contenido interior para
+   * sincronizarla con la animación. Al cerrarse, restablece ambos estados.
+   */
   useEffect(() => {
     if (isOpen) {
       setIsUnrolling(true);

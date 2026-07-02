@@ -1,19 +1,27 @@
 import { motion } from "framer-motion";
 import { useModalStore } from "../../store/ModalStore";
 
+/**
+ * Modal animado que notifica a ambos jugadores el inicio de una batalla.
+ * Muestra el texto "Battle Started!" con una animación de entrada y salida basada
+ * en Framer Motion. Al completarse la animación, invoca toggleBattleModal para
+ * ocultar el modal y dar paso al primer turno del defensor.
+ *
+ * No recibe props. Gestiona su visibilidad a través de ModalStore.
+ */
 export function BattleModal() {
   const [toggleBattleModal] = useModalStore((state) => [state.toggleBattleModal]);
 
   return (
     <div className="fixed inset-0 flex items-center justify-center" style={{ zIndex: 53 }}>
       <motion.div
-        animate={{ 
-          opacity: [0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0], 
-          scaleY: [1, 1, 1, 1, 1, 1, 0.9, 0.8, 0.7, 0.6, 0.0], 
-          scaleX: [0, 0, 1, 1, 1, 1, 1, 1.1, 1.2, 1.3] 
+        animate={{
+          opacity: [0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0],
+          scaleY: [1, 1, 1, 1, 1, 1, 0.9, 0.8, 0.7, 0.6, 0.0],
+          scaleX: [0, 0, 1, 1, 1, 1, 1, 1.1, 1.2, 1.3]
         }}
-        transition={{ 
-          duration: 4, 
+        transition={{
+          duration: 4,
           times: [0.0, 0.5, 0.55, 0.6, 0.65, 0.7, 0.75, 0.8, 0.85, 0.9, 1.0],
           delay: 0
         }}
@@ -26,13 +34,13 @@ export function BattleModal() {
           padding: '24px 0'  // py-6 → valor fijo
         }}
       >
-        <motion.h2 
-          animate={{ 
-            opacity: [0, 0, 0.5, 1, 1, 1, 1, 1, 1, 1, 0], 
-            scale: [0.8, 0.8, 0.9, 1, 1, 1, 1.1, 1.2, 1.3, 1.4, 1.5] 
+        <motion.h2
+          animate={{
+            opacity: [0, 0, 0.5, 1, 1, 1, 1, 1, 1, 1, 0],
+            scale: [0.8, 0.8, 0.9, 1, 1, 1, 1.1, 1.2, 1.3, 1.4, 1.5]
           }}
-          transition={{ 
-            duration: 4, 
+          transition={{
+            duration: 4,
             times: [0.0, 0.5, 0.55, 0.6, 0.65, 0.7, 0.75, 0.8, 0.85, 0.9, 1.0],
             delay: 0
           }}

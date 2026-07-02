@@ -1,5 +1,16 @@
 import { CardType, CardInfo } from "../@types/Card";
 
+/**
+ * Definición completa del mazo de cartas de Cazahadas.
+ * Contiene todas las cartas disponibles organizadas por tipo: cartas de captura,
+ * cartas mágicas y cartas defensivas. Las cartas mágicas incluyen una función
+ * operation que define su efecto sobre la variable X, y las cartas defensivas
+ * incluyen una función defenseCondition que evalúa si el hada queda protegida
+ * al finalizar la batalla. Este fichero es la única fuente de verdad del mazo
+ * y es referenciado tanto por NeoHandStore como por HydrateCard.
+ */
+
+/** Cartas de captura. Permiten iniciar un intento de captura sobre un hada disponible. */
 const catchCard1: CardInfo = {
   name: "Catch",
   type: CardType.CATCH,
@@ -14,6 +25,7 @@ const catchCard2: CardInfo = {
   image: "/cartasPNG/Hatrapahadas.jpg"
 };
 
+/** Cartas mágicas. Cada una aplica una operación matemática sobre la variable X. */
 const magicCard1: CardInfo = {
   name: "+=1",
   type: CardType.MAGIC,
@@ -169,6 +181,7 @@ const magicCard15: CardInfo = {
   image: "/cartasPNG/bucle4.jpg"
 };
 
+/** Cartas defensivas. Cada una establece una condición lógica que protege el hada si se cumple al finalizar la batalla. */
 const shieldCard1: CardInfo = {
   name: "x>=0",
   type: CardType.SHIELD,

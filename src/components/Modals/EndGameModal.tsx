@@ -7,6 +7,19 @@ import explosion0 from "../../assets/sounds/explosion0.mp3";
 import explosion1 from "../../assets/sounds/explosion1.mp3";
 import explosion2 from "../../assets/sounds/explosion2.mp3";
 
+/**
+ * Modal de fin de partida que muestra el resultado final al jugador.
+ * Renderiza uno de tres estados posibles en función del resultado:
+ * victoria, derrota o empate. En caso de victoria, muestra una animación
+ * de fuegos artificiales con efectos de sonido mediante la librería
+ * Fireworks. El resultado se determina cruzando el rol del jugador local
+ * (amIP1) con el valor del resultado almacenado en GameStore.
+ *
+ * @param {boolean} amIP1 - Indica si el jugador local es el Jugador 1.
+ * @param {Result} winner - Resultado de la partida, obtenido de GameStore.
+ *   Los valores posibles son Result.PLAYER1WIN, Result.PLAYER2WIN y Result.DRAW.
+ */
+
 export function EndGameModal({ amIP1, winner }: { amIP1: boolean, winner: Result }) {
 
   const ref = useRef<FireworksHandlers>(null)

@@ -5,6 +5,16 @@ import homeBackground from '../../assets/images/fondo.png';
 import useBackgroundStore from "../../store/BackgroundStore";
 import { useAuthStore } from '../../store/LoginStore';
 
+/**
+ * Página de inicio de la aplicación.
+ * Presenta las opciones de crear una nueva partida o unirse a una existente
+ * mediante un modal con campo de texto para introducir el código de sala.
+ * Gestiona la conexión Socket.IO y los eventos de respuesta del servidor
+ * para validar la sala antes de navegar a la vista de juego.
+ *
+ * No recibe props. Obtiene el estado de sesión de LoginStore y el fondo
+ * de BackgroundStore.
+ */
 export default function Home() {
   const navigate = useNavigate()
   const [playerName, setPlayerName] = useState<string>('')
@@ -14,6 +24,14 @@ export default function Home() {
   const [logedUser] = useAuthStore((state) => [state.logedUser]);
   const [showJoinModal, setShowJoinModal] = useState(false);
 
+  /**
+   * Efecto de registro de listeners Socket.IO para la fase de unión a partida.
+   * Registra handlers para los eventos "game-busy" (sala completa),
+   * "game-not-found" (código inválido) y "game-found" (sala encontrada).
+   * Ante "game-found", navega a la ruta de juego y emite "join-game" con el
+   * nombre del jugador. Si hay sesión activa, usa el nombre de usuario
+   * autenticado. Limpia los listeners al desmontar el componente.
+   */
   useEffect(() => {
     socket.on('game-busy', () => {
       setErrorMessage('Esta sala ya está completa')
@@ -44,6 +62,13 @@ export default function Home() {
     }
   }, [])
 
+  /**
+   * Genera un identificador UUID v4 compatible con todos los navegadores
+   * mediante la API Web Crypto. Utiliza crypto.getRandomValues para garantizar
+   * aleatoriedad criptográficamente segura sin dependencias externas.
+   *
+   * @returns {string} UUID v4 en formato estándar xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx.
+   */
   function generateUUID() {
     return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
       const r = (crypto.getRandomValues(new Uint8Array(1))[0] % 16) | 0;
@@ -51,6 +76,14 @@ export default function Home() {
     });
   }
 
+  /**
+   * Gestiona la creación de una nueva partida.
+   * Genera un UUID como identificador de sala, navega a la ruta de juego,
+   * establece el fondo de pantalla, conecta el socket y emite el evento
+   * "start-game-info" al servidor con el nombre del jugador y el código de sala.
+   * Si hay sesión activa, usa el nombre de usuario autenticado como nombre
+   * de jugador.
+   */
   const handleStartGame = () => {
     if (logedUser) {
       setPlayerName(logedUser)
@@ -65,6 +98,12 @@ export default function Home() {
     })
   }
 
+  /**
+   * Gestiona el intento de unión a una partida existente.
+   * Conecta el socket y emite el evento "attempt-to-join-game" al servidor
+   * con el código de sala introducido por el usuario. La respuesta del servidor
+   * se procesa en los listeners registrados en el useEffect de inicialización.
+   */
   const handleJoinGame = () => {
     socket.connect()
     socket.emit('attempt-to-join-game', {
@@ -72,6 +111,12 @@ export default function Home() {
     })
   }
 
+  /**
+   * Actualiza el estado local gameId con el valor introducido en el campo
+   * de texto del modal de unión, eliminando espacios en blanco en los extremos.
+   *
+   * @param {React.ChangeEvent<HTMLInputElement>} e - Evento de cambio del input.
+   */
   const handleChangeGameIdInput = (e: React.ChangeEvent<HTMLInputElement>) => {
     setGameId(e.target.value.trim())
   }

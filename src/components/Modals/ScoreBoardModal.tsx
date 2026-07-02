@@ -10,6 +10,20 @@ interface ScoreboardModalProps {
   }>;
 }
 
+/**
+ * Modal que muestra el ranking global de jugadores ordenado por número
+ * de hadas capturadas. Incluye un efecto visual de glitch aleatorio que
+ * se activa con una probabilidad del 30% cada 3 segundos. Los tres primeros
+ * puestos reciben iconos y colores diferenciados. El modal gestiona
+ * internamente si la animación de entrada ya se ha ejecutado para evitar
+ * repetirla al reabrirse.
+ *
+ * @param {boolean} isOpen - Indica si el modal está visible.
+ * @param {() => void} onClose - Callback invocado al cerrar el modal.
+ * @param {Array<{username: string, score: number}>} [scores] - Lista de
+ *   jugadores con sus puntuaciones, obtenida del endpoint GET /get-scores
+ *   del proxy FastAPI.
+ */
 const ScoreboardModal: React.FC<ScoreboardModalProps> = ({
   isOpen,
   onClose,
@@ -19,13 +33,24 @@ const ScoreboardModal: React.FC<ScoreboardModalProps> = ({
   const [showContent, setShowContent] = useState(false);
   const [glitchEffect, setGlitchEffect] = useState(false);
 
-  // Procesar scores para añadir rankings automáticamente
+  /**
+   * Procesa la lista de puntuaciones recibida añadiendo el número de posición
+   * en el ranking a cada entrada. La fecha se establece como la fecha actual
+   * en formato ISO ya que el backend no almacena la fecha de la última partida.
+   */
   const processedScores = scores?.map((score, index) => ({
     ...score,
     rank: index + 1,
     date: new Date().toISOString().split('T')[0] // Fecha actual por defecto
   }));
 
+  /**
+   * Efecto que gestiona la animación de entrada y el efecto glitch del modal.
+   * En la primera apertura, activa la animación e inicia el intervalo de glitch
+   * tras 800 ms. En aperturas posteriores, muestra el contenido directamente
+   * sin repetir la animación. Al cerrarse, restablece todos los estados visuales.
+   * El intervalo de glitch se limpia al desmontar el componente o al cerrar el modal.
+   */
   useEffect(() => {
     if (isOpen && !hasAnimated) {
       setHasAnimated(true);
@@ -55,6 +80,15 @@ const ScoreboardModal: React.FC<ScoreboardModalProps> = ({
     }
   }, [isOpen, hasAnimated]);
 
+  /**
+   * Devuelve el icono correspondiente a la posición en el ranking.
+   * Las tres primeras posiciones reciben iconos diferenciados: Corona para el
+   * primero, Medalla para el segundo y Trofeo para el tercero. El resto de
+   * posiciones reciben un icono de estrella.
+   *
+   * @param {number} rank - Posición en el ranking, comenzando en 1.
+   * @returns {JSX.Element} Componente de icono de Lucide React con estilos aplicados.
+   */
   const getRankIcon = (rank: number) => {
     switch (rank) {
       case 1: return <Crown className="w-6 h-6 text-yellow-300" />;
@@ -64,6 +98,15 @@ const ScoreboardModal: React.FC<ScoreboardModalProps> = ({
     }
   };
 
+  /**
+   * Devuelve las clases CSS de gradiente y color de texto correspondientes
+   * a la posición en el ranking. Las tres primeras posiciones reciben
+   * gradientes diferenciados en dorado, plateado y bronce respectivamente.
+   * El resto de posiciones reciben un gradiente azul por defecto.
+   *
+   * @param {number} rank - Posición en el ranking, comenzando en 1.
+   * @returns {string} Cadena de clases Tailwind CSS para el gradiente y color de texto.
+   */
   const getRankColor = (rank: number) => {
     switch (rank) {
       case 1: return "from-yellow-400 via-yellow-300 to-yellow-500 text-yellow-900";

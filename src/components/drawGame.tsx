@@ -4,6 +4,16 @@ import { AnimatePresence, motion } from 'framer-motion'
 import useTurnStore from "../store/TurnStore"
 import { useParams } from "react-router-dom"
 
+/**
+ * Componente que muestra el botón para solicitar tablas al rival.
+ * El botón solo es visible cuando es el turno del jugador local, la partida
+ * no ha finalizado, y no hay ningún modal de batalla o de tablas activo.
+ * Al pulsarlo, emite el evento Socket.IO "request-draw" al servidor, que
+ * notifica al rival mediante el evento "request-draw-player".
+ *
+ * No recibe props. Obtiene el estado del juego de GameStore y TurnStore,
+ * y el identificador de sala de los parámetros de la URL.
+ */
 export default function RequestDraw() {
 
   const [showDrawModal, showBattleModal] = useTurnStore((state) => [state.showDrawModal, state.showBattleModal])
@@ -12,6 +22,11 @@ export default function RequestDraw() {
 
   const { id: gameId } = useParams<{ id: string }>()
 
+  /**
+   * Emite al servidor la solicitud de tablas del jugador local.
+   * Envía el identificador de sala y la identidad del jugador mediante
+   * el evento Socket.IO "request-draw".
+   */
   function handleRequestDraw() {
     socket.emit('request-draw', { gameId, amIP1 })
   }

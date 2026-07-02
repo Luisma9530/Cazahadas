@@ -6,10 +6,25 @@ interface GameRulesModalProps {
   onClose: () => void;
 }
 
+/**
+ * Modal que muestra las reglas completas del juego al jugador.
+ * Puede consultarse en cualquier momento durante la partida sin interrumpir
+ * el flujo de juego ni el turno activo. Presenta una animación de despliegue
+ * de pergamino al abrirse y permite cerrarse mediante el callback onClose.
+ *
+ * @param {boolean} isOpen - Indica si el modal está visible.
+ * @param {() => void} onClose - Callback invocado al cerrar el modal.
+ */
 const GameRulesModal: React.FC<GameRulesModalProps> = ({ isOpen, onClose }) => {
   const [isUnrolling, setIsUnrolling] = useState(false);
   const [showContent, setShowContent] = useState(false);
 
+  /**
+   * Efecto que controla la animación de despliegue del pergamino en función
+   * del estado de visibilidad del modal. Al abrirse, activa la animación de
+   * despliegue y retrasa 1200 ms la aparición del contenido interior para
+   * sincronizarla con la animación. Al cerrarse, restablece ambos estados.
+   */
   useEffect(() => {
     if (isOpen) {
       setIsUnrolling(true);

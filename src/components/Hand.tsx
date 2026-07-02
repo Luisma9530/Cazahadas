@@ -14,6 +14,17 @@ type Hand = {
 const flickAudio = new Audio(flickSound)
 const hoverAudio = new Audio(hoverSound)
 
+/**
+ * Componente que representa la mano de cartas del jugador local.
+ * Muestra las cartas en disposición de abanico con animaciones de entrada,
+ * salida y hover basadas en Framer Motion. Gestiona la selección de cartas
+ * mediante CardStore y reproduce efectos de sonido al seleccionar y al pasar
+ * el cursor sobre una carta. Las cartas seleccionadas se emiten al servidor
+ * mediante el evento Socket.IO "selected-cards" para mantener la sincronización.
+ *
+ * No recibe props. Obtiene las cartas de NeoHandStore y el estado de selección
+ * de CardStore.
+ */
 export default function Hand() {
   const [playerCards] = useNeoHandStore((state) => [
     state.playerCards
@@ -27,6 +38,14 @@ export default function Hand() {
     state.setHoveredCard
   ])
 
+  /**
+   * Gestiona la selección o deselección de una carta al hacer clic sobre ella.
+   * Alterna el estado de selección en CardStore, reproduce el efecto de sonido
+   * de volteo de carta y emite el estado actualizado de las cartas seleccionadas
+   * al servidor mediante el evento "selected-cards".
+   *
+   * @param {CardUnity} card - Carta sobre la que se ha hecho clic.
+   */
   const handleCardClick = (card: CardUnity) => {
     toggleCardSelection(card)
 
@@ -41,6 +60,14 @@ export default function Hand() {
     socket.emit("selected-cards", { cards: updatedSelectedCards });
   }
 
+  /**
+   * Gestiona el inicio del hover sobre una carta.
+   * Establece la carta como carta sobre la que se encuentra el cursor en CardStore
+   * y reproduce el efecto de sonido de hover, siempre que la carta no esté
+   * previamente seleccionada.
+   *
+   * @param {CardUnity} card - Carta sobre la que se ha iniciado el hover.
+   */
   const handleHoverStart = (card: CardUnity) => {
     if (!isCardSelected(card)) {
       setHoveredCard(card)

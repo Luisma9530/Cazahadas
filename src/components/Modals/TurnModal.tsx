@@ -2,6 +2,16 @@ import { motion } from "framer-motion";
 import { useModalStore } from "../../store/ModalStore";
 import useTurnStore from "../../store/TurnStore";
 
+/**
+ * Modal animado que notifica a cada jugador si es su turno o el del rival.
+ * Muestra "Your Turn" en verde o "Opponent's Turn" en rojo según el valor
+ * de isMyTurn en TurnStore. La animación de entrada y salida tiene una
+ * duración de 2 segundos, tras los cuales se invoca toggleTurnModal para
+ * ocultar el modal y permitir que el jugador actúe.
+ *
+ * No recibe props. Gestiona su visibilidad a través de ModalStore
+ * y obtiene el estado del turno de TurnStore.
+ */
 export function TurnModal() {
   const [toggleTurnModal] = useModalStore((state) => [state.toggleTurnModal]);
   const [isMyTurn] = useTurnStore((state) => [state.isMyTurn, state.isMyFirstTurn, state.setIsMyFirstTurn])
