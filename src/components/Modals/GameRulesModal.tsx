@@ -174,20 +174,20 @@ const GameRulesModal: React.FC<GameRulesModalProps> = ({ isOpen, onClose }) => {
 
                       <div className="flex items-start gap-3">
                         <span className="text-amber-600 font-bold">2</span>
-                        <p>Se forma el <span className="font-semibold">tablero</span> de 3 filas x 4 columnas:</p>
+                        <p>Se forma el <span className="font-semibold">tablero</span>:</p>
                       </div>
                       <div className="ml-6 space-y-2">
                         <div className="flex items-start gap-3">
                           <span className="text-amber-600 font-bold">•</span>
-                          <p><span className="font-semibold">Fila superior:</span> Defensas, Hadas capturadas, Descartes, Zona de magias jugadas.</p>
+                          <p><span className="font-semibold">Fila superior:</span> Hadas capturadas por el rival y Defensas del rival.</p>
                         </div>
                         <div className="flex items-start gap-3">
                           <span className="text-amber-600 font-bold">•</span>
-                          <p><span className="font-semibold">Fila central:</span> 3 casillas con hadas y la casilla de la variable X.</p>
+                          <p><span className="font-semibold">Fila central:</span> 3 casillas con hadas, la casilla de la variable X y zona de magias jugadas.</p>
                         </div>
                         <div className="flex items-start gap-3">
                           <span className="text-amber-600 font-bold">•</span>
-                          <p><span className="font-semibold">Fila inferior:</span> Defensas, Hadas capturadas, Descartes, Zona de magias jugadas.</p>
+                          <p><span className="font-semibold">Fila inferior:</span> Hadas capturadas por el jugador, Defensas del jugador y zona de Descartes.</p>
                         </div>
                       </div>
 
@@ -219,7 +219,7 @@ const GameRulesModal: React.FC<GameRulesModalProps> = ({ isOpen, onClose }) => {
                         </div>
                         <div className="flex items-start gap-2">
                           <span className="text-amber-600">✨</span>
-                          <p><span className="font-semibold">Zona de Magias:</span> Donde se colocan las cartas Magic.</p>
+                          <p><span className="font-semibold">Zona de Magias:</span> Donde se colocan las cartas de Magia.</p>
                         </div>
                         <div className="flex items-start gap-2">
                           <span className="text-amber-600">🧚</span>
@@ -227,19 +227,19 @@ const GameRulesModal: React.FC<GameRulesModalProps> = ({ isOpen, onClose }) => {
                         </div>
                         <div className="flex items-start gap-2">
                           <span className="text-amber-600">❌</span>
-                          <p><span className="font-semibold">Variable X:</span> Valor numérico modificable con Magic.</p>
+                          <p><span className="font-semibold">Variable X:</span> Valor numérico modificable con Magias.</p>
                         </div>
                         <div className="flex items-start gap-2">
                           <span className="text-amber-600">🎯</span>
-                          <p><span className="font-semibold">Cartas Catch:</span> Para intentar capturar hadas.</p>
+                          <p><span className="font-semibold">Cartas de Captura:</span> Para intentar capturar hadas.</p>
                         </div>
                         <div className="flex items-start gap-2">
                           <span className="text-amber-600">🔮</span>
-                          <p><span className="font-semibold">Cartas Magic:</span> Modifican el valor de X.</p>
+                          <p><span className="font-semibold">Cartas de Magia:</span> Modifican el valor de X.</p>
                         </div>
                         <div className="flex items-start gap-2">
                           <span className="text-amber-600">🛡️</span>
-                          <p><span className="font-semibold">Cartas Shield:</span> Evitan capturas adversarias.</p>
+                          <p><span className="font-semibold">Cartas de Defensa:</span> Evitan capturas adversarias.</p>
                         </div>
                       </div>
                     </div>
@@ -254,11 +254,11 @@ const GameRulesModal: React.FC<GameRulesModalProps> = ({ isOpen, onClose }) => {
                         </div>
                         <div className="flex items-start gap-3">
                           <span className="text-amber-600 text-lg">🔄</span>
-                          <p>Cada turno <span className="font-semibold">jugará una carta</span>.</p>
+                          <p>Cada turno <span className="font-semibold">jugará una carta o descartará</span> tantas como quiera.</p>
                         </div>
                         <div className="flex items-start gap-3">
                           <span className="text-amber-600 text-lg">📤</span>
-                          <p>Al comienzo del siguiente turno <span className="font-semibold">robará una carta</span>, a menos que se encuentre en una <span className="font-semibold">batalla</span>.</p>
+                          <p>Al comienzo del siguiente turno <span className="font-semibold">robarán cartas</span> hasta llegar a 7 en la mano, a menos que se encuentre en una <span className="font-semibold">batalla</span>.</p>
                         </div>
 
                         <div className="bg-amber-50 p-4 rounded-lg border border-amber-200">
@@ -274,10 +274,10 @@ const GameRulesModal: React.FC<GameRulesModalProps> = ({ isOpen, onClose }) => {
                         <div className="bg-amber-50 p-4 rounded-lg border border-amber-200">
                           <h4 className="font-bold text-amber-800 mb-2">🎯 Durante la batalla:</h4>
                           <div className="space-y-2 text-sm">
-                            <p>• El jugador que ha colocado la carta Catch deberá usar sus cartas de magia para que el valor de <span className="font-semibold">X</span> cumpla con la <span className="font-semibold">condición de captura</span>.</p>
-                            <p>• La condición de captura la impondrá el jugador que <span className="font-semibold">NO</span> ha usado la carta Catch, utilizando la <span className="font-semibold">última carta</span> situada en la casilla de defensa.</p>
+                            <p>• El jugador que ha colocado la carta de Captura deberá usar sus cartas de magia para que el valor de <span className="font-semibold">X</span> cumpla con la <span className="font-semibold">condición de captura</span>.</p>
+                            <p>• La condición de captura la impondrá el jugador que <span className="font-semibold">NO</span> ha usado la carta de Captura, utilizando la carta situada en la casilla de defensa.</p>
                             <p>• El jugador que defiende también podrá <span className="font-semibold">modificar el valor de X</span> durante la batalla.</p>
-                            <p>• Fuera de la batalla <span className="font-semibold">no se puede usar magia</span> para modificar <span className="font-semibold">X</span>.</p>
+                            <p>• Fuera de la batalla <span className="font-semibold">no se puede usar magia</span> para modificar <span className="font-semibold">X</span> ni colocar <span className="font-semibold">ninguna carta de defensa</span>.</p>
                           </div>
                         </div>
                       </div>
@@ -298,7 +298,7 @@ const GameRulesModal: React.FC<GameRulesModalProps> = ({ isOpen, onClose }) => {
                       <div className="space-y-2">
                         <div className="flex items-start gap-3">
                           <span className="text-amber-600">⚖️</span>
-                          <p><span className="font-semibold">Equilibra tu X:</span> Ajusta la variable X para preparar capturas clave.</p>
+                          <p><span className="font-semibold">Equilibra tu X:</span> Ajusta la variable X guardando cartas que te permitan aumentar o disminuir su valor en la batalla.</p>
                         </div>
                         <div className="flex items-start gap-3">
                           <span className="text-amber-600">🎯</span>
@@ -317,6 +317,13 @@ const GameRulesModal: React.FC<GameRulesModalProps> = ({ isOpen, onClose }) => {
                         ¡Que empiece la caza de hadas! ¡Buena suerte y que captures muchas hadas!
                       </p>
                     </div>
+                  </div>
+
+                  {/* Acreditación */}
+                  <div className="flex flex-col items-center gap-1 mt-6 text-amber-700 text-sm font-serif opacity-75">
+                    <p>Desarrollado por <span className="font-semibold">Luis Manuel Solares García</span></p>
+                    <p>Basado en el juego original de <span className="font-semibold">Enol Junquera Álvarez</span></p>
+                    <p>Universidad de Oviedo · 2026</p>
                   </div>
 
                   {/* Ornamento inferior */}

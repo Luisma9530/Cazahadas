@@ -80,7 +80,6 @@ const useBoardStore = create<BoardStore>((set, get) => ({
         return tile
       })
     )
-    console.log('Board after clearing decks and magic:', updatedBoard)
     set({ board: updatedBoard })
   },
 

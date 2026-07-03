@@ -120,7 +120,6 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
    */
   async function sendCapturedFairies() {
     if (isAddingScore) {
-      console.log("⏳ Ya hay una petición en curso, ignorando...");
       return;
     }
 
@@ -133,7 +132,6 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
           "Authorization": `Bearer ${token}`,
         },
       });
-      console.log("Add-score response:", response);
 
       if (!response.ok) {
         console.error("❌ Error al guardar puntos en la base de datos:", await response.json());
@@ -162,17 +160,12 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
    * @param {number} colIndex - Índice de columna de la casilla.
    */
   function handleCellClick(position: Tile, rowIndex: number, colIndex: number) {
-    console.log(tiles)
-    console.log("Is battle:", isBattle);
-    console.log("Im player 1:", amIP1);
-    console.log("Is first turn battle:", isMyFirstTurnBattle);
     if (!selectedCard || !canAddCardToPosition(selectedCard, position, rowIndex)) return;
     // Lógica para colocar la carta. Se asume que mapPawns transforma la celda y actualiza el estado.
     const newTiles = mapPawns(selectedCard, rowIndex, colIndex, tiles, amIP1);
     for (const card of selectedCard) {
       placeCard(card);
     }
-    console.log(newTiles)
     setTiles(newTiles);
     resetSelectedCard();
     socket.emit("place-card", { tiles: newTiles, gameId: gameId, isBattle: isBattle, selectedCard: selectedCard });
@@ -320,8 +313,6 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
     const handleBattleStart = (data: { amIP1: boolean }) => {
       setIsBattle(true);
       setIsMyFirstTurnBattle(true);
-      console.log("Battle started");
-      console.log("amIP1:", data.amIP1, " | I am:", amIP1Ref.current);
       if (data.amIP1 !== amIP1Ref.current) {
         setShowBattleModal(true)
       } else {
@@ -349,7 +340,6 @@ export default function Board({ amIP1 }: { amIP1: boolean }) {
     };
 
     //Remover TODOS los listeners anteriores antes de registrar
-    console.log("Limpiando todos los listeners anteriores");
     socket.off('update-tiles');
     socket.off('request-draw-player');
     socket.off('start-battle-player');

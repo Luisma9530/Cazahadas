@@ -221,11 +221,9 @@ export default function Game() {
       if (data?.reason === 'draw-request') {
         setGameResult(Result.DRAW)
       }
-      console.log("Player Result:", gameResult);
 
       if (data?.playerDisconnected) {
         setPlayerDisconnected(true)
-        console.log("El oponente se ha desconectado.");
 
         // Solo establecer victoria por desconexión si no hay resultado previo
         if (gameResult === Result.NONE) {
@@ -462,11 +460,9 @@ export default function Game() {
           <BattleConfirmModal
             isOpen={showBattleModal}
             onAccept={() => {
-              console.log("Battle confirmed");
               setShowBattleModal(false);
             }}
             onReject={() => {
-              console.log("Battle rejected");
               socket.emit("end-battle", { gameId: gameId, tiles: board });
               clearDeckAndMagic();
               setShowBattleModal(false);

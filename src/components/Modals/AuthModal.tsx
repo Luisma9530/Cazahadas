@@ -117,7 +117,6 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
         alert("✅ Login exitoso");
         setLogedUser(data.username);
         setToken(data.access_token);
-        console.log("Token recibido:", data.access_token);
         onClose();
       } else {
         alert("❌ Error de login: " + data.detail);

@@ -76,7 +76,6 @@ let currentGames = {} as {
  * y registra todos los listeners de eventos del juego para ese socket.
  */
 io.on("connection", (socket) => {
-  console.log("A Player with id", socket.id, "connected");
 
   /**
    * Manejador del evento "skip-turn".
@@ -211,7 +210,6 @@ io.on("connection", (socket) => {
   socket.on("place-card", (data: { tiles: Tile[][]; gameId: string, isBattle: boolean, selectedCard: CardUnity[] }) => {
     // VALIDACIÓN: Verificar que es el turno de este jugador
     if (currentGames[data.gameId].currentTurnPlayerId !== socket.id) {
-      console.log("Place-card rejected: Not your turn! Socket:", socket.id, "Current turn:", currentGames[data.gameId].currentTurnPlayerId);
       return;
     }
 
@@ -315,7 +313,6 @@ io.on("connection", (socket) => {
    * para declararlo ganador por abandono.
    */
   socket.on("disconnect", () => {
-    console.log("A Player with id", socket.id, "disconnected");
     const gameIdForDcedPlayer = Object.keys(currentGames).find((gameId) =>
       currentGames[gameId].playerIds.includes(socket.id)
     );
@@ -392,7 +389,6 @@ io.on("connection", (socket) => {
    * clientes con los nombres de los jugadores para iniciar la partida.
    */
   socket.on("join-game", (data: { playerName: string; gameId: string }) => {
-    console.log("Player", data.playerName, "is trying to join game", data.gameId);
     if (currentGames[data.gameId]["playerIds"].includes(socket.id)) {
       currentGames[data.gameId].playerNames.push(data.playerName);
       currentGames[data.gameId].currentTurnPlayerId = currentGames[data.gameId].playerIds[0];
@@ -446,7 +442,6 @@ app.listen({ port: parseInt(process.env.PORT!) || 4000, host: '0.0.0.0' }, (err,
     console.error(err);
     process.exit(1);
   }
-  console.log(`Server listening at ${address}`);
 });
 
 /**

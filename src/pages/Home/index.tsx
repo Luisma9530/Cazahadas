@@ -47,7 +47,6 @@ export default function Home() {
       if (logedUser) {
         setPlayerName(logedUser)
       }
-      console.log('Joining game', data.gameIdFound)
       navigate(`/game/${data.gameIdFound}`)
       socket.emit('join-game', {
         playerName,
